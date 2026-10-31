@@ -2405,7 +2405,41 @@
           fishing: [16, 1.9],
           sail: [15, 1.8],
         };
-        const hullLen = (s) => HULL_NM[s.type] || HULL_NM.large;
+        /* The 3D view draws every ship HULL_MAG times its true size (SHIP_MAG there reads this), so hulls touch exactly where they visibly touch.
+                                       Set HULL_MAG = 1 for true-size contact (and SHIP_MAG follows, so the picture stays honest). */
+        const HULL_MAG = 3;
+        const hullLen = (s) => (HULL_NM[s.type] || HULL_NM.large) * HULL_MAG;
+        /* the barge a tug has in tow (position and size in the tug model's own units, measured behind its centre) */
+        const TOW = { tug: { at: 45, hl: 6, hw: 3 } };
+        const towUnit = (s) => hullLen(s) / HULL_MODEL[s.type][0];
+        const reach = (s) => {
+          const t = TOW[s.type];
+          return Math.max(hullLen(s) / 2, t ? (t.at + t.hl) * towUnit(s) : 0);
+        };
+        function hullPolys(s, x, y) {
+          const P = [hullPoly(s, x, y)],
+            t = TOW[s.type];
+          if (t) {
+            const u = towUnit(s),
+              c = rad(s.course),
+              fx = Math.sin(c),
+              fy = Math.cos(c),
+              rx = fy,
+              ry = -fx,
+              f1 = -(t.at - t.hl) * u,
+              f2 = -(t.at + t.hl) * u,
+              hw = t.hw * u;
+            P.push(
+              [
+                [hw, f1],
+                [hw, f2],
+                [-hw, f2],
+                [-hw, f1],
+              ].map(([a, f]) => [x + a * rx + f * fx, y + a * ry + f * fy]),
+            );
+          }
+          return P;
+        }
         const hullHalfBeam = (s) => {
           const m = HULL_MODEL[s.type] || HULL_MODEL.large;
           return (m[1] * hullLen(s)) / m[0];
@@ -2459,9 +2493,10 @@
 
         /* do vessels a and b touch with their centres at (ax,ay) and (bx,by)? */
         function hullsTouch(a, ax, ay, b, bx, by) {
-          if (Math.hypot(ax - bx, ay - by) > (hullLen(a) + hullLen(b)) / 2 + 1e-9)
-            return false; // too far apart for any overlap
-          return polysTouch(hullPoly(a, ax, ay), hullPoly(b, bx, by));
+          if (Math.hypot(ax - bx, ay - by) > reach(a) + reach(b) + 1e-9) return false; // too far apart for any overlap
+          const A = hullPolys(a, ax, ay),
+            B = hullPolys(b, bx, by);
+          return A.some((p) => B.some((q) => polysTouch(p, q)));
         }
 
         function checkColl() {
@@ -2795,6 +2830,7 @@
           SPDRATE,
           COLL,
           HULL_NM,
+          HULL_MAG,
           hullPoly,
           hullsTouch,
           get time() {
@@ -2921,8 +2957,8 @@
         };
         const REAL_NM = { large: 0.13, tug: 0.06, fishing: 0.04, sail: 0.015 };
         /* how much bigger than true size ships are drawn (1 = true size); the minimum on-screen length is SHIP_MIN_PX */
-        const SHIP_MAG = 3;
-        const SHIP_MIN_PX = 48;
+        const SHIP_MAG = (root.Sim && root.Sim.HULL_MAG) || 3;
+        const SHIP_MIN_PX = 80; // minimum on-screen length of the biggest type; smaller types get proportionally less (by the square root of their true length)
         const FOV = 40; // vertical field of view, degrees (bridge / chase widen it)
         const TDUR = 0.9; // view transition, seconds
         const BRIDGE_Y = 0.012; // bridge eye height, nm (about 22 m), before the size multiplier
@@ -3821,6 +3857,14 @@ void main(){
             vmWhiteLine: { color: "#ffffff", roughness: 0.4 },
             vmWood: { color: "#a8672f", roughness: 0.7 },
             vmSail: { color: "#f5f5f1", roughness: 0.9, metalness: 0 },
+            vmPilotOr: { color: "#f5a20f", roughness: 0.45 },
+            vmPilotDeck: { color: "#dfe3e5", roughness: 0.6 },
+            vmTeal: { color: "#2a9d8f", roughness: 0.6 },
+            vmAl: { color: "#cfd4d7", roughness: 0.35, metalness: 0.55 },
+            vmAlBot: { color: "#b3babe", roughness: 0.4, metalness: 0.55 },
+            vmWhiteDeck: { color: "#eef1f2", roughness: 0.6 },
+            vmCushion: { color: "#3d3d42", roughness: 0.9, metalness: 0 },
+            vmFloor: { color: "#7d8286", roughness: 0.8 },
             vmBgTop: { color: "#7b3b2e" },
             vmBgBot: { color: "#3f2a26", roughness: 0.8 },
             vmBgDeck: { color: "#6b6b66", roughness: 0.85 },
@@ -3870,13 +3914,13 @@ void main(){
             gapSize: 0.1,
           });
           /* hull-name decals: "ANGLO-EASTERN" with the gold logo */
-          const decal = (key, text, color, logo) => {
+          const decal = (key, text, color, logo, cw = 1024, ch = 128) => {
             const c = document.createElement("canvas");
-            c.width = 1024;
-            c.height = 128;
+            c.width = cw;
+            c.height = ch;
             const x = c.getContext("2d"),
-              hh = 128;
-            let tx = 512;
+              hh = ch;
+            let tx = cw / 2;
             if (logo) {
               const r = hh * 0.4,
                 cx = hh * 0.5 + 4,
@@ -3895,11 +3939,11 @@ void main(){
               x.beginPath();
               x.ellipse(cx, cy, r * 0.55, r, 0, 0, 6.2832);
               x.stroke();
-              tx = (1024 + hh) / 2;
+              tx = (cw + hh) / 2;
             }
             let fs = hh * 0.86;
             x.font = "bold " + fs + "px Arial, Helvetica, sans-serif";
-            const maxW = (1024 - (logo ? hh : 0)) * 0.95,
+            const maxW = (cw - (logo ? hh : 0)) * 0.95,
               tw = x.measureText(text).width;
             if (tw > maxW) fs *= maxW / tw;
             x.font = "bold " + Math.round(fs) + "px Arial, Helvetica, sans-serif";
@@ -3922,6 +3966,7 @@ void main(){
           decal("dcTug", "ANGLO EASTERN", "#ffffff", true);
           decal("dcFish", "ANGLO-EASTERN", "#ffffff", true);
           decal("dcYacht", "ANGLO-EASTERN", "#13294b", true);
+          decal("dcPilot", "PILOT", "#101010", false, 512, 224);
           const lc = document.createElement("canvas");
           lc.width = 128;
           lc.height = 128;
@@ -4094,9 +4139,12 @@ void main(){
           g.add(new THREE.Mesh(grid(S.map(ringRed)), o.bottom));
           g.add(new THREE.Mesh(grid(S.map((s) => s.blue)), o.top));
           g.add(new THREE.Mesh(grid(S.map((s) => s.blue.map(mir))), o.top));
-          g.add(
-            new THREE.Mesh(grid(S.map((s) => [mir(s.blue[1]), s.blue[1]])), o.deck),
-          );
+          (o.deckRanges || [[-1e9, 1e9]]).forEach(([za, zb]) => {
+            const rows = S.filter((s, i) => zAt(i / N) >= za && zAt(i / N) <= zb).map(
+              (s) => [mir(s.blue[1]), s.blue[1]],
+            );
+            if (rows.length > 1) g.add(new THREE.Mesh(grid(rows), o.deck));
+          });
           [0, N].forEach((i) => {
             const s = S[i],
               sp = s.blue[0],
@@ -5195,6 +5243,322 @@ void main(){
           }
           s.moorA.visible = cnd === "anchor";
           s.moorG.visible = cnd === "aground";
+        }
+
+        /* ---- activity vessels (pilot boat, supply ship, towed / pushed barge), built as real hulls ----------- */
+        function buildRigBarge(g, bl, hwHint) {
+          csMats();
+          const hw = Math.max(hwHint, bl / 5);
+          loftHull(g, {
+            L: bl,
+            W: hw,
+            H: 1.0,
+            D: 0.7,
+            rake: 0.4,
+            rakeLen: 0.08,
+            bowLen: 0.09,
+            bowPow: 0.5,
+            sternLen: 0.09,
+            sternTaper: 0.15,
+            flareBase: 0,
+            flare: 0.05,
+            flareLen: 0.2,
+            sheerRise: 0,
+            sheerLen: 0.2,
+            keelBow: 0.7,
+            keelStern: 0,
+            split: 0.5,
+            top: mats.vmBgTop,
+            bottom: mats.vmBgBot,
+            deck: mats.vmBgDeck,
+            rails: [0.22],
+          });
+          const cm = [mats.vmC0, mats.vmC1, mats.vmC2, mats.vmC3],
+            nb = Math.max(2, Math.floor((bl * 0.8) / 1.7)),
+            cw = (2 * hw * 0.8) / 3;
+          for (let c = -1; c <= 1; c++)
+            for (let b = 0; b < nb; b++) {
+              const n = 1 + ((b + c + 3) % 2);
+              for (let k = 0; k < n; k++)
+                g.add(
+                  box(
+                    cw * 0.94,
+                    0.55,
+                    1.6,
+                    c * cw,
+                    1.0 + 0.3 + k * 0.58,
+                    (b - (nb - 1) / 2) * 1.7,
+                    cm[(b * 2 + c + k + 4) % 4],
+                  ),
+                );
+            }
+        }
+        /* pilot boat (orange hull, white cabin with orange roof, black PILOT lettering) */
+        function buildPilotBoat(g, len, hw) {
+          csMats();
+          const hb = 0.55 + 0.035 * len,
+            ch = len * 0.16,
+            cl = len * 0.4,
+            cw = 2 * hw * 0.74,
+            zc = -len * 0.02;
+          loftHull(g, {
+            L: len,
+            W: hw,
+            H: hb,
+            D: 0.4,
+            N: 28,
+            rake: len * 0.05,
+            rakeLen: 0.2,
+            bowLen: 0.55,
+            bowPow: 0.8,
+            sternLen: 0.12,
+            sternTaper: 0.05,
+            flareBase: 0.02,
+            flare: 0.25,
+            flareLen: 0.55,
+            sheerRise: len * 0.02,
+            sheerLen: 0.35,
+            keelBow: 0.5,
+            keelStern: 0,
+            split: 0.3,
+            top: mats.vmPilotOr,
+            bottom: mats.vmTeal,
+            deck: mats.vmPilotDeck,
+            rails: [0.25, 0.5],
+            stripe: { y0: hb - 0.14, y1: hb - 0.03, mat: mats.csDark },
+          });
+          g.add(box(cw, ch, cl, 0, hb + ch / 2, zc, mats.csWhite)); // cabin
+          g.add(
+            winBox(cw * 0.9, ch * 0.42, 0.05, 0, hb + ch * 0.66, zc - cl / 2 - 0.01),
+          );
+          [-1, 1].forEach((sg) => {
+            g.add(
+              winBox(
+                0.05,
+                ch * 0.42,
+                cl * 0.8,
+                sg * (cw / 2 + 0.01),
+                hb + ch * 0.66,
+                zc,
+              ),
+            );
+            const pl = new THREE.Mesh(
+              new THREE.PlaneGeometry(ch * 0.36 * (512 / 224), ch * 0.36),
+              mats.dcPilot,
+            ); // PILOT
+            pl.position.set(sg * (cw / 2 + 0.03), hb + ch * 0.2, zc);
+            pl.rotation.y = sg > 0 ? Math.PI / 2 : -Math.PI / 2;
+            g.add(pl);
+          });
+          g.add(
+            box(cw + 0.12, 0.07, cl + 0.12, 0, hb + ch + 0.035, zc, mats.vmPilotOr),
+          ); // roof
+          g.add(
+            box(
+              cw * 0.45,
+              ch * 0.2,
+              cl * 0.22,
+              0,
+              hb + ch + 0.07 + ch * 0.1,
+              zc + cl * 0.18,
+              mats.csWhite,
+            ),
+          ); // radar housing
+          g.add(
+            cyl(
+              0.04,
+              len * 0.2,
+              0,
+              hb + ch + 0.07 + len * 0.1,
+              zc + cl * 0.3,
+              mats.csGrey,
+              6,
+            ),
+          ); // mast
+          g.add(
+            box(
+              0.22,
+              0.05,
+              0.05,
+              0,
+              hb + ch + 0.07 + len * 0.16,
+              zc + cl * 0.3,
+              mats.csGrey,
+            ),
+          );
+          g.add(
+            box(
+              0.14,
+              0.06,
+              0.06,
+              -0.08,
+              hb + ch + 0.07 + len * 0.2,
+              zc + cl * 0.3,
+              mats.vmC1,
+            ),
+          ); // red and green lights
+          g.add(
+            box(
+              0.14,
+              0.06,
+              0.06,
+              0.08,
+              hb + ch + 0.07 + len * 0.2,
+              zc + cl * 0.3,
+              mats.vmC3,
+            ),
+          );
+          [-1, 1].forEach((sg) =>
+            g.add(
+              ringObj(
+                0.15,
+                0.07,
+                mats.csDark,
+                sg * (hw * 1.04),
+                hb * 0.55,
+                len * 0.08,
+              ),
+            ),
+          ); // fenders
+        }
+        /* open aluminium launch for transfers: white foredeck, sunken cockpit, cushioned benches, steering console */
+        function buildTransferBoat(g, len, hw) {
+          csMats();
+          const hb = 0.55 + 0.03 * len,
+            fz = -len * 0.12; // top of the hull; end of the foredeck
+          loftHull(g, {
+            L: len,
+            W: hw,
+            H: hb,
+            D: 0.4,
+            N: 28,
+            rake: len * 0.04,
+            rakeLen: 0.2,
+            bowLen: 0.5,
+            bowPow: 0.75,
+            sternLen: 0.1,
+            sternTaper: 0.04,
+            flareBase: 0.02,
+            flare: 0.2,
+            flareLen: 0.5,
+            sheerRise: len * 0.015,
+            sheerLen: 0.35,
+            keelBow: 0.45,
+            keelStern: 0,
+            split: 0.3,
+            top: mats.vmAl,
+            bottom: mats.vmAlBot,
+            deck: mats.vmWhiteDeck,
+            rails: [0.06],
+            deckRanges: [
+              [-len, fz],
+              [len * 0.44, len],
+            ],
+          });
+          const fy = hb - 0.2; // cockpit floor
+          g.add(
+            box(
+              2 * hw * 0.72,
+              0.05,
+              len * 0.55,
+              0,
+              fy,
+              (fz + len * 0.44) / 2,
+              mats.vmFloor,
+            ),
+          );
+          g.add(
+            box(
+              2 * hw * 0.78,
+              0.32,
+              len * 0.1,
+              0,
+              fy + 0.18,
+              len * 0.37,
+              mats.vmCushion,
+            ),
+          ); // stern bench
+          g.add(
+            box(2 * hw * 0.78, 0.3, 0.1, 0, fy + 0.48, len * 0.42, mats.vmCushion),
+          );
+          [-1, 1].forEach((sg) => {
+            g.add(
+              box(
+                hw * 0.42,
+                0.3,
+                len * 0.26,
+                sg * hw * 0.56,
+                fy + 0.17,
+                len * 0.16,
+                mats.vmCushion,
+              ),
+            ); // side benches
+            g.add(
+              box(
+                0.1,
+                0.3,
+                len * 0.26,
+                sg * hw * 0.8,
+                fy + 0.45,
+                len * 0.16,
+                mats.vmCushion,
+              ),
+            );
+          });
+          g.add(
+            box(
+              hw * 0.5,
+              0.42,
+              len * 0.1,
+              hw * 0.4,
+              fy + 0.23,
+              -len * 0.04,
+              mats.vmCushion,
+            ),
+          ); // helm seat
+          g.add(
+            box(hw * 0.46, 0.34, 0.1, hw * 0.4, fy + 0.5, -len * 0.0, mats.vmCushion),
+          );
+          g.add(
+            box(
+              hw * 0.5,
+              0.4,
+              len * 0.1,
+              hw * 0.4,
+              fy + 0.22,
+              -len * 0.14,
+              mats.vmAl,
+            ),
+          ); // console
+          const wh = ringObj(
+            0.17,
+            0.025,
+            mats.csDark,
+            hw * 0.4,
+            fy + 0.52,
+            -len * 0.14 + 0.1,
+          ); // steering wheel
+          wh.rotation.x = -0.9;
+          g.add(wh);
+          g.add(
+            cyl(
+              0.025,
+              len * 0.16,
+              0,
+              hb + len * 0.08,
+              len / 2 - 0.12,
+              mats.csGrey,
+              6,
+            ),
+          ); // flag staff
+          g.add(
+            box(0.02, 0.18, 0.28, 0, hb + len * 0.15, len / 2 - 0.27, mats.vmRed),
+          );
+          [-1, 1].forEach((sg) =>
+            g.add(
+              box(0.1, 0.04, 0.05, sg * hw * 0.7, hb + 0.03, -len * 0.3, mats.csGrey),
+            ),
+          ); // cleats
         }
         function buildModel(type) {
           const [L, Wd] = MODEL_DIMS[type] || MODEL_DIMS.large,
@@ -6996,11 +7360,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               bz = st + L * 1.5 + bl / 2,
               bg = new THREE.Group(),
               tl = rLine(8);
-            bg.add(
-              rBox(M.barge, bw, 1.5, bl, 0, 0.55, 0),
-              rBox(M.white, bw * 0.5, 1.1, bl * 0.18, 0, 1.6, bl * 0.3),
-            );
+            buildRigBarge(bg, bl, bw / 2);
             flt.add(bg, tl);
+            if (type === "tug") bg.visible = tl.visible = false; // a tug already tows its own barge
             upd = (t) => {
               const sw = Math.sin(t * 0.5),
                 yaw = 0.14 * Math.sin(t * 0.5 + 0.6);
@@ -7023,13 +7385,15 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             const bl = L * 0.85,
               bw = Math.min(W * 1.9, W + 2.5),
               pz = -(L / 2 + bl / 2 - 0.8);
-            const barge = rBox(M.barge, bw, 1.6, bl, 0, 0.6, pz);
-            grp.add(barge, rBox(M.red, bw * 0.7, 1.2, bl * 0.55, 0, 1.9, pz));
+            const barge = new THREE.Group();
+            buildRigBarge(barge, bl, bw / 2);
+            barge.position.set(0, 0, pz);
+            grp.add(barge);
             [-1, 1].forEach((k) =>
               grp.add(rBox(M.dark, 0.8, 1.2, 1.2, k * W * 0.45, 1.0, -L / 2 + 0.6)),
             );
             upd = (t) => {
-              barge.position.y = 0.6 + 0.04 * Math.sin(t * 3);
+              barge.position.y = 0.04 * Math.sin(t * 3);
             };
           } else if (key === "dredging") {
             // suction pipe over the side and a brown sediment plume that spreads astern
@@ -7155,10 +7519,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             // pilot boat alongside to starboard, pilot ladder over the side
             const pb = new THREE.Group(),
               lad = rLine(2);
-            pb.add(
-              rBox(M.orange, W * 0.6, 0.8, L * 0.3, 0, 0.3, 0),
-              rBox(M.white, W * 0.42, 0.8, L * 0.11, 0, 1.1, -L * 0.02),
-            );
+            const pbHalf = Math.max(0.55, L * 0.3 * 0.17);
+            buildPilotBoat(pb, L * 0.3, pbHalf);
             flt.add(pb);
             grp.add(lad);
             const lp = lad.geometry.attributes.position;
@@ -7179,7 +7541,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               );
             upd = (t) => {
               pb.position.set(
-                W + W * 0.65 + 0.1 * W * Math.sin(t * 0.6),
+                W + pbHalf + 0.4 + 0.1 * W * Math.sin(t * 0.6),
                 0.1 * Math.sin(t * 1.8),
                 L * 0.1 + 0.15 * L * Math.sin(t * 0.35),
               );
@@ -7194,23 +7556,20 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
                 flt.add(l);
                 return l;
               });
-            sv.add(
-              rBox(M.supply, W * 0.9, 1.7, L * 0.75, 0, 0.6, 0),
-              rBox(M.white, W * 0.7, 1.8, L * 0.14, 0, 2.3, L * 0.22),
-              rBox(M.steel, 0.3, 3.2, 0.3, 0, 3.0, L * 0.22),
-            );
+            const svHalf = Math.max(0.6, L * 0.3 * 0.19);
+            buildTransferBoat(sv, L * 0.3, svHalf);
             const trol = rBox(M.red, 0.7, 0.7, 0.7, 0, 0, 0);
             flt.add(sv, trol);
             upd = (t) => {
-              const sx = W * 2.5 + 0.2 * Math.sin(t * 0.5),
+              const sx = W + svHalf + 0.9 + 0.2 * Math.sin(t * 0.5),
                 sz = -L * 0.05 + 0.06 * L * Math.sin(t * 0.3);
               sv.position.set(sx, 0.08 * Math.sin(t + 1), sz);
               sv.rotation.z = 0.03 * Math.sin(t * 0.9);
-              const zi = [-L * 0.15, 0, L * 0.15],
+              const zi = [-L * 0.07, 0, L * 0.07],
                 u = (t * 0.22) % 1;
               hoses.forEach((h, i) => {
                 const a = [W * 0.6, y0 + 2.2, zi[i]],
-                  b = [sx - W * 0.45, 2.7, sz + zi[i]],
+                  b = [sx - svHalf * 0.9, 1.3, sz + zi[i]],
                   sag = 1.2 + 0.4 * Math.sin(t * 0.8 + i);
                 rSag(h, a, b, sag);
                 if (i === 1)
@@ -7658,7 +8017,10 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             const L = MODEL_DIMS[type][0];
             return Math.max(
               (REAL_NM[type] * SHIP_MAG) / L,
-              (pxAt(x, y, z) * SHIP_MIN_PX) / L,
+              (pxAt(x, y, z) *
+                SHIP_MIN_PX *
+                Math.sqrt(REAL_NM[type] / REAL_NM.large)) /
+                L,
             );
           };
 
