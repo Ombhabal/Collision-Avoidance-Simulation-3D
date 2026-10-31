@@ -394,7 +394,7 @@
         display: none;
       }
       /* panel boxes must never be squashed by the flex column; overflow-x:auto otherwise
-                                 lets .box.scroll shrink to just its scrollbar when .side is height-limited */
+                                       lets .box.scroll shrink to just its scrollbar when .side is height-limited */
       .side > .box {
         flex-shrink: 0;
       }
@@ -824,13 +824,13 @@
         const mod = (a, n) => ((a % n) + n) % n;
         const cl = (v, a, b) => Math.max(a, Math.min(b, v));
         /* per view: turn (radians, free), tilt (radians, min / max), zoom quantity (smaller = closer) and its limits,
-                                   ys / ts = key direction signs, zref = value that reads as x1 */
+                                         ys / ts = key direction signs, zref = value that reads as x1 */
         const ACC = {
           orbit: {
             yaw: ["yaw"],
             pitch: ["pitch", -1.5, 1.5],
             zoom: ["d", 0.06, 90],
-            zref: 16,
+            zref: 10,
             ys: 1,
             ts: -1,
           },
@@ -1038,7 +1038,7 @@
     <script>
       /* ======== embedded COLREG data ======== */
       /* Embedded COLREG data. This is the built-in 9-state set (no lights or shapes: scene3d.js draws its own fallback
-                                       lights and shapes for these). To use your full colreg.json, replace the object below with its contents. */
+                                             lights and shapes for these). To use your full colreg.json, replace the object below with its contents. */
       window.COLREG_EMBEDDED = {
         states: [
           {
@@ -1203,22 +1203,22 @@
     <script>
       /* ======== colreg.js ======== */
       /* ===========================================================================
-                                       colreg.js  -  COLREG data layer (no DOM, no canvas, no Three.js)
-                                       Ported from colreg_2d_fixed.html, script block 1, with identical logic.
+                                             colreg.js  -  COLREG data layer (no DOM, no canvas, no Three.js)
+                                             Ported from colreg_2d_fixed.html, script block 1, with identical logic.
 
-                                       Global: COLREG   (also module.exports under Node)
+                                             Global: COLREG   (also module.exports under Node)
 
-                                       Load order in the page:  colreg.js  ->  sim.js  ->  ...
+                                             Load order in the page:  colreg.js  ->  sim.js  ->  ...
 
-                                       Moved over unchanged:   loadCOLREG (as COLREG.load), stateFor, stateLabel,
-                                                               stateForType, applyCOLREGState, lightColour,
-                                                               shapeText, colregInfo, COLREG_FALLBACK (9 states)
-                                       Extracted from syncT(): pickState / rebuildState  (the state filter that
-                                                               used to read the vc/vs/va/vt <select> values)
-                                                               configOf (what syncT used to put into those selects)
-                                       Extracted from drawJSONLights(): lightLayout (position maths only; the
-                                                               drawing now belongs to scene3d.js)
-                                       =========================================================================== */
+                                             Moved over unchanged:   loadCOLREG (as COLREG.load), stateFor, stateLabel,
+                                                                     stateForType, applyCOLREGState, lightColour,
+                                                                     shapeText, colregInfo, COLREG_FALLBACK (9 states)
+                                             Extracted from syncT(): pickState / rebuildState  (the state filter that
+                                                                     used to read the vc/vs/va/vt <select> values)
+                                                                     configOf (what syncT used to put into those selects)
+                                             Extracted from drawJSONLights(): lightLayout (position maths only; the
+                                                                     drawing now belongs to scene3d.js)
+                                             =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -1486,7 +1486,7 @@
         ];
 
         /* Was rebuildState()'s filter. vesselType is the simulator type key
-                                       (large | tug | fishing | sail). Returns the best state object or null. */
+                                             (large | tug | fishing | sail). Returns the best state object or null. */
         function pickState(vesselType, condition, special, activity) {
           const type = TYPE_MAP[vesselType] || "power_driven";
 
@@ -1564,8 +1564,8 @@
         }
 
         /* Was the body of rebuildState(): store the editor choices on the vessel and
-                                       pick its COLREG state. The caller passes what the four <select>s held.
-                                       NOTE (fix 2): when the vessel TYPE changes, pass activity = "normal_navigation". */
+                                             pick its COLREG state. The caller passes what the four <select>s held.
+                                             NOTE (fix 2): when the vessel TYPE changes, pass activity = "normal_navigation". */
         function rebuildState(s, condition, special, activity) {
           s.cond = condition;
           s.special = special;
@@ -1632,15 +1632,15 @@
         }
 
         /* ---- light layout (was the position maths of drawJSONLights) ----------
-                                       Returns null when the vessel's state has no light definitions (the renderer
-                                       then uses its built-in light model), otherwise an array of
-                                         { side, along, token, colours, names }
-                                       side    -1 = port, +1 = starboard, 0 = centre   (2D: x = -W, +W, 0)
-                                       along   fraction of hull length L, negative = towards the bow   (2D: y / L)
-                                       token   'top' | 'bottom' | 'forward' | 'stern' | 'mid'  (what the JSON said)
-                                       colours hex strings, one per lamp; several colours = a vertical stack
-                                               (2D spacing between lamps: min(5, L * 0.12))
-                                       names   the raw colour names                                                */
+                                             Returns null when the vessel's state has no light definitions (the renderer
+                                             then uses its built-in light model), otherwise an array of
+                                               { side, along, token, colours, names }
+                                             side    -1 = port, +1 = starboard, 0 = centre   (2D: x = -W, +W, 0)
+                                             along   fraction of hull length L, negative = towards the bow   (2D: y / L)
+                                             token   'top' | 'bottom' | 'forward' | 'stern' | 'mid'  (what the JSON said)
+                                             colours hex strings, one per lamp; several colours = a vertical stack
+                                                     (2D spacing between lamps: min(5, L * 0.12))
+                                             names   the raw colour names                                                */
         function lightLayout(s) {
           const q = stateFor(s);
           if (!q || !Array.isArray(q.lights) || !q.lights.length) return null;
@@ -1717,55 +1717,55 @@
     <script>
       /* ======== sim.js ======== */
       /* ===========================================================================
-                                       sim.js  -  headless COLREG / CPA-TCPA simulation core
-                                       Ported from colreg_2d_fixed.html (script blocks 2 and 3) with IDENTICAL
-                                       logic and numbers. No document, no $(), no canvas, no Three.js.
+                                             sim.js  -  headless COLREG / CPA-TCPA simulation core
+                                             Ported from colreg_2d_fixed.html (script blocks 2 and 3) with IDENTICAL
+                                             logic and numbers. No document, no $(), no canvas, no Three.js.
 
-                                       Needs colreg.js loaded first.   Global: Sim   (also module.exports in Node)
+                                             Needs colreg.js loaded first.   Global: Sim   (also module.exports in Node)
 
-                                       Units: nm, kn, minutes (TCPA), degrees true.  World: x = east, y = north.
+                                             Units: nm, kn, minutes (TCPA), degrees true.  World: x = east, y = north.
 
-                                       Every slider the 2D code read is now a field of Sim.settings:
-                                         range       furthest a target may be placed or dragged from own ship, nm
-                                         ownCourse   deg                  (was slider #oc, applied every step)
-                                         ownSpeed    kn                   (was slider #os)
-                                         cpaLimit    nm                   (was #cl)
-                                         tcpaAlarm   min                  (was #tl)
-                                         timeScale   simulated s per real s   (was #ms)
-                                         zone        'open' | 'coast' | 'harbour'   (was #zone)
-                                         autoAction  bool                 (was the #ai checkbox)
+                                             Every slider the 2D code read is now a field of Sim.settings:
+                                               range       furthest a target may be placed or dragged from own ship, nm
+                                               ownCourse   deg                  (was slider #oc, applied every step)
+                                               ownSpeed    kn                   (was slider #os)
+                                               cpaLimit    nm                   (was #cl)
+                                               tcpaAlarm   min                  (was #tl)
+                                               timeScale   simulated s per real s   (was #ms)
+                                               zone        'open' | 'coast' | 'harbour'   (was #zone)
+                                               autoAction  bool                 (was the #ai checkbox)
 
-                                       API
-                                         await Sim.init(opts)   load COLREG data, apply opts, build a scenario
-                                         Sim.reset()            new random scenario (same as the Reset button)
-                                         Sim.step(realDt)       one frame; realDt in real seconds (capped at 0.1,
-                                                                exactly like the 2D loop). Does nothing but keep
-                                                                own ship in sync while paused.
-                                         Sim.getState()         snapshot for UI / renderer (see below)
-                                       plus helpers: toggle, setRunning, setSettings, applyZone, setScenario,
-                                       setRandom, seed, placeTarget, moveTarget, setTargetCourse, setTargetSpeed,
-                                       manualOverride, setVesselType, setVesselConfig, and the pure functions
-                                       cpa, status, encounter, condOf, isStatic, rankOf, vel, norm180.
+                                             API
+                                               await Sim.init(opts)   load COLREG data, apply opts, build a scenario
+                                               Sim.reset()            new random scenario (same as the Reset button)
+                                               Sim.step(realDt)       one frame; realDt in real seconds (capped at 0.1,
+                                                                      exactly like the 2D loop). Does nothing but keep
+                                                                      own ship in sync while paused.
+                                               Sim.getState()         snapshot for UI / renderer (see below)
+                                             plus helpers: toggle, setRunning, setSettings, applyZone, setScenario,
+                                             setRandom, seed, placeTarget, moveTarget, setTargetCourse, setTargetSpeed,
+                                             manualOverride, setVesselType, setVesselConfig, and the pure functions
+                                             cpa, status, encounter, condOf, isStatic, rankOf, vel, norm180.
 
-                                       getState() returns
-                                         own, targets        live vessel objects (treat as read-only)
-                                                             {n,type,x,y,course,speed,colregState,cond?,special?,
-                                                              act?,man,...}
-                                         results[i]          one per target:
-                                            n, rg, br, cpa, tcpa (min, null if no relative motion), cl, closing,
-                                            status          SAFE | CAUTION | DANGER | COLLISION | COLLIDED
-                                            enc             encounter(own, target)  = YOUR duty
-                                            encRev          encounter(target, own)  = the TARGET's duty
-                                            lookH           look-ahead hours used for the 2D motion vectors
-                                            ownEnd, tgtEnd  [x,y] world nm of both ships after lookH
-                                            endSep          distance between those two points, nm
-                                            acting          target is carrying out an automatic manoeuvre
-                                         ownVecEnd           [x,y] end of the own 6-minute vector (world nm)
-                                         collisions          [[nameA,nameB],...]     collided  bool
-                                         log                 last 6 avoiding-action lines, newest first
-                                         simTime             simulated seconds       running   bool
-                                         settings            copy of Sim.settings
-                                       =========================================================================== */
+                                             getState() returns
+                                               own, targets        live vessel objects (treat as read-only)
+                                                                   {n,type,x,y,course,speed,colregState,cond?,special?,
+                                                                    act?,man,...}
+                                               results[i]          one per target:
+                                                  n, rg, br, cpa, tcpa (min, null if no relative motion), cl, closing,
+                                                  status          SAFE | CAUTION | DANGER | COLLISION | COLLIDED
+                                                  enc             encounter(own, target)  = YOUR duty
+                                                  encRev          encounter(target, own)  = the TARGET's duty
+                                                  lookH           look-ahead hours used for the 2D motion vectors
+                                                  ownEnd, tgtEnd  [x,y] world nm of both ships after lookH
+                                                  endSep          distance between those two points, nm
+                                                  acting          target is carrying out an automatic manoeuvre
+                                               ownVecEnd           [x,y] end of the own 6-minute vector (world nm)
+                                               collisions          [[nameA,nameB],...]     collided  bool
+                                               log                 last 6 avoiding-action lines, newest first
+                                               simTime             simulated seconds       running   bool
+                                               settings            copy of Sim.settings
+                                             =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -1901,8 +1901,8 @@
           ROT[t.type] * (settings.specialSim && rankOf(t) === 3 ? 0.5 : 1);
 
         /* Rule 3(g): these activities make a vessel restricted in her ability to manoeuvre (RAM).
-                                       Towing and pushing are not listed: they only count when the tow severely restricts the ability to
-                                       deviate, which the user states by choosing Special = RAM. */
+                                             Towing and pushing are not listed: they only count when the tow severely restricts the ability to
+                                             deviate, which the user states by choosing Special = RAM. */
         const RAM_ACTS = ["dredging", "cable", "mine_clearance", "replenishment"];
         const isRamAct = (s) => RAM_ACTS.indexOf(s.act) >= 0;
 
@@ -1925,9 +1925,9 @@
         }
 
         /* Vessels at anchor, aground or not making way cannot move: force speed 0.
-                                       The previous cruise speed is remembered and restored when underway again.
-                                       (2D version also synchronised slider widgets; that part now belongs to the UI.
-                                        settings.ownSpeed plays the role of the #os slider value.) */
+                                             The previous cruise speed is remembered and restored when underway again.
+                                             (2D version also synchronised slider widgets; that part now belongs to the UI.
+                                              settings.ownSpeed plays the role of the #os slider value.) */
         function motionRules() {
           tg.forEach((t) => {
             if (isStatic(t)) {
@@ -2041,13 +2041,13 @@
         }
 
         /* ===== AUTOMATIC ACTION BY TARGET VESSELS (Rules 8, 13-17) ================
-                                       Give-way target (R16): early, substantial action. Head-on and crossing: alter to starboard
-                                       (R14, R15), overtaking and R18: either side, starboard preferred. Speed is reduced when a course
-                                       change alone is not enough (R8(e)). The plan is chosen as the least drastic action that keeps the
-                                       predicted CPA with every other ship above the CPA limit, assuming the others hold course and speed.
-                                       Stand-on target (R17): keeps course and speed until, at half the TCPA alarm, the give-way vessel
-                                       has still not acted; it then alters to starboard (never to port for a vessel on its port side).
-                                       The vessel resumes its original course and speed once the other vessel is past and clear.       */
+                                             Give-way target (R16): early, substantial action. Head-on and crossing: alter to starboard
+                                             (R14, R15), overtaking and R18: either side, starboard preferred. Speed is reduced when a course
+                                             change alone is not enough (R8(e)). The plan is chosen as the least drastic action that keeps the
+                                             predicted CPA with every other ship above the CPA limit, assuming the others hold course and speed.
+                                             Stand-on target (R17): keeps course and speed until, at half the TCPA alarm, the give-way vessel
+                                             has still not acted; it then alters to starboard (never to port for a vessel on its port side).
+                                             The vessel resumes its original course and speed once the other vessel is past and clear.       */
 
         const fmtT = (x) =>
           String(Math.floor(x / 3600)).padStart(2, "0") +
@@ -2062,7 +2062,7 @@
         };
 
         /* Predict where t will be once it has completed a turn to course c / speed sp (limited turn rate and
-                                       acceleration), then return the smallest predicted CPA to any closing vessel from that moment on. */
+                                             acceleration), then return the smallest predicted CPA to any closing vessel from that moment on. */
         function worstFor(t, c, sp) {
           let x = t.x,
             y = t.y,
@@ -2218,7 +2218,7 @@
         }
 
         /* true when t has actually reached the course and speed the manoeuvre m is steering to;
-                                       evaluate it at each use, never cache it across a phase change */
+                                             evaluate it at each use, never cache it across a phase change */
         const isReached = (t, m) =>
           Math.abs(norm180(m.course - t.course)) < 0.5 &&
           Math.abs(m.speed - t.speed) < 0.05;
@@ -2231,7 +2231,7 @@
             const m = t.man;
             if (!m) return;
             /* The geometry changed (a ship was dragged, another vessel acted): if the current plan no longer
-                                           keeps us clear, plan again from where we are. Checked at most once per simulated minute. */
+                                                 keeps us clear, plan again from where we are. Checked at most once per simulated minute. */
             if (simT - (m.at || 0) >= 60 && worstAt(t, m.course, m.speed) < lim) {
               m.at = simT;
               const d = settings.autoAction ? assess(t) : null;
@@ -2394,10 +2394,10 @@
         /* ---- collisions and time stepping --------------------------------------- */
 
         /* ---- hull contact -------------------------------------------------------
-                                       A collision happens when two hulls actually touch, not when the centres come within a fixed radius.
-                                       Each hull is the same outline the 3D view draws (pointed bow, straight sides, square stern) at TRUE size:
-                                       HULL_NM = real length in nm, HULL_MODEL = [length, half-beam] in model units (keep in step with
-                                       scene3d.js REAL_NM / MODEL_DIMS). Heading = course; x is east, y is north, course clockwise from north. */
+                                             A collision happens when two hulls actually touch, not when the centres come within a fixed radius.
+                                             Each hull is the same outline the 3D view draws (pointed bow, straight sides, square stern) at TRUE size:
+                                             HULL_NM = real length in nm, HULL_MODEL = [length, half-beam] in model units (keep in step with
+                                             scene3d.js REAL_NM / MODEL_DIMS). Heading = course; x is east, y is north, course clockwise from north. */
         const HULL_NM = { large: 0.13, tug: 0.06, fishing: 0.04, sail: 0.015 };
         const HULL_MODEL = {
           large: [34, 3.4],
@@ -2406,8 +2406,9 @@
           sail: [15, 1.8],
         };
         /* The 3D view draws every ship HULL_MAG times its true size (SHIP_MAG there reads this), so hulls touch exactly where they visibly touch.
-                                       Set HULL_MAG = 1 for true-size contact (and SHIP_MAG follows, so the picture stays honest). */
-        const HULL_MAG = 3;
+                                             The drawn size is FIXED in the world (it never changes with zoom), so two hulls overlap on screen only when they really touch here.
+                                             Bigger HULL_MAG = bigger ships, and a bigger contact hull. Set HULL_MAG = 1 for true-size contact. */
+        const HULL_MAG = 5;
         const hullLen = (s) => (HULL_NM[s.type] || HULL_NM.large) * HULL_MAG;
         /* the barge a tug has in tow (position and size in the tug model's own units, measured behind its centre) */
         const TOW = { tug: { at: 45, hl: 6, hw: 3 } };
@@ -2511,8 +2512,8 @@
         }
 
         /* Earliest moment in this step (fraction 0..1) at which any two hulls touch, or null.
-                                       The path of each ship is sampled finely enough that two small, fast hulls cannot pass through
-                                       each other between two checks. x0/y0 = positions before the move, s.x/s.y = after. */
+                                             The path of each ship is sampled finely enough that two small, fast hulls cannot pass through
+                                             each other between two checks. x0/y0 = positions before the move, s.x/s.y = after. */
         function firstContact(all, x0, y0) {
           let best = null;
           for (let i = 0; i < all.length; i++)
@@ -2573,8 +2574,8 @@
         }
 
         /* One frame. Same order as the 2D loop():
-                                       own course from settings -> motionRules -> (if running and no collision:
-                                       manageMan, autoManeuver, advance(dt * timeScale)) -> checkColl -> stop on a NEW collision. */
+                                             own course from settings -> motionRules -> (if running and no collision:
+                                             manageMan, autoManeuver, advance(dt * timeScale)) -> checkColl -> stop on a NEW collision. */
         function step(realDt) {
           if (!own) return;
           const dt = Number.isFinite(realDt) ? Math.max(0, Math.min(0.1, realDt)) : 0;
@@ -2658,7 +2659,7 @@
         }
 
         /* What setZone() did to the slider VALUES: select the zone and start at the
-                                       upper (safer) CPA limit and TCPA alarm of its band. Slider min/max are UI. */
+                                             upper (safer) CPA limit and TCPA alarm of its band. Slider min/max are UI. */
         function applyZone(k) {
           const z = ZONES[k];
           if (!z) return;
@@ -2668,8 +2669,8 @@
         }
 
         /* Install an explicit scenario (for tests and saved set-ups).
-                                       o  : { course, speed, type? }
-                                       ts : [{ type, course, speed, rg, brg }  or  { type, course, speed, x, y }, ...] */
+                                             o  : { course, speed, type? }
+                                             ts : [{ type, course, speed, rg, brg }  or  { type, course, speed, x, y }, ...] */
         function setScenario(def) {
           const o = {
             n: "Own",
@@ -2722,7 +2723,7 @@
         }
 
         /* A manual change to a target cancels its automatic manoeuvre and holds the
-                                       AI off for 10 simulated minutes (was touch()). */
+                                             AI off for 10 simulated minutes (was touch()). */
         function manualOverride(who) {
           const t = vessel(who);
           if (t) {
@@ -2779,8 +2780,8 @@
         /* ---- init ------------------------------------------------------------------ */
 
         /* opts: { settings, zone, colregUrl, colregData, seed, scenario }
-                                       colregUrl: string = fetch it (default 'colreg.json'), null = built-in fallback only.
-                                       Resolves when the COLREG data is in and a scenario has been installed. */
+                                             colregUrl: string = fetch it (default 'colreg.json'), null = built-in fallback only.
+                                             Resolves when the COLREG data is in and a scenario has been installed. */
         async function init(opts) {
           opts = opts || {};
           if (opts.seed !== undefined) seed(opts.seed);
@@ -2848,51 +2849,51 @@
     <script>
       /* ======== scene3d.js ======== */
       /* ===========================================================================
-                                       scene3d.js  -  Three.js r128 renderer for the COLREG CPA/TCPA simulator.
-                                       Needs: THREE (r128 UMD) loaded first. No simulation logic in this file.
+                                             scene3d.js  -  Three.js r128 renderer for the COLREG CPA/TCPA simulator.
+                                             Needs: THREE (r128 UMD) loaded first. No simulation logic in this file.
 
-                                       Global: Scene3D
+                                             Global: Scene3D
 
-                                       World mapping : sim x = east, y = north (nm)  ->  three (x, 0, -y)
-                                       Floating origin: own ship is always drawn at (0,0,0); a vessel at sim (x,y)
-                                                        is drawn at (x-own.x, 0, -(y-own.y)).  Heading c deg true:
-                                                        group.rotation.y = -rad(c)   (bow is -Z in model space).
+                                             World mapping : sim x = east, y = north (nm)  ->  three (x, 0, -y)
+                                             Floating origin: own ship is always drawn at (0,0,0); a vessel at sim (x,y)
+                                                              is drawn at (x-own.x, 0, -(y-own.y)).  Heading c deg true:
+                                                              group.rotation.y = -rad(c)   (bow is -Z in model space).
 
-                                       API
-                                         Scene3D.init(canvas, opts?)     opts: { view, night, sel, onPick? (unused here) }
-                                         Scene3D.updateScene(state, settings)   call EVERY frame. state = Sim.getState(),
-                                                                         settings = state.settings (uses .range). Updates
-                                                                         ships, rings, camera, then renders.
-                                         Scene3D.render(state, settings) alias of updateScene
-                                         Scene3D.setView('orbit'|'chase'|'bridge')   smooth transition
-                                         Scene3D.recenter()              back to own ship, default angle and zoom
-                                         Scene3D.setNight(bool)          day / night palette
-                                         Scene3D.setConfig({view,night,sel,palette,range,overlay})   any subset
-                                                                         overlay:false hides the built-in COLLISION text (markers stay)
-                                         Scene3D.resize()                called automatically on window / container resize
-                                         Scene3D.getView()  Scene3D.getConfig()  Scene3D.dispose()
-                                         Scene3D.orbit                   { enabled } - set false while a ship is being dragged
+                                             API
+                                               Scene3D.init(canvas, opts?)     opts: { view, night, sel, onPick? (unused here) }
+                                               Scene3D.updateScene(state, settings)   call EVERY frame. state = Sim.getState(),
+                                                                               settings = state.settings (uses .range). Updates
+                                                                               ships, rings, camera, then renders.
+                                               Scene3D.render(state, settings) alias of updateScene
+                                               Scene3D.setView('orbit'|'chase'|'bridge')   smooth transition
+                                               Scene3D.recenter()              back to own ship, default angle and zoom
+                                               Scene3D.setNight(bool)          day / night palette
+                                               Scene3D.setConfig({view,night,sel,palette,range,overlay})   any subset
+                                                                               overlay:false hides the built-in COLLISION text (markers stay)
+                                               Scene3D.resize()                called automatically on window / container resize
+                                               Scene3D.getView()  Scene3D.getConfig()  Scene3D.dispose()
+                                               Scene3D.orbit                   { enabled } - set false while a ship is being dragged
 
-                                       Views / keys are wired in index.html:  1 orbit, 2 chase, 3 bridge, C centre.
+                                             Views / keys are wired in index.html:  1 orbit, 2 chase, 3 bridge, C centre.
 
-                                       Phase 4 overlays (all driven by state.results / settings, nothing computed here):
-                                         CPA-limit dashed ring, own 6-minute vector, per target: dashed own + target
-                                         vectors to the look-ahead point, predicted-position spheres, CPA line + label,
-                                         pulsing meeting ring, status colouring, "T3 . stand-on [ACT]" tags, COLLISION
-                                         text overlay + 3D markers.  Every dynamic ribbon / label reuses one buffer or
-                                         canvas, so nothing is allocated per frame.
+                                             Phase 4 overlays (all driven by state.results / settings, nothing computed here):
+                                               CPA-limit dashed ring, own 6-minute vector, per target: dashed own + target
+                                               vectors to the look-ahead point, predicted-position spheres, CPA line + label,
+                                               pulsing meeting ring, status colouring, "T3 . stand-on [ACT]" tags, COLLISION
+                                               text overlay + 3D markers.  Every dynamic ribbon / label reuses one buffer or
+                                               canvas, so nothing is allocated per frame.
 
-                                       Phase 5 (night / day):
-                                         setNight() now FADES over ~1.8 s. Material colours, sea, fog, sky dome and light
-                                         rig are blended continuously between the day and night palettes; text and status
-                                         colours flip once at the half-way point.  At night every ship shows glowing
-                                         navigation lights (screen-size additive sprite + emissive core), taken from
-                                         COLREG.lightLayout() when the colreg state has lights, else a fallback set by
-                                         condition / type (fishing sidelights + sternlight only above 0.5 kn).  Up to 8
-                                         PointLights (2 per ship, fixed count so shaders never recompile) light the hulls.
-                                         By day the same ships show black day shapes (anchor ball, aground balls, JSON
-                                         shapes, or built-in NUC / RAM / CBD / fishing shapes).
-                                       =========================================================================== */
+                                             Phase 5 (night / day):
+                                               setNight() now FADES over ~1.8 s. Material colours, sea, fog, sky dome and light
+                                               rig are blended continuously between the day and night palettes; text and status
+                                               colours flip once at the half-way point.  At night every ship shows glowing
+                                               navigation lights (screen-size additive sprite + emissive core), taken from
+                                               COLREG.lightLayout() when the colreg state has lights, else a fallback set by
+                                               condition / type (fishing sidelights + sternlight only above 0.5 kn).  Up to 8
+                                               PointLights (2 per ship, fixed count so shaders never recompile) light the hulls.
+                                               By day the same ships show black day shapes (anchor ball, aground balls, JSON
+                                               shapes, or built-in NUC / RAM / CBD / fishing shapes).
+                                             =========================================================================== */
       (function (root) {
         "use strict";
         if (typeof THREE === "undefined") {
@@ -2947,8 +2948,8 @@
         };
 
         /* ---- ship model data -----------------------------------------------------
-                                       Model units = the 2D pixel units. [L, W] = length, half-beam (same as the 2D SIZE table).
-                                       Bow is -Z, starboard is +X.  REAL_NM = true length in nm, used in the chase / bridge views. */
+                                             Model units = the 2D pixel units. [L, W] = length, half-beam (same as the 2D SIZE table).
+                                             Bow is -Z, starboard is +X.  REAL_NM = true length in nm, used in the chase / bridge views. */
         const MODEL_DIMS = {
           large: [34, 3.4],
           tug: [18, 2.6],
@@ -2956,9 +2957,11 @@
           sail: [15, 1.8],
         };
         const REAL_NM = { large: 0.13, tug: 0.06, fishing: 0.04, sail: 0.015 };
-        /* how much bigger than true size ships are drawn (1 = true size); the minimum on-screen length is SHIP_MIN_PX */
+        /* how much bigger than true size ships are drawn (1 = true size). Hulls are drawn at this FIXED world size at every zoom,
+                                             so zooming is a real zoom and ships only overlap on screen when they really are that close. */
         const SHIP_MAG = (root.Sim && root.Sim.HULL_MAG) || 3;
-        const SHIP_MIN_PX = 80; // minimum on-screen length of the biggest type; smaller types get proportionally less (by the square root of their true length)
+        const MAG_REF = 3; // magnification the camera distances below were tuned for (chase / bridge scale by SHIP_MAG / MAG_REF)
+        const PIP_PX = 16; // a hull shorter than ~14 px on screen is marked by a small constant-size dot (fades out as the hull grows)
         const FOV = 40; // vertical field of view, degrees (bridge / chase widen it)
         const TDUR = 0.9; // view transition, seconds
         const BRIDGE_Y = 0.012; // bridge eye height, nm (about 22 m), before the size multiplier
@@ -2989,7 +2992,7 @@
           enabled: true,
           yaw: 0.6,
           pitch: 0.62,
-          d: 16,
+          d: 10,
           pan: new THREE.Vector3(),
           lookYaw: 0,
           lookPitch: 0,
@@ -3341,7 +3344,7 @@
           return m;
         }
         /* Screen-size label sprite with its OWN canvas + texture, redrawn only when the text or colour changes
-                                       (no cache growth, no per-frame allocation). Always faces the camera, drawn on top, with a halo for legibility. */
+                                             (no cache growth, no per-frame allocation). Always faces the camera, drawn on top, with a halo for legibility. */
         function makeLabel(w, h, align) {
           const c = document.createElement("canvas");
           c.width = w;
@@ -3445,9 +3448,9 @@
         }
 
         /* Dashed (or solid) flat ribbon in a preallocated buffer, rewritten in place every frame.
-                                       line(x0,z0,x1,z1,halfWidth,dash,gap,y)   gap <= 0 gives one solid quad
-                                       ring(radius,halfWidth,dash,gap,y)        around the origin (own ship)
-                                       Widths and dash lengths are given in nm, so the caller passes (pixels * nm-per-pixel). */
+                                             line(x0,z0,x1,z1,halfWidth,dash,gap,y)   gap <= 0 gives one solid quad
+                                             ring(radius,halfWidth,dash,gap,y)        around the origin (own ship)
+                                             Widths and dash lengths are given in nm, so the caller passes (pixels * nm-per-pixel). */
         function DashRibbon(maxDash, material) {
           const pos = new Float32Array(maxDash * 18),
             geom = new THREE.BufferGeometry();
@@ -3541,9 +3544,9 @@
         }
 
         /* ---- ocean: one big shaded plane that follows the camera; the waves are anchored to the world ---------------
-                                       Wave heights are never built as geometry. Seven travelling sine waves (wavelength 420 m down to 27 m, deep-water
-                                       speed) give the surface slope, which drives sky reflection (Fresnel), a sun glint, crest foam and haze. Each wave
-                                       fades out when it is smaller than a few pixels, so the far sea stays calm instead of shimmering. */
+                                             Wave heights are never built as geometry. Seven travelling sine waves (wavelength 420 m down to 27 m, deep-water
+                                             speed) give the surface slope, which drives sky reflection (Fresnel), a sun glint, crest foam and haze. Each wave
+                                             fades out when it is smaller than a few pixels, so the far sea stays calm instead of shimmering. */
         const OCEAN_VS =
           "varying vec3 vW;\nvoid main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }";
         const OCEAN_FS = `
@@ -3694,8 +3697,8 @@ void main(){
         }
 
         /* Foam texture laid on the sea around every ship, in ship lengths (L): the plane spans 2.4 L across and 4 L along,
-                                       starting 0.6 L ahead of the centre. Top of the picture = bow. Bow wave, a foam ring along the hull, two Kelvin arms
-                                       and a propeller wash that fades astern. */
+                                             starting 0.6 L ahead of the centre. Top of the picture = bow. Bow wave, a foam ring along the hull, two Kelvin arms
+                                             and a propeller wash that fades astern. */
         function makeWakeTex() {
           const W = 256,
             H = 512,
@@ -3819,8 +3822,8 @@ void main(){
           return new THREE.Mesh(g, m);
         }
         /* ==== ship models, matched to the Anglo-Eastern reference pictures ================================
-                                       loftHull() builds a lofted hull from options; every type below uses it. Model units as before:
-                                       bow is -Z, starboard is +X, y = 0 is the sea. */
+                                             loftHull() builds a lofted hull from options; every type below uses it. Model units as before:
+                                             bow is -Z, starboard is +X, y = 0 is the sea. */
         function csMats() {
           if (mats.csTop) return;
           const std = (o) =>
@@ -3913,6 +3916,19 @@ void main(){
             dashSize: 0.22,
             gapSize: 0.1,
           });
+          /* The Anglo-Eastern logo, traced from the supplied artwork (1000 x 1000 box, even-odd fill). aeLogo(ctx, centreX, centreY, diameter)
+                   draws it in gold; every ship texture below (hull decals, funnel, yacht sail) uses this one drawing. */
+          const AE_LOGO = new Path2D(
+            "M567 998L635 985L687 966L719 952L769 924L801 901L828 879L859 848L884 821L912 783L945 726L972 662L989 598L996 561L998 515L997 509L994 506L989 506L920 525L910 530L908 535L901 584L886 636L877 661L851 712L824 752L800 781L778 803L743 832L712 853L688 867L646 886L637 888L633 885L631 876L631 523L634 512L643 507L981 416L988 412L989 404L981 371L967 324L948 279L933 251L913 218L890 187L865 157L835 127L807 103L776 81L716 46L666 25L636 15L591 5L552 0L546 3L544 12L544 435L540 441L532 444L466 463L458 463L456 458L456 10L454 3L449 0L425 2L385 10L350 19L283 46L220 83L187 107L153 137L125 167L98 201L76 234L49 283L39 306L20 359L7 423L2 482L2 489L5 493L12 493L81 475L88 471L91 464L97 424L103 400L114 361L137 307L174 250L210 208L251 172L301 139L339 120L355 113L361 112L365 115L366 123L366 479L364 488L356 493L17 584L11 589L11 601L20 642L27 662L48 714L68 752L87 783L105 808L131 840L159 868L192 896L239 930L289 957L364 985L405 994L449 1000L454 996L456 988L456 564L457 560L461 558L494 547L534 537L541 537L543 540L544 990L545 996L549 999ZM876 350L839 362L690 403L642 414L634 413L631 405L631 124L634 113L641 112L657 118L709 145L747 171L776 196L804 224L826 251L844 277L876 336L878 345ZM364 887L360 888L353 886L298 860L249 826L219 800L193 773L159 727L134 686L122 657L122 653L123 649L166 636L356 586L361 585L364 587L366 594L366 877Z",
+          );
+          const aeLogo = (g, cx, cy, d) => {
+            g.save();
+            g.translate(cx - d / 2, cy - d / 2);
+            g.scale(d / 1000, d / 1000);
+            g.fillStyle = "#f6ae1b";
+            g.fill(AE_LOGO, "evenodd");
+            g.restore();
+          };
           /* hull-name decals: "ANGLO-EASTERN" with the gold logo */
           const decal = (key, text, color, logo, cw = 1024, ch = 128) => {
             const c = document.createElement("canvas");
@@ -3922,23 +3938,7 @@ void main(){
               hh = ch;
             let tx = cw / 2;
             if (logo) {
-              const r = hh * 0.4,
-                cx = hh * 0.5 + 4,
-                cy = hh / 2;
-              x.strokeStyle = "#e8a91c";
-              x.lineWidth = hh * 0.07;
-              x.beginPath();
-              x.arc(cx, cy, r, 0, 6.2832);
-              x.stroke();
-              x.beginPath();
-              x.moveTo(cx - r, cy);
-              x.lineTo(cx + r, cy);
-              x.moveTo(cx, cy - r);
-              x.lineTo(cx, cy + r);
-              x.stroke();
-              x.beginPath();
-              x.ellipse(cx, cy, r * 0.55, r, 0, 0, 6.2832);
-              x.stroke();
+              aeLogo(x, hh * 0.5 + 4, hh / 2, hh * 0.86);
               tx = (cw + hh) / 2;
             }
             let fs = hh * 0.86;
@@ -3966,25 +3966,12 @@ void main(){
           decal("dcTug", "ANGLO EASTERN", "#ffffff", true);
           decal("dcFish", "ANGLO-EASTERN", "#ffffff", true);
           decal("dcYacht", "ANGLO-EASTERN", "#13294b", true);
-          decal("dcPilot", "PILOT", "#101010", false, 512, 224);
+          decal("dcPilot", "PILOT", "#101010", true, 768, 224); // logo + PILOT
           const lc = document.createElement("canvas");
           lc.width = 128;
           lc.height = 128;
           const lx = lc.getContext("2d");
-          lx.strokeStyle = "#e8a91c";
-          lx.lineWidth = 10;
-          lx.beginPath();
-          lx.arc(64, 64, 52, 0, 6.2832);
-          lx.stroke();
-          lx.beginPath();
-          lx.moveTo(12, 64);
-          lx.lineTo(116, 64);
-          lx.moveTo(64, 12);
-          lx.lineTo(64, 116);
-          lx.stroke();
-          lx.beginPath();
-          lx.ellipse(64, 64, 29, 52, 0, 0, 6.2832);
-          lx.stroke();
+          aeLogo(lx, 64, 64, 118);
           const lt = new THREE.CanvasTexture(lc);
           lt.anisotropy = 4;
           mats.dcLogo = new THREE.MeshStandardMaterial({
@@ -4004,17 +3991,7 @@ void main(){
           sx.fillRect(0, 0, 512, 512);
           sx.save();
           sx.scale(1, 0.24);
-          sx.strokeStyle = "#e8a91c";
-          sx.lineWidth = 12;
-          sx.beginPath();
-          sx.arc(256, 880, 60, 0, 6.2832);
-          sx.stroke();
-          sx.beginPath();
-          sx.moveTo(196, 880);
-          sx.lineTo(316, 880);
-          sx.moveTo(256, 820);
-          sx.lineTo(256, 940);
-          sx.stroke();
+          aeLogo(sx, 256, 880, 132);
           sx.fillStyle = "#13294b";
           sx.font = "bold 86px Arial, Helvetica, sans-serif";
           sx.textAlign = "center";
@@ -4771,7 +4748,7 @@ void main(){
           }
           g.add(lineObj(rope, "#c9b48a", false));
           const bg = new THREE.Group();
-          loftHull(bg, {
+          const bgHull = loftHull(bg, {
             L: 12,
             W: 3,
             H: 1.2,
@@ -4795,6 +4772,7 @@ void main(){
             deck: mats.vmBgDeck,
             rails: [0.25],
           });
+          sideDecal(bg, bgHull, mats.dcLogo, 0, 0.62, 0.9, 0.9); // gold logo on both sides of the barge
           const cm = [mats.vmC0, mats.vmC1, mats.vmC2, mats.vmC3];
           for (let c = -1; c <= 1; c++)
             for (let b = 0; b < 5; b++) {
@@ -5249,7 +5227,7 @@ void main(){
         function buildRigBarge(g, bl, hwHint) {
           csMats();
           const hw = Math.max(hwHint, bl / 5);
-          loftHull(g, {
+          const bgHull = loftHull(g, {
             L: bl,
             W: hw,
             H: 1.0,
@@ -5273,6 +5251,7 @@ void main(){
             deck: mats.vmBgDeck,
             rails: [0.22],
           });
+          sideDecal(g, bgHull, mats.dcLogo, 0, 0.5, 0.7, 0.7); // gold logo on both sides of the barge
           const cm = [mats.vmC0, mats.vmC1, mats.vmC2, mats.vmC3],
             nb = Math.max(2, Math.floor((bl * 0.8) / 1.7)),
             cw = (2 * hw * 0.8) / 3;
@@ -5343,7 +5322,7 @@ void main(){
               ),
             );
             const pl = new THREE.Mesh(
-              new THREE.PlaneGeometry(ch * 0.36 * (512 / 224), ch * 0.36),
+              new THREE.PlaneGeometry(ch * 0.36 * (768 / 224), ch * 0.36),
               mats.dcPilot,
             ); // PILOT
             pl.position.set(sg * (cw / 2 + 0.03), hb + ch * 0.2, zc);
@@ -5426,7 +5405,7 @@ void main(){
           csMats();
           const hb = 0.55 + 0.03 * len,
             fz = -len * 0.12; // top of the hull; end of the foredeck
-          loftHull(g, {
+          const launchHull = loftHull(g, {
             L: len,
             W: hw,
             H: hb,
@@ -5455,6 +5434,15 @@ void main(){
               [len * 0.44, len],
             ],
           });
+          sideDecal(
+            g,
+            launchHull,
+            mats.dcLogo,
+            len * 0.14,
+            hb * 0.5,
+            hb * 0.7,
+            hb * 0.7,
+          ); // gold logo on both sides of the hull
           const fy = hb - 0.2; // cockpit floor
           g.add(
             box(
@@ -5715,6 +5703,24 @@ void main(){
           s.model.add(s.lampGroup, s.shapeGroup);
           s.hud = new THREE.Group();
           s.hud.add(s.label); // label lives in world space, not rotated
+          // locator pip: constant-size dot shown only while the true-scale hull is too small to see
+          s.pip = new THREE.Sprite(
+            new THREE.SpriteMaterial({
+              map: glowTex,
+              color: "#fff",
+              transparent: true,
+              opacity: 0,
+              depthTest: false,
+              depthWrite: false,
+              sizeAttenuation: false,
+              toneMapped: false,
+              fog: false,
+            }),
+          );
+          s.pip.renderOrder = 6;
+          s.pip.visible = false;
+          s.pipKey = "";
+          s.root.add(s.pip);
           return s;
         }
         function setShipType(s, type) {
@@ -5765,8 +5771,8 @@ void main(){
           return t;
         }
         /* ---- sun, moon and stars: a sky layer that follows the camera (world-fixed directions, drawn over the dome) ------------
-                                       Day: sun disc + glow (low and orange at sunset, pale and dim in fog). Night: moon, and a star field that twinkles.
-                                       The sun direction also drives the sea glint, so the glitter path lies under the sun (or the moon at night). */
+                                             Day: sun disc + glow (low and orange at sunset, pale and dim in fog). Night: moon, and a star field that twinkles.
+                                             The sun direction also drives the sea glint, so the glitter path lies under the sun (or the moon at night). */
         let sky = null,
           skyOn = true,
           skyEl = 0.31;
@@ -5778,7 +5784,7 @@ void main(){
           _sc = new THREE.Color(),
           _sc2 = new THREE.Color();
         /* Sea state and ship motion. The same 10 waves the ocean shader draws are sampled on the CPU (same directions, same
-                 formula, same clock), so every ship heaves, pitches and rolls on the waves you can see. Visual only. */
+                       formula, same clock), so every ship heaves, pitches and rolls on the waves you can see. Visual only. */
         const SEA_LV = {
           calm: 0.5,
           slight: 1.0,
@@ -5868,7 +5874,7 @@ void main(){
           if (o.motion !== undefined) sea.motion = !!o.motion;
         }
         /* Ocean current (visual only): kn = rate, set = direction the water flows TOWARDS (degrees true). The water pattern is moved
-                 by kn x simulated hours, so it keeps pace with the ships whatever the time speed and stops when paused. */
+                       by kn x simulated hours, so it keeps pace with the ships whatever the time speed and stops when paused. */
         let cur = { kn: 0, set: 90 },
           curOff = new THREE.Vector2(),
           curLast = null;
@@ -6117,9 +6123,9 @@ void main(){
         }
 
         /* ---- Rain and snow: GPU-animated particles in a box that follows the camera ---------------------------------
-                             Every drop has a fixed random start in [0,1)^3; the vertex shader moves it down with the clock and wraps it
-                             round the camera, so nothing is updated on the CPU. The box size follows the camera distance (bridge: fixed
-                             and small), so the look is the same at any zoom. VISUAL ONLY: never read by Sim. */
+                                   Every drop has a fixed random start in [0,1)^3; the vertex shader moves it down with the clock and wraps it
+                                   round the camera, so nothing is updated on the CPU. The box size follows the camera distance (bridge: fixed
+                                   and small), so the look is the same at any zoom. VISUAL ONLY: never read by Sim. */
         const RAIN_VS = `
 attribute float aEnd;
 uniform vec3 uCam; uniform float uS, uH, uTime, uRate, uLen;
@@ -6296,7 +6302,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* Lamp list for one vessel, in model units: [{x, y, z, col, r}].  JSON layout first (position tokens from
-                                       COLREG.lightLayout, the same maths as the 2D drawJSONLights), else the fallback set by condition then type. */
+                                             COLREG.lightLayout, the same maths as the 2D drawJSONLights), else the fallback set by condition then type. */
         const RAM_ACTS = ["dredging", "cable", "mine_clearance", "replenishment"]; // Rule 3(g), same list as sim.js
         function lampSpec(v) {
           const type = v.type,
@@ -6730,7 +6736,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
 
         /* ---- camera poses ------------------------------------------------------------------------- */
         function sizeMult() {
-          return focusMult; // 1 for own ship; scaled by length for a focused target
+          return focusMult * (SHIP_MAG / MAG_REF); // 1 for own ship; scaled by length for a focused target and by the hull magnification
         }
         const _base = new THREE.Vector3();
         function pose(v, own, dt) {
@@ -6849,7 +6855,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           orbit.pan.set(0, 0, 0);
           if (zoom) {
             const L = shipLen(i);
-            if (view === "orbit") orbit.d = clamp(L * 6, 0.06, 90);
+            if (view === "orbit")
+              orbit.d = clamp(L * SHIP_MAG * 2, 0.06, 90); // the drawn hull fills most of the view
             else if (view === "chase") orbit.chaseD = clamp(0.55, 0.05, 25);
             else orbit.bridgeFov = 62;
           }
@@ -6913,7 +6920,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           orbit.lookPitch = clamp(Math.atan(slope + 0.00533), -1.4, 1.4);
           if (len)
             orbit.bridgeFov = clamp(
-              (2 * Math.atan(len / 2 / dist) * 180 * 3) / Math.PI,
+              (2 * Math.atan(len / 2 / dist) * 180 * SHIP_MAG) / Math.PI,
               10,
               62,
             );
@@ -6994,9 +7001,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* ---- view controller: a drag anywhere on the sea moves the view -------------------------------------------------
-                                       Orbit view:  one finger / left button = pan (the sea follows the pointer), right button / middle / Shift / Ctrl = turn and tilt,
-                                                    wheel or pinch = zoom, two-finger twist = turn, two-finger slide up / down = tilt.
-                                       Chase / bridge: a drag looks around.  A press on a ship is taken by input.js first (it drags the ship instead). */
+                                             Orbit view:  one finger / left button = pan (the sea follows the pointer), right button / middle / Shift / Ctrl = turn and tilt,
+                                                          wheel or pinch = zoom, two-finger twist = turn, two-finger slide up / down = tilt.
+                                             Chase / bridge: a drag looks around.  A press on a ship is taken by input.js first (it drags the ship instead). */
         function recenter() {
           startTrans();
           orbit.focus = -1;
@@ -7004,7 +7011,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           orbit.pan.set(0, 0, 0);
           orbit.yaw = 0.6;
           orbit.pitch = 0.62;
-          orbit.d = 16;
+          orbit.d = 10;
           orbit.roll = 0;
           orbit.lookYaw = 0;
           orbit.lookPitch = 0;
@@ -7188,8 +7195,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           sail: { w: 1.4, h: 0.45, roll: 0.07, pitch: 0.03 },
         };
         /* ---- Activity rigs: what each Activity looks like (fishing, towing, pushing, dredging, cable, mine clearance, pilotage,
-                 replenishment). Visual only. Everything is built in model units: bow -Z, stern +Z, starboard +X. Floating things go
-                 in s.flat (they stay at sea level), deck gear in s.model (it moves with the ship). ----------------------------- */
+                       replenishment). Visual only. Everything is built in model units: bow -Z, stern +Z, starboard +X. Floating things go
+                       in s.flat (they stay at sea level), deck gear in s.model (it moves with the ship). ----------------------------- */
         const ACT_RIG = {
           fishing: 1,
           towing: 1,
@@ -7558,7 +7565,26 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               });
             const svHalf = Math.max(0.6, L * 0.3 * 0.19);
             buildTransferBoat(sv, L * 0.3, svHalf);
-            const trol = rBox(M.red, 0.7, 0.7, 0.7, 0, 0, 0);
+            /* transfer trolley: red box with the gold logo on a light plate on each of its four sides */
+            csMats();
+            const trol = new THREE.Group();
+            trol.add(rBox(M.red, 0.7, 0.7, 0.7, 0, 0, 0));
+            [0, 1, 2, 3].forEach((q) => {
+              const face = new THREE.Group();
+              face.rotation.y = (q * Math.PI) / 2;
+              const plate = new THREE.Mesh(
+                  new THREE.PlaneGeometry(0.54, 0.54),
+                  M.white,
+                ),
+                logo = new THREE.Mesh(
+                  new THREE.PlaneGeometry(0.48, 0.48),
+                  mats.dcLogo,
+                );
+              plate.position.z = 0.352;
+              logo.position.z = 0.356;
+              face.add(plate, logo);
+              trol.add(face);
+            });
             flt.add(sv, trol);
             upd = (t) => {
               const sx = W + svHalf + 0.9 + 0.2 * Math.sin(t * 0.5),
@@ -7879,8 +7905,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* Tag text after "Own": MY role, taken from the COLREG encounter of every target
-                             (r.enc = own ship's duty towards that target). Several targets can give different
-                             roles, e.g. give-way to T1 and stand-on to T3, so they are grouped by role. */
+                                   (r.enc = own ship's duty towards that target). Several targets can give different
+                                   roles, e.g. give-way to T1 and stand-on to T3, so they are grouped by role. */
         function ownRole(res) {
           const g = [],
             so = [],
@@ -8013,15 +8039,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             return (U * 2 * Math.max(0.001, _v.dot(camFwd)) * tanF) / H;
           }; // nm per UI pixel here
           const unitAt = (x, y, z, type) => {
-            // true ship size, but never smaller than ~16 px long
+            // fixed world size (true length x SHIP_MAG): the same at every zoom, so the picture is to scale
             const L = MODEL_DIMS[type][0];
-            return Math.max(
-              (REAL_NM[type] * SHIP_MAG) / L,
-              (pxAt(x, y, z) *
-                SHIP_MIN_PX *
-                Math.sqrt(REAL_NM[type] / REAL_NM.large)) /
-                L,
-            );
+            return (REAL_NM[type] * SHIP_MAG) / L;
           };
 
           /* ships (floating origin: own at 0,0,0) */
@@ -8053,6 +8073,21 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           /* constant-size sprites */
           const spH = (px) => (px / H) * 2 * tanF;
           [ownShip, ...ships].forEach((s) => scaleLabel(s.label, spH));
+          [ownShip, ...ships].forEach((s) => {
+            const p = s.root.position,
+              hullPx =
+                ((REAL_NM[s.type] || REAL_NM.large) * SHIP_MAG) / pxAt(p.x, 0, p.z), // hull length on screen, UI px
+              o = clamp((26 - hullPx) / 12, 0, 1) * s.label.material.opacity,
+              pc = s.isOwn ? P.acc : STATUS_COL(s.status || "SAFE");
+            if (s.pipKey !== pc) {
+              s.pip.material.color.set(pc);
+              s.pipKey = pc;
+            }
+            s.pip.material.opacity = o;
+            s.pip.visible = o > 0.01;
+            const h = spH(PIP_PX * U);
+            s.pip.scale.set(h, h, 1);
+          });
 
           /* lamps, shapes, point lights */
           mats.shape.opacity = 1 - nw;
@@ -8070,7 +8105,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             const sc = sel < 0 ? ownSc : scales[sel] || ownSc;
             selRing.visible = !inShip(sel);
             selRing.position.set(sv.x - own.x, yoLevel * 0.8, -(sv.y - own.y));
-            selRing.scale.setScalar(22 * sc);
+            selRing.scale.setScalar(
+              Math.max(22 * sc, 13 * pxAt(sv.x - own.x, 0, -(sv.y - own.y))),
+            ); // ring stays visible when zoomed far out
           } else selRing.visible = false;
 
           drawOverlays(state, settings || state.settings || {}, pxAt, spH);
@@ -8219,64 +8256,64 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== input.js ======== */
       /* ===========================================================================
-                                       input.js  -  pointer, wheel and keyboard input for the 3D COLREG simulator
-                                       Needs, already loaded:  three.js r128 (UMD),  sim.js (Sim),  scene3d.js (Scene3D)
-                                       Global: Input.   No simulation maths lives here: every change goes through
-                                       Sim.moveTarget / Sim.toggle / Sim.reset / Sim.setSettings and
-                                       Scene3D.setConfig / setView / setNight.
+                                             input.js  -  pointer, wheel and keyboard input for the 3D COLREG simulator
+                                             Needs, already loaded:  three.js r128 (UMD),  sim.js (Sim),  scene3d.js (Scene3D)
+                                             Global: Input.   No simulation maths lives here: every change goes through
+                                             Sim.moveTarget / Sim.toggle / Sim.reset / Sim.setSettings and
+                                             Scene3D.setConfig / setView / setNight.
 
-                                       Usage (after Scene3D.init):
-                                         Input.init(canvas, { onAction(name, detail) { ...refresh your UI... } });
+                                             Usage (after Scene3D.init):
+                                               Input.init(canvas, { onAction(name, detail) { ...refresh your UI... } });
 
-                                       POINTER (primary button / touch / pen)
-                                         - A THREE.Raycaster goes from the pointer through the camera to the sea plane
-                                           (y = 0).  Hit testing compares the pointer with each ship's projected screen
-                                           position (24 px for a mouse, 38 px for touch, the 2D values), nearest target
-                                           first, then own ship.
-                                         - Press on a target: select it and start a drag.  The ship keeps the offset
-                                           between the pointer and its centre (the 2D "grab" offset), and moves only after
-                                           the pointer has travelled a few px, so a tap selects without nudging it.
-                                           The new position is clamped to the placement limit (distance from own ship
-                                           <= settings.range) and written with Sim.moveTarget(i, x, y), which is what the 2D
-                                           pointermove did to tg[drag].x / .y.
-                                         - Press on own ship: select own (sel = -1).  Own ship is not draggable.
-                                         - While a ship is held, the orbit camera is switched off (Scene3D.orbit.enabled =
-                                           false) and the press never reaches Scene3D's own orbit handler; on release it is
-                                           switched back on.  A press on empty sea orbits as before.
-                                         - Only one pointer may start a ship drag; a second finger is ignored, and a ship
-                                           drag never starts while another pointer is already down.
-                                         - Dragging is off in the bridge view (the sea is seen at a grazing angle); selecting
-                                           still works there.
-                                         - Hover (mouse): cursor 'grab' over a target, 'pointer' over own ship.
-                                       WHEEL  (captured before Scene3D's own wheel handler, which therefore never runs)
-                                         - Zoom in orbit, chase and bridge (Scene3D.zoomBy), Shift + wheel too.
-                                       KEYBOARD
-                                         Space  start / pause    only when focus is on the page body or the canvas
-                                         R      reset            N  day / night
-                                         1 orbit  2 chase  3 bridge  C centre the view
-                                         Esc    closes the info panel (default #zpanel, button #zinfo; or opts.onEscape)
-                                         Letters and digits are ignored while typing in an input / select / textarea,
-                                         and with Ctrl / Alt / Meta held.
+                                             POINTER (primary button / touch / pen)
+                                               - A THREE.Raycaster goes from the pointer through the camera to the sea plane
+                                                 (y = 0).  Hit testing compares the pointer with each ship's projected screen
+                                                 position (24 px for a mouse, 38 px for touch, the 2D values), nearest target
+                                                 first, then own ship.
+                                               - Press on a target: select it and start a drag.  The ship keeps the offset
+                                                 between the pointer and its centre (the 2D "grab" offset), and moves only after
+                                                 the pointer has travelled a few px, so a tap selects without nudging it.
+                                                 The new position is clamped to the placement limit (distance from own ship
+                                                 <= settings.range) and written with Sim.moveTarget(i, x, y), which is what the 2D
+                                                 pointermove did to tg[drag].x / .y.
+                                               - Press on own ship: select own (sel = -1).  Own ship is not draggable.
+                                               - While a ship is held, the orbit camera is switched off (Scene3D.orbit.enabled =
+                                                 false) and the press never reaches Scene3D's own orbit handler; on release it is
+                                                 switched back on.  A press on empty sea orbits as before.
+                                               - Only one pointer may start a ship drag; a second finger is ignored, and a ship
+                                                 drag never starts while another pointer is already down.
+                                               - Dragging is off in the bridge view (the sea is seen at a grazing angle); selecting
+                                                 still works there.
+                                               - Hover (mouse): cursor 'grab' over a target, 'pointer' over own ship.
+                                             WHEEL  (captured before Scene3D's own wheel handler, which therefore never runs)
+                                               - Zoom in orbit, chase and bridge (Scene3D.zoomBy), Shift + wheel too.
+                                             KEYBOARD
+                                               Space  start / pause    only when focus is on the page body or the canvas
+                                               R      reset            N  day / night
+                                               1 orbit  2 chase  3 bridge  C centre the view
+                                               Esc    closes the info panel (default #zpanel, button #zinfo; or opts.onEscape)
+                                               Letters and digits are ignored while typing in an input / select / textarea,
+                                               and with Ctrl / Alt / Meta held.
 
-                                       Options
-                                         hit            { fine: 24, coarse: 38 }       hit radius, px
-                                         dragThreshold  { fine: 3,  coarse: 8 }        px before a press becomes a drag
-                                         infoPanel, infoButton   element or selector   (defaults '#zpanel', '#zinfo')
-                                         onEscape()     return true if you closed something yourself
-                                         getState()     default Sim.getState
-                                         getCamera()    default Scene3D.getCamera, else captured (see below)
-                                         onAction(name, detail)  called AFTER the default action:
-                                            'select' {sel}   'dragstart' {sel}   'drag' {sel,x,y}   'dragend' {sel}
-                                            'range' {range}  'toggle' {running}  'reset'  'night' {night}
-                                            'view' {view}    'escape'
+                                             Options
+                                               hit            { fine: 24, coarse: 38 }       hit radius, px
+                                               dragThreshold  { fine: 3,  coarse: 8 }        px before a press becomes a drag
+                                               infoPanel, infoButton   element or selector   (defaults '#zpanel', '#zinfo')
+                                               onEscape()     return true if you closed something yourself
+                                               getState()     default Sim.getState
+                                               getCamera()    default Scene3D.getCamera, else captured (see below)
+                                               onAction(name, detail)  called AFTER the default action:
+                                                  'select' {sel}   'dragstart' {sel}   'drag' {sel,x,y}   'dragend' {sel}
+                                                  'range' {range}  'toggle' {running}  'reset'  'night' {night}
+                                                  'view' {view}    'escape'
 
-                                       Assumptions about scene3d.js: own ship sits at the scene origin (floating origin)
-                                       and a vessel at sim (x, y) is drawn at (x - own.x, 0, -(y - own.y)).
-                                       The camera is read from opts.getCamera() or Scene3D.getCamera() if either exists;
-                                       otherwise it is captured from the PerspectiveCamera that scene3d.js updates every
-                                       frame, so scene3d.js needs no change.  (Adding  getCamera: () => camera  to the
-                                       Scene3D export is a one-line way to make it explicit.)
-                                       =========================================================================== */
+                                             Assumptions about scene3d.js: own ship sits at the scene origin (floating origin)
+                                             and a vessel at sim (x, y) is drawn at (x - own.x, 0, -(y - own.y)).
+                                             The camera is read from opts.getCamera() or Scene3D.getCamera() if either exists;
+                                             otherwise it is captured from the PerspectiveCamera that scene3d.js updates every
+                                             frame, so scene3d.js needs no change.  (Adding  getCamera: () => camera  to the
+                                             Scene3D export is a one-line way to make it explicit.)
+                                             =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -8337,10 +8374,10 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             t.isContentEditable);
 
         /* The camera, in order of preference:
-                                         1. opts.getCamera()           2. Scene3D.getCamera()
-                                         3. the PerspectiveCamera that scene3d.js updates every frame (captured from
-                                            THREE.PerspectiveCamera.prototype.updateProjectionMatrix, because in r128
-                                            WebGLRenderer.render is a per-instance method and cannot be wrapped). */
+                                               1. opts.getCamera()           2. Scene3D.getCamera()
+                                               3. the PerspectiveCamera that scene3d.js updates every frame (captured from
+                                                  THREE.PerspectiveCamera.prototype.updateProjectionMatrix, because in r128
+                                                  WebGLRenderer.render is a per-instance method and cannot be wrapped). */
         function hookCamera() {
           if ((o && o.getCamera) || (S() && typeof S().getCamera === "function"))
             return;
@@ -8775,30 +8812,30 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== ui.js ======== */
       /* ===========================================================================
-                                       ui.js  -  the side panel of the 3D COLREG CPA/TCPA simulator
-                                       Ported from colreg_2d_fixed.html (ui(), types(), syncT(), setZone(), zinfo(),
-                                       setMode() and the slider / button handlers) with the same behaviour and the
-                                       same CSS colour classes (SAFE CAUTION DANGER COLLISION COLLIDED GW SO KC CK dimtxt).
+                                             ui.js  -  the side panel of the 3D COLREG CPA/TCPA simulator
+                                             Ported from colreg_2d_fixed.html (ui(), types(), syncT(), setZone(), zinfo(),
+                                             setMode() and the slider / button handlers) with the same behaviour and the
+                                             same CSS colour classes (SAFE CAUTION DANGER COLLISION COLLIDED GW SO KC CK dimtxt).
 
-                                       Needs, already loaded:  colreg.js (COLREG), sim.js (Sim), scene3d.js (Scene3D)
-                                       Optional:               input.js (Input) - keyboard, wheel and 3D pointer input
-                                       Global: UI
+                                             Needs, already loaded:  colreg.js (COLREG), sim.js (Sim), scene3d.js (Scene3D)
+                                             Optional:               input.js (Input) - keyboard, wheel and 3D pointer input
+                                             Global: UI
 
-                                       All simulation changes go through Sim (setSettings, applyZone, toggle, reset,
-                                       placeTarget, setTargetCourse/Speed, setVesselType/Config).  Nothing is computed
-                                       here: every number shown comes from Sim.getState().
+                                             All simulation changes go through Sim (setSettings, applyZone, toggle, reset,
+                                             placeTarget, setTargetCourse/Speed, setVesselType/Config).  Nothing is computed
+                                             here: every number shown comes from Sim.getState().
 
-                                       API
-                                         UI.init({ night })          wire the panel; call once, after Sim.init()
-                                         UI.update(state)            refresh tables, banner, log, outputs (main.js: every 4th frame)
-                                         UI.refreshAll()             rebuild everything (after Reset or a new scenario)
-                                         UI.onAction(name, detail)   hook for Input.init({ onAction }): select, view, night,
-                                                                     range, reset, toggle
-                                         UI.setSel(i) / UI.getSel()  selected vessel, -1 = own ship, 0..2 = T1..T3
-                                         UI.setMode(night)           day / night (page theme + Scene3D.setNight)
+                                             API
+                                               UI.init({ night })          wire the panel; call once, after Sim.init()
+                                               UI.update(state)            refresh tables, banner, log, outputs (main.js: every 4th frame)
+                                               UI.refreshAll()             rebuild everything (after Reset or a new scenario)
+                                               UI.onAction(name, detail)   hook for Input.init({ onAction }): select, view, night,
+                                                                           range, reset, toggle
+                                               UI.setSel(i) / UI.getSel()  selected vessel, -1 = own ship, 0..2 = T1..T3
+                                               UI.setMode(night)           day / night (page theme + Scene3D.setNight)
 
-                                       Keyboard (Space, R, N, 1-4, Esc), the wheel and pointer picking belong to input.js.
-                                       =========================================================================== */
+                                             Keyboard (Space, R, N, 1-4, Esc), the wheel and pointer picking belong to input.js.
+                                             =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -9922,19 +9959,19 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== main.js ======== */
       /* ===========================================================================
-                                       main.js  -  boot sequence and frame loop of the 3D COLREG CPA/TCPA simulator
-                                       Load order (this file):  three r128 -> embedded data -> colreg -> sim -> scene3d -> input -> ui -> main
+                                             main.js  -  boot sequence and frame loop of the 3D COLREG CPA/TCPA simulator
+                                             Load order (this file):  three r128 -> embedded data -> colreg -> sim -> scene3d -> input -> ui -> main
 
-                                       boot():  Sim.init()   loads colreg.json (built-in 9-state fallback if it is missing or
-                                                             the page is opened from file://), then builds a random scenario
-                                                UI.init()    side panel, tables, sliders, theme
-                                                Scene3D.init + Input.init   3D scene, pointer / wheel / keyboard
-                                                requestAnimationFrame(loop)
+                                             boot():  Sim.init()   loads colreg.json (built-in 9-state fallback if it is missing or
+                                                                   the page is opened from file://), then builds a random scenario
+                                                      UI.init()    side panel, tables, sliders, theme
+                                                      Scene3D.init + Input.init   3D scene, pointer / wheel / keyboard
+                                                      requestAnimationFrame(loop)
 
-                                       loop(): same order as the 2D loop():
-                                                Sim.step(dt)  ->  Scene3D.updateScene(state)  ->  every 4th frame UI.update(state)
-                                       If WebGL is not available the side panel and the simulation still run; a message is shown.
-                                       =========================================================================== */
+                                             loop(): same order as the 2D loop():
+                                                      Sim.step(dt)  ->  Scene3D.updateScene(state)  ->  every 4th frame UI.update(state)
+                                             If WebGL is not available the side panel and the simulation still run; a message is shown.
+                                             =========================================================================== */
       (function () {
         "use strict";
 
