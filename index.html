@@ -312,7 +312,11 @@
         background: var(--panel);
         color: var(--ink);
         border: 1px solid var(--acc);
-        font: 600 13px/1.2 ui-monospace, Menlo, Consolas, monospace;
+        font:
+          600 13px/1.2 ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.25s;
@@ -390,7 +394,7 @@
         display: none;
       }
       /* panel boxes must never be squashed by the flex column; overflow-x:auto otherwise
-                           lets .box.scroll shrink to just its scrollbar when .side is height-limited */
+                                 lets .box.scroll shrink to just its scrollbar when .side is height-limited */
       .side > .box {
         flex-shrink: 0;
       }
@@ -820,7 +824,7 @@
         const mod = (a, n) => ((a % n) + n) % n;
         const cl = (v, a, b) => Math.max(a, Math.min(b, v));
         /* per view: turn (radians, free), tilt (radians, min / max), zoom quantity (smaller = closer) and its limits,
-                             ys / ts = key direction signs, zref = value that reads as x1 */
+                                   ys / ts = key direction signs, zref = value that reads as x1 */
         const ACC = {
           orbit: {
             yaw: ["yaw"],
@@ -1034,7 +1038,7 @@
     <script>
       /* ======== embedded COLREG data ======== */
       /* Embedded COLREG data. This is the built-in 9-state set (no lights or shapes: scene3d.js draws its own fallback
-                                 lights and shapes for these). To use your full colreg.json, replace the object below with its contents. */
+                                       lights and shapes for these). To use your full colreg.json, replace the object below with its contents. */
       window.COLREG_EMBEDDED = {
         states: [
           {
@@ -1199,22 +1203,22 @@
     <script>
       /* ======== colreg.js ======== */
       /* ===========================================================================
-                                 colreg.js  -  COLREG data layer (no DOM, no canvas, no Three.js)
-                                 Ported from colreg_2d_fixed.html, script block 1, with identical logic.
+                                       colreg.js  -  COLREG data layer (no DOM, no canvas, no Three.js)
+                                       Ported from colreg_2d_fixed.html, script block 1, with identical logic.
 
-                                 Global: COLREG   (also module.exports under Node)
+                                       Global: COLREG   (also module.exports under Node)
 
-                                 Load order in the page:  colreg.js  ->  sim.js  ->  ...
+                                       Load order in the page:  colreg.js  ->  sim.js  ->  ...
 
-                                 Moved over unchanged:   loadCOLREG (as COLREG.load), stateFor, stateLabel,
-                                                         stateForType, applyCOLREGState, lightColour,
-                                                         shapeText, colregInfo, COLREG_FALLBACK (9 states)
-                                 Extracted from syncT(): pickState / rebuildState  (the state filter that
-                                                         used to read the vc/vs/va/vt <select> values)
-                                                         configOf (what syncT used to put into those selects)
-                                 Extracted from drawJSONLights(): lightLayout (position maths only; the
-                                                         drawing now belongs to scene3d.js)
-                                 =========================================================================== */
+                                       Moved over unchanged:   loadCOLREG (as COLREG.load), stateFor, stateLabel,
+                                                               stateForType, applyCOLREGState, lightColour,
+                                                               shapeText, colregInfo, COLREG_FALLBACK (9 states)
+                                       Extracted from syncT(): pickState / rebuildState  (the state filter that
+                                                               used to read the vc/vs/va/vt <select> values)
+                                                               configOf (what syncT used to put into those selects)
+                                       Extracted from drawJSONLights(): lightLayout (position maths only; the
+                                                               drawing now belongs to scene3d.js)
+                                       =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -1482,7 +1486,7 @@
         ];
 
         /* Was rebuildState()'s filter. vesselType is the simulator type key
-                                 (large | tug | fishing | sail). Returns the best state object or null. */
+                                       (large | tug | fishing | sail). Returns the best state object or null. */
         function pickState(vesselType, condition, special, activity) {
           const type = TYPE_MAP[vesselType] || "power_driven";
 
@@ -1560,8 +1564,8 @@
         }
 
         /* Was the body of rebuildState(): store the editor choices on the vessel and
-                                 pick its COLREG state. The caller passes what the four <select>s held.
-                                 NOTE (fix 2): when the vessel TYPE changes, pass activity = "normal_navigation". */
+                                       pick its COLREG state. The caller passes what the four <select>s held.
+                                       NOTE (fix 2): when the vessel TYPE changes, pass activity = "normal_navigation". */
         function rebuildState(s, condition, special, activity) {
           s.cond = condition;
           s.special = special;
@@ -1628,15 +1632,15 @@
         }
 
         /* ---- light layout (was the position maths of drawJSONLights) ----------
-                                 Returns null when the vessel's state has no light definitions (the renderer
-                                 then uses its built-in light model), otherwise an array of
-                                   { side, along, token, colours, names }
-                                 side    -1 = port, +1 = starboard, 0 = centre   (2D: x = -W, +W, 0)
-                                 along   fraction of hull length L, negative = towards the bow   (2D: y / L)
-                                 token   'top' | 'bottom' | 'forward' | 'stern' | 'mid'  (what the JSON said)
-                                 colours hex strings, one per lamp; several colours = a vertical stack
-                                         (2D spacing between lamps: min(5, L * 0.12))
-                                 names   the raw colour names                                                */
+                                       Returns null when the vessel's state has no light definitions (the renderer
+                                       then uses its built-in light model), otherwise an array of
+                                         { side, along, token, colours, names }
+                                       side    -1 = port, +1 = starboard, 0 = centre   (2D: x = -W, +W, 0)
+                                       along   fraction of hull length L, negative = towards the bow   (2D: y / L)
+                                       token   'top' | 'bottom' | 'forward' | 'stern' | 'mid'  (what the JSON said)
+                                       colours hex strings, one per lamp; several colours = a vertical stack
+                                               (2D spacing between lamps: min(5, L * 0.12))
+                                       names   the raw colour names                                                */
         function lightLayout(s) {
           const q = stateFor(s);
           if (!q || !Array.isArray(q.lights) || !q.lights.length) return null;
@@ -1713,55 +1717,55 @@
     <script>
       /* ======== sim.js ======== */
       /* ===========================================================================
-                                 sim.js  -  headless COLREG / CPA-TCPA simulation core
-                                 Ported from colreg_2d_fixed.html (script blocks 2 and 3) with IDENTICAL
-                                 logic and numbers. No document, no $(), no canvas, no Three.js.
+                                       sim.js  -  headless COLREG / CPA-TCPA simulation core
+                                       Ported from colreg_2d_fixed.html (script blocks 2 and 3) with IDENTICAL
+                                       logic and numbers. No document, no $(), no canvas, no Three.js.
 
-                                 Needs colreg.js loaded first.   Global: Sim   (also module.exports in Node)
+                                       Needs colreg.js loaded first.   Global: Sim   (also module.exports in Node)
 
-                                 Units: nm, kn, minutes (TCPA), degrees true.  World: x = east, y = north.
+                                       Units: nm, kn, minutes (TCPA), degrees true.  World: x = east, y = north.
 
-                                 Every slider the 2D code read is now a field of Sim.settings:
-                                   range       furthest a target may be placed or dragged from own ship, nm
-                                   ownCourse   deg                  (was slider #oc, applied every step)
-                                   ownSpeed    kn                   (was slider #os)
-                                   cpaLimit    nm                   (was #cl)
-                                   tcpaAlarm   min                  (was #tl)
-                                   timeScale   simulated s per real s   (was #ms)
-                                   zone        'open' | 'coast' | 'harbour'   (was #zone)
-                                   autoAction  bool                 (was the #ai checkbox)
+                                       Every slider the 2D code read is now a field of Sim.settings:
+                                         range       furthest a target may be placed or dragged from own ship, nm
+                                         ownCourse   deg                  (was slider #oc, applied every step)
+                                         ownSpeed    kn                   (was slider #os)
+                                         cpaLimit    nm                   (was #cl)
+                                         tcpaAlarm   min                  (was #tl)
+                                         timeScale   simulated s per real s   (was #ms)
+                                         zone        'open' | 'coast' | 'harbour'   (was #zone)
+                                         autoAction  bool                 (was the #ai checkbox)
 
-                                 API
-                                   await Sim.init(opts)   load COLREG data, apply opts, build a scenario
-                                   Sim.reset()            new random scenario (same as the Reset button)
-                                   Sim.step(realDt)       one frame; realDt in real seconds (capped at 0.1,
-                                                          exactly like the 2D loop). Does nothing but keep
-                                                          own ship in sync while paused.
-                                   Sim.getState()         snapshot for UI / renderer (see below)
-                                 plus helpers: toggle, setRunning, setSettings, applyZone, setScenario,
-                                 setRandom, seed, placeTarget, moveTarget, setTargetCourse, setTargetSpeed,
-                                 manualOverride, setVesselType, setVesselConfig, and the pure functions
-                                 cpa, status, encounter, condOf, isStatic, rankOf, vel, norm180.
+                                       API
+                                         await Sim.init(opts)   load COLREG data, apply opts, build a scenario
+                                         Sim.reset()            new random scenario (same as the Reset button)
+                                         Sim.step(realDt)       one frame; realDt in real seconds (capped at 0.1,
+                                                                exactly like the 2D loop). Does nothing but keep
+                                                                own ship in sync while paused.
+                                         Sim.getState()         snapshot for UI / renderer (see below)
+                                       plus helpers: toggle, setRunning, setSettings, applyZone, setScenario,
+                                       setRandom, seed, placeTarget, moveTarget, setTargetCourse, setTargetSpeed,
+                                       manualOverride, setVesselType, setVesselConfig, and the pure functions
+                                       cpa, status, encounter, condOf, isStatic, rankOf, vel, norm180.
 
-                                 getState() returns
-                                   own, targets        live vessel objects (treat as read-only)
-                                                       {n,type,x,y,course,speed,colregState,cond?,special?,
-                                                        act?,man,...}
-                                   results[i]          one per target:
-                                      n, rg, br, cpa, tcpa (min, null if no relative motion), cl, closing,
-                                      status          SAFE | CAUTION | DANGER | COLLISION | COLLIDED
-                                      enc             encounter(own, target)  = YOUR duty
-                                      encRev          encounter(target, own)  = the TARGET's duty
-                                      lookH           look-ahead hours used for the 2D motion vectors
-                                      ownEnd, tgtEnd  [x,y] world nm of both ships after lookH
-                                      endSep          distance between those two points, nm
-                                      acting          target is carrying out an automatic manoeuvre
-                                   ownVecEnd           [x,y] end of the own 6-minute vector (world nm)
-                                   collisions          [[nameA,nameB],...]     collided  bool
-                                   log                 last 6 avoiding-action lines, newest first
-                                   simTime             simulated seconds       running   bool
-                                   settings            copy of Sim.settings
-                                 =========================================================================== */
+                                       getState() returns
+                                         own, targets        live vessel objects (treat as read-only)
+                                                             {n,type,x,y,course,speed,colregState,cond?,special?,
+                                                              act?,man,...}
+                                         results[i]          one per target:
+                                            n, rg, br, cpa, tcpa (min, null if no relative motion), cl, closing,
+                                            status          SAFE | CAUTION | DANGER | COLLISION | COLLIDED
+                                            enc             encounter(own, target)  = YOUR duty
+                                            encRev          encounter(target, own)  = the TARGET's duty
+                                            lookH           look-ahead hours used for the 2D motion vectors
+                                            ownEnd, tgtEnd  [x,y] world nm of both ships after lookH
+                                            endSep          distance between those two points, nm
+                                            acting          target is carrying out an automatic manoeuvre
+                                         ownVecEnd           [x,y] end of the own 6-minute vector (world nm)
+                                         collisions          [[nameA,nameB],...]     collided  bool
+                                         log                 last 6 avoiding-action lines, newest first
+                                         simTime             simulated seconds       running   bool
+                                         settings            copy of Sim.settings
+                                       =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -1831,7 +1835,12 @@
         const vel = (s) => {
           let vx = s.speed * Math.sin(rad(s.course)),
             vy = s.speed * Math.cos(rad(s.course));
-          if (settings.specialSim && s !== own && condOf(s) === "underway_stop" && rankOf(s) === 1) {
+          if (
+            settings.specialSim &&
+            s !== own &&
+            condOf(s) === "underway_stop" &&
+            rankOf(s) === 1
+          ) {
             // NUC with no way on: not under command, so she drifts (about 0.6 kn, set by wind and current)
             const a = rad(hashN(s.n) * 360);
             vx += 0.6 * Math.sin(a);
@@ -1888,11 +1897,12 @@
         }
         const isStatic = (s) => condOf(s) !== "underway_mw";
         /* constrained by her draught: a deep, heavy ship turns at half the usual rate (Special = CBD) */
-        const rotOf = (t) => ROT[t.type] * (settings.specialSim && rankOf(t) === 3 ? 0.5 : 1);
+        const rotOf = (t) =>
+          ROT[t.type] * (settings.specialSim && rankOf(t) === 3 ? 0.5 : 1);
 
         /* Rule 3(g): these activities make a vessel restricted in her ability to manoeuvre (RAM).
-                                 Towing and pushing are not listed: they only count when the tow severely restricts the ability to
-                                 deviate, which the user states by choosing Special = RAM. */
+                                       Towing and pushing are not listed: they only count when the tow severely restricts the ability to
+                                       deviate, which the user states by choosing Special = RAM. */
         const RAM_ACTS = ["dredging", "cable", "mine_clearance", "replenishment"];
         const isRamAct = (s) => RAM_ACTS.indexOf(s.act) >= 0;
 
@@ -1915,9 +1925,9 @@
         }
 
         /* Vessels at anchor, aground or not making way cannot move: force speed 0.
-                                 The previous cruise speed is remembered and restored when underway again.
-                                 (2D version also synchronised slider widgets; that part now belongs to the UI.
-                                  settings.ownSpeed plays the role of the #os slider value.) */
+                                       The previous cruise speed is remembered and restored when underway again.
+                                       (2D version also synchronised slider widgets; that part now belongs to the UI.
+                                        settings.ownSpeed plays the role of the #os slider value.) */
         function motionRules() {
           tg.forEach((t) => {
             if (isStatic(t)) {
@@ -2031,13 +2041,13 @@
         }
 
         /* ===== AUTOMATIC ACTION BY TARGET VESSELS (Rules 8, 13-17) ================
-                                 Give-way target (R16): early, substantial action. Head-on and crossing: alter to starboard
-                                 (R14, R15), overtaking and R18: either side, starboard preferred. Speed is reduced when a course
-                                 change alone is not enough (R8(e)). The plan is chosen as the least drastic action that keeps the
-                                 predicted CPA with every other ship above the CPA limit, assuming the others hold course and speed.
-                                 Stand-on target (R17): keeps course and speed until, at half the TCPA alarm, the give-way vessel
-                                 has still not acted; it then alters to starboard (never to port for a vessel on its port side).
-                                 The vessel resumes its original course and speed once the other vessel is past and clear.       */
+                                       Give-way target (R16): early, substantial action. Head-on and crossing: alter to starboard
+                                       (R14, R15), overtaking and R18: either side, starboard preferred. Speed is reduced when a course
+                                       change alone is not enough (R8(e)). The plan is chosen as the least drastic action that keeps the
+                                       predicted CPA with every other ship above the CPA limit, assuming the others hold course and speed.
+                                       Stand-on target (R17): keeps course and speed until, at half the TCPA alarm, the give-way vessel
+                                       has still not acted; it then alters to starboard (never to port for a vessel on its port side).
+                                       The vessel resumes its original course and speed once the other vessel is past and clear.       */
 
         const fmtT = (x) =>
           String(Math.floor(x / 3600)).padStart(2, "0") +
@@ -2052,7 +2062,7 @@
         };
 
         /* Predict where t will be once it has completed a turn to course c / speed sp (limited turn rate and
-                                 acceleration), then return the smallest predicted CPA to any closing vessel from that moment on. */
+                                       acceleration), then return the smallest predicted CPA to any closing vessel from that moment on. */
         function worstFor(t, c, sp) {
           let x = t.x,
             y = t.y,
@@ -2208,7 +2218,7 @@
         }
 
         /* true when t has actually reached the course and speed the manoeuvre m is steering to;
-                                 evaluate it at each use, never cache it across a phase change */
+                                       evaluate it at each use, never cache it across a phase change */
         const isReached = (t, m) =>
           Math.abs(norm180(m.course - t.course)) < 0.5 &&
           Math.abs(m.speed - t.speed) < 0.05;
@@ -2221,7 +2231,7 @@
             const m = t.man;
             if (!m) return;
             /* The geometry changed (a ship was dragged, another vessel acted): if the current plan no longer
-                                     keeps us clear, plan again from where we are. Checked at most once per simulated minute. */
+                                           keeps us clear, plan again from where we are. Checked at most once per simulated minute. */
             if (simT - (m.at || 0) >= 60 && worstAt(t, m.course, m.speed) < lim) {
               m.at = simT;
               const d = settings.autoAction ? assess(t) : null;
@@ -2272,7 +2282,8 @@
               // NUC still making way: steering failure, the heading wanders and swings (a few degrees a minute)
               if (isStatic(t) || rankOf(t) !== 1) return;
               const h = hashN(t.n),
-                rate = (h - 0.5) * 5 + 2.2 * Math.sin(simT / (170 + h * 60) + h * 6.28); // deg per minute
+                rate =
+                  (h - 0.5) * 5 + 2.2 * Math.sin(simT / (170 + h * 60) + h * 6.28); // deg per minute
               t.course = (((t.course + (rate * sec) / 60) % 360) + 360) % 360;
             });
           tg.forEach((t) => {
@@ -2383,10 +2394,10 @@
         /* ---- collisions and time stepping --------------------------------------- */
 
         /* ---- hull contact -------------------------------------------------------
-                                 A collision happens when two hulls actually touch, not when the centres come within a fixed radius.
-                                 Each hull is the same outline the 3D view draws (pointed bow, straight sides, square stern) at TRUE size:
-                                 HULL_NM = real length in nm, HULL_MODEL = [length, half-beam] in model units (keep in step with
-                                 scene3d.js REAL_NM / MODEL_DIMS). Heading = course; x is east, y is north, course clockwise from north. */
+                                       A collision happens when two hulls actually touch, not when the centres come within a fixed radius.
+                                       Each hull is the same outline the 3D view draws (pointed bow, straight sides, square stern) at TRUE size:
+                                       HULL_NM = real length in nm, HULL_MODEL = [length, half-beam] in model units (keep in step with
+                                       scene3d.js REAL_NM / MODEL_DIMS). Heading = course; x is east, y is north, course clockwise from north. */
         const HULL_NM = { large: 0.13, tug: 0.06, fishing: 0.04, sail: 0.015 };
         const HULL_MODEL = {
           large: [34, 3.4],
@@ -2465,8 +2476,8 @@
         }
 
         /* Earliest moment in this step (fraction 0..1) at which any two hulls touch, or null.
-                                 The path of each ship is sampled finely enough that two small, fast hulls cannot pass through
-                                 each other between two checks. x0/y0 = positions before the move, s.x/s.y = after. */
+                                       The path of each ship is sampled finely enough that two small, fast hulls cannot pass through
+                                       each other between two checks. x0/y0 = positions before the move, s.x/s.y = after. */
         function firstContact(all, x0, y0) {
           let best = null;
           for (let i = 0; i < all.length; i++)
@@ -2527,8 +2538,8 @@
         }
 
         /* One frame. Same order as the 2D loop():
-                                 own course from settings -> motionRules -> (if running and no collision:
-                                 manageMan, autoManeuver, advance(dt * timeScale)) -> checkColl -> stop on a NEW collision. */
+                                       own course from settings -> motionRules -> (if running and no collision:
+                                       manageMan, autoManeuver, advance(dt * timeScale)) -> checkColl -> stop on a NEW collision. */
         function step(realDt) {
           if (!own) return;
           const dt = Number.isFinite(realDt) ? Math.max(0, Math.min(0.1, realDt)) : 0;
@@ -2612,7 +2623,7 @@
         }
 
         /* What setZone() did to the slider VALUES: select the zone and start at the
-                                 upper (safer) CPA limit and TCPA alarm of its band. Slider min/max are UI. */
+                                       upper (safer) CPA limit and TCPA alarm of its band. Slider min/max are UI. */
         function applyZone(k) {
           const z = ZONES[k];
           if (!z) return;
@@ -2622,8 +2633,8 @@
         }
 
         /* Install an explicit scenario (for tests and saved set-ups).
-                                 o  : { course, speed, type? }
-                                 ts : [{ type, course, speed, rg, brg }  or  { type, course, speed, x, y }, ...] */
+                                       o  : { course, speed, type? }
+                                       ts : [{ type, course, speed, rg, brg }  or  { type, course, speed, x, y }, ...] */
         function setScenario(def) {
           const o = {
             n: "Own",
@@ -2676,7 +2687,7 @@
         }
 
         /* A manual change to a target cancels its automatic manoeuvre and holds the
-                                 AI off for 10 simulated minutes (was touch()). */
+                                       AI off for 10 simulated minutes (was touch()). */
         function manualOverride(who) {
           const t = vessel(who);
           if (t) {
@@ -2733,8 +2744,8 @@
         /* ---- init ------------------------------------------------------------------ */
 
         /* opts: { settings, zone, colregUrl, colregData, seed, scenario }
-                                 colregUrl: string = fetch it (default 'colreg.json'), null = built-in fallback only.
-                                 Resolves when the COLREG data is in and a scenario has been installed. */
+                                       colregUrl: string = fetch it (default 'colreg.json'), null = built-in fallback only.
+                                       Resolves when the COLREG data is in and a scenario has been installed. */
         async function init(opts) {
           opts = opts || {};
           if (opts.seed !== undefined) seed(opts.seed);
@@ -2801,51 +2812,51 @@
     <script>
       /* ======== scene3d.js ======== */
       /* ===========================================================================
-                                 scene3d.js  -  Three.js r128 renderer for the COLREG CPA/TCPA simulator.
-                                 Needs: THREE (r128 UMD) loaded first. No simulation logic in this file.
+                                       scene3d.js  -  Three.js r128 renderer for the COLREG CPA/TCPA simulator.
+                                       Needs: THREE (r128 UMD) loaded first. No simulation logic in this file.
 
-                                 Global: Scene3D
+                                       Global: Scene3D
 
-                                 World mapping : sim x = east, y = north (nm)  ->  three (x, 0, -y)
-                                 Floating origin: own ship is always drawn at (0,0,0); a vessel at sim (x,y)
-                                                  is drawn at (x-own.x, 0, -(y-own.y)).  Heading c deg true:
-                                                  group.rotation.y = -rad(c)   (bow is -Z in model space).
+                                       World mapping : sim x = east, y = north (nm)  ->  three (x, 0, -y)
+                                       Floating origin: own ship is always drawn at (0,0,0); a vessel at sim (x,y)
+                                                        is drawn at (x-own.x, 0, -(y-own.y)).  Heading c deg true:
+                                                        group.rotation.y = -rad(c)   (bow is -Z in model space).
 
-                                 API
-                                   Scene3D.init(canvas, opts?)     opts: { view, night, sel, onPick? (unused here) }
-                                   Scene3D.updateScene(state, settings)   call EVERY frame. state = Sim.getState(),
-                                                                   settings = state.settings (uses .range). Updates
-                                                                   ships, rings, camera, then renders.
-                                   Scene3D.render(state, settings) alias of updateScene
-                                   Scene3D.setView('orbit'|'chase'|'bridge')   smooth transition
-                                   Scene3D.recenter()              back to own ship, default angle and zoom
-                                   Scene3D.setNight(bool)          day / night palette
-                                   Scene3D.setConfig({view,night,sel,palette,range,overlay})   any subset
-                                                                   overlay:false hides the built-in COLLISION text (markers stay)
-                                   Scene3D.resize()                called automatically on window / container resize
-                                   Scene3D.getView()  Scene3D.getConfig()  Scene3D.dispose()
-                                   Scene3D.orbit                   { enabled } - set false while a ship is being dragged
+                                       API
+                                         Scene3D.init(canvas, opts?)     opts: { view, night, sel, onPick? (unused here) }
+                                         Scene3D.updateScene(state, settings)   call EVERY frame. state = Sim.getState(),
+                                                                         settings = state.settings (uses .range). Updates
+                                                                         ships, rings, camera, then renders.
+                                         Scene3D.render(state, settings) alias of updateScene
+                                         Scene3D.setView('orbit'|'chase'|'bridge')   smooth transition
+                                         Scene3D.recenter()              back to own ship, default angle and zoom
+                                         Scene3D.setNight(bool)          day / night palette
+                                         Scene3D.setConfig({view,night,sel,palette,range,overlay})   any subset
+                                                                         overlay:false hides the built-in COLLISION text (markers stay)
+                                         Scene3D.resize()                called automatically on window / container resize
+                                         Scene3D.getView()  Scene3D.getConfig()  Scene3D.dispose()
+                                         Scene3D.orbit                   { enabled } - set false while a ship is being dragged
 
-                                 Views / keys are wired in index.html:  1 orbit, 2 chase, 3 bridge, C centre.
+                                       Views / keys are wired in index.html:  1 orbit, 2 chase, 3 bridge, C centre.
 
-                                 Phase 4 overlays (all driven by state.results / settings, nothing computed here):
-                                   CPA-limit dashed ring, own 6-minute vector, per target: dashed own + target
-                                   vectors to the look-ahead point, predicted-position spheres, CPA line + label,
-                                   pulsing meeting ring, status colouring, "T3 . stand-on [ACT]" tags, COLLISION
-                                   text overlay + 3D markers.  Every dynamic ribbon / label reuses one buffer or
-                                   canvas, so nothing is allocated per frame.
+                                       Phase 4 overlays (all driven by state.results / settings, nothing computed here):
+                                         CPA-limit dashed ring, own 6-minute vector, per target: dashed own + target
+                                         vectors to the look-ahead point, predicted-position spheres, CPA line + label,
+                                         pulsing meeting ring, status colouring, "T3 . stand-on [ACT]" tags, COLLISION
+                                         text overlay + 3D markers.  Every dynamic ribbon / label reuses one buffer or
+                                         canvas, so nothing is allocated per frame.
 
-                                 Phase 5 (night / day):
-                                   setNight() now FADES over ~1.8 s. Material colours, sea, fog, sky dome and light
-                                   rig are blended continuously between the day and night palettes; text and status
-                                   colours flip once at the half-way point.  At night every ship shows glowing
-                                   navigation lights (screen-size additive sprite + emissive core), taken from
-                                   COLREG.lightLayout() when the colreg state has lights, else a fallback set by
-                                   condition / type (fishing sidelights + sternlight only above 0.5 kn).  Up to 8
-                                   PointLights (2 per ship, fixed count so shaders never recompile) light the hulls.
-                                   By day the same ships show black day shapes (anchor ball, aground balls, JSON
-                                   shapes, or built-in NUC / RAM / CBD / fishing shapes).
-                                 =========================================================================== */
+                                       Phase 5 (night / day):
+                                         setNight() now FADES over ~1.8 s. Material colours, sea, fog, sky dome and light
+                                         rig are blended continuously between the day and night palettes; text and status
+                                         colours flip once at the half-way point.  At night every ship shows glowing
+                                         navigation lights (screen-size additive sprite + emissive core), taken from
+                                         COLREG.lightLayout() when the colreg state has lights, else a fallback set by
+                                         condition / type (fishing sidelights + sternlight only above 0.5 kn).  Up to 8
+                                         PointLights (2 per ship, fixed count so shaders never recompile) light the hulls.
+                                         By day the same ships show black day shapes (anchor ball, aground balls, JSON
+                                         shapes, or built-in NUC / RAM / CBD / fishing shapes).
+                                       =========================================================================== */
       (function (root) {
         "use strict";
         if (typeof THREE === "undefined") {
@@ -2900,8 +2911,8 @@
         };
 
         /* ---- ship model data -----------------------------------------------------
-                                 Model units = the 2D pixel units. [L, W] = length, half-beam (same as the 2D SIZE table).
-                                 Bow is -Z, starboard is +X.  REAL_NM = true length in nm, used in the chase / bridge views. */
+                                       Model units = the 2D pixel units. [L, W] = length, half-beam (same as the 2D SIZE table).
+                                       Bow is -Z, starboard is +X.  REAL_NM = true length in nm, used in the chase / bridge views. */
         const MODEL_DIMS = {
           large: [34, 3.4],
           tug: [18, 2.6],
@@ -2909,6 +2920,9 @@
           sail: [15, 1.8],
         };
         const REAL_NM = { large: 0.13, tug: 0.06, fishing: 0.04, sail: 0.015 };
+        /* how much bigger than true size ships are drawn (1 = true size); the minimum on-screen length is SHIP_MIN_PX */
+        const SHIP_MAG = 3;
+        const SHIP_MIN_PX = 48;
         const FOV = 40; // vertical field of view, degrees (bridge / chase widen it)
         const TDUR = 0.9; // view transition, seconds
         const BRIDGE_Y = 0.012; // bridge eye height, nm (about 22 m), before the size multiplier
@@ -3088,7 +3102,16 @@
         for (const k in ENV_PRESETS)
           // fields the older presets do not set (so a switch never keeps a stale value)
           ENV_PRESETS[k] = Object.assign(
-            { waveMul: 1, glint: 1, precip: "", pAmt: 0, seaSky: 0, glit: 0, seaDeep: "", seaShallow: "" },
+            {
+              waveMul: 1,
+              glint: 1,
+              precip: "",
+              pAmt: 0,
+              seaSky: 0,
+              glit: 0,
+              seaDeep: "",
+              seaShallow: "",
+            },
             ENV_PRESETS[k],
           );
         let env = Object.assign({ name: "clear", lowFx: false }, ENV_PRESETS.clear);
@@ -3282,7 +3305,7 @@
           return m;
         }
         /* Screen-size label sprite with its OWN canvas + texture, redrawn only when the text or colour changes
-                                 (no cache growth, no per-frame allocation). Always faces the camera, drawn on top, with a halo for legibility. */
+                                       (no cache growth, no per-frame allocation). Always faces the camera, drawn on top, with a halo for legibility. */
         function makeLabel(w, h, align) {
           const c = document.createElement("canvas");
           c.width = w;
@@ -3386,9 +3409,9 @@
         }
 
         /* Dashed (or solid) flat ribbon in a preallocated buffer, rewritten in place every frame.
-                                 line(x0,z0,x1,z1,halfWidth,dash,gap,y)   gap <= 0 gives one solid quad
-                                 ring(radius,halfWidth,dash,gap,y)        around the origin (own ship)
-                                 Widths and dash lengths are given in nm, so the caller passes (pixels * nm-per-pixel). */
+                                       line(x0,z0,x1,z1,halfWidth,dash,gap,y)   gap <= 0 gives one solid quad
+                                       ring(radius,halfWidth,dash,gap,y)        around the origin (own ship)
+                                       Widths and dash lengths are given in nm, so the caller passes (pixels * nm-per-pixel). */
         function DashRibbon(maxDash, material) {
           const pos = new Float32Array(maxDash * 18),
             geom = new THREE.BufferGeometry();
@@ -3482,9 +3505,9 @@
         }
 
         /* ---- ocean: one big shaded plane that follows the camera; the waves are anchored to the world ---------------
-                                 Wave heights are never built as geometry. Seven travelling sine waves (wavelength 420 m down to 27 m, deep-water
-                                 speed) give the surface slope, which drives sky reflection (Fresnel), a sun glint, crest foam and haze. Each wave
-                                 fades out when it is smaller than a few pixels, so the far sea stays calm instead of shimmering. */
+                                       Wave heights are never built as geometry. Seven travelling sine waves (wavelength 420 m down to 27 m, deep-water
+                                       speed) give the surface slope, which drives sky reflection (Fresnel), a sun glint, crest foam and haze. Each wave
+                                       fades out when it is smaller than a few pixels, so the far sea stays calm instead of shimmering. */
         const OCEAN_VS =
           "varying vec3 vW;\nvoid main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }";
         const OCEAN_FS = `
@@ -3635,8 +3658,8 @@ void main(){
         }
 
         /* Foam texture laid on the sea around every ship, in ship lengths (L): the plane spans 2.4 L across and 4 L along,
-                                 starting 0.6 L ahead of the centre. Top of the picture = bow. Bow wave, a foam ring along the hull, two Kelvin arms
-                                 and a propeller wash that fades astern. */
+                                       starting 0.6 L ahead of the centre. Top of the picture = bow. Bow wave, a foam ring along the hull, two Kelvin arms
+                                       and a propeller wash that fades astern. */
         function makeWakeTex() {
           const W = 256,
             H = 512,
@@ -3759,336 +3782,222 @@ void main(){
           g.computeVertexNormals();
           return new THREE.Mesh(g, m);
         }
-        /* ---- realistic container ship (type "large") ------------------------------------------------------
-                                 Lofted hull (bulbous bow, raked stem, flare, sheer, transom, two-tone paint), merged stacks of
-                                 coloured containers, a five-tier accommodation block with bridge wings, funnel, lifeboats, deck
-                                 cranes, rails and a hull-name decal. Model units as before: bow is -Z, starboard is +X, y = 0 is the sea. */
+        /* ==== ship models, matched to the Anglo-Eastern reference pictures ================================
+                                       loftHull() builds a lofted hull from options; every type below uses it. Model units as before:
+                                       bow is -Z, starboard is +X, y = 0 is the sea. */
         function csMats() {
           if (mats.csTop) return;
           const std = (o) =>
             new THREE.MeshStandardMaterial(
-              Object.assign({ roughness: 0.55, metalness: 0.15, side: THREE.DoubleSide }, o),
+              Object.assign(
+                { roughness: 0.55, metalness: 0.15, side: THREE.DoubleSide },
+                o,
+              ),
             );
-          mats.csTop = std({ color: "#4fb6c6" });
-          mats.csBottom = std({ color: "#d9534d", roughness: 0.7 });
-          mats.csDeck = std({ color: "#7a4a3d", roughness: 0.85, metalness: 0.05 });
-          mats.csWhite = std({ color: "#eef2f4", roughness: 0.6 });
-          mats.csGlass = std({ color: "#1b2b36", roughness: 0.25, metalness: 0.5 });
-          mats.csCrane = std({ color: "#e8b21c", roughness: 0.6 });
-          mats.csBoat = std({ color: "#ee6a1a", roughness: 0.6 });
-          mats.csDark = std({ color: "#23282c", roughness: 0.6 });
-          mats.csGrey = std({ color: "#8d979c", roughness: 0.5, metalness: 0.4 });
+          const defs = {
+            csTop: { color: "#6fcfea" },
+            csBottom: { color: "#c63d33", roughness: 0.7 },
+            csDeck: { color: "#b8432f", roughness: 0.85, metalness: 0.05 },
+            csWhite: { color: "#eef2f4", roughness: 0.6 },
+            csGlass: { color: "#1b2b36", roughness: 0.25, metalness: 0.5 },
+            csCrane: { color: "#e8b21c", roughness: 0.6 },
+            csBoat: { color: "#ee6a1a", roughness: 0.6 },
+            csDark: { color: "#23282c", roughness: 0.6 },
+            csGrey: { color: "#8d979c", roughness: 0.5, metalness: 0.4 },
+            vmTugTop: { color: "#1b2f5c" },
+            vmTugBot: { color: "#a8281f", roughness: 0.7 },
+            vmTugDeck: { color: "#59656b", roughness: 0.85 },
+            vmRed: { color: "#c0392b" },
+            vmNavy: { color: "#1b2f5c" },
+            vmFishTop: { color: "#16357c" },
+            vmFishBot: { color: "#8f1d1d", roughness: 0.7 },
+            vmFishDeck: { color: "#b98a52", roughness: 0.85 },
+            vmFishRoof: { color: "#1f45b0" },
+            vmBronze: { color: "#6b5230", roughness: 0.5, metalness: 0.5 },
+            vmYTop: { color: "#f7f9fa", roughness: 0.35 },
+            vmYBot: { color: "#e6ebee", roughness: 0.5 },
+            vmYDeck: { color: "#b98a52", roughness: 0.8 },
+            vmYStripe: { color: "#2a66b8", roughness: 0.4 },
+            vmWhiteLine: { color: "#ffffff", roughness: 0.4 },
+            vmWood: { color: "#a8672f", roughness: 0.7 },
+            vmSail: { color: "#f5f5f1", roughness: 0.9, metalness: 0 },
+            vmBgTop: { color: "#7b3b2e" },
+            vmBgBot: { color: "#3f2a26", roughness: 0.8 },
+            vmBgDeck: { color: "#6b6b66", roughness: 0.85 },
+            vmC0: { color: "#2d63c8" },
+            vmC1: { color: "#d23b32" },
+            vmC2: { color: "#9aa3a8" },
+            vmC3: { color: "#e08a1e" },
+            vmSand: {
+              color: "#b9a374",
+              roughness: 1,
+              metalness: 0,
+              transparent: true,
+              opacity: 0.95,
+            },
+            vmShallow: {
+              color: "#8fd6c8",
+              roughness: 1,
+              metalness: 0,
+              transparent: true,
+              opacity: 0.38,
+              depthWrite: false,
+            },
+            vmRock: {
+              color: "#4a4a46",
+              roughness: 0.95,
+              metalness: 0,
+              flatShading: true,
+            },
+          };
+          Object.keys(defs).forEach((k) => (mats[k] = std(defs[k])));
           mats.csCont = new THREE.MeshStandardMaterial({
             vertexColors: true,
             roughness: 0.55,
             metalness: 0.2,
             side: THREE.DoubleSide,
           });
-          const c = document.createElement("canvas");
-          c.width = 1024;
-          c.height = 128;
-          const x = c.getContext("2d");
-          x.font = "bold 92px Arial, Helvetica, sans-serif";
-          x.textAlign = "center";
-          x.textBaseline = "middle";
-          x.fillStyle = "#ffffff";
-          x.fillText("SHIPPING LINE", 512, 68);
-          const tex = new THREE.CanvasTexture(c);
-          tex.anisotropy = 4;
-          mats.csDecal = new THREE.MeshStandardMaterial({
-            map: tex,
+          mats.vmRing = new THREE.MeshBasicMaterial({
+            color: "#ffffff",
+            transparent: true,
+            opacity: 0.4,
+            depthWrite: false,
+            side: THREE.DoubleSide,
+          });
+          mats.vmChain = new THREE.LineDashedMaterial({
+            color: "#3a3f44",
+            dashSize: 0.22,
+            gapSize: 0.1,
+          });
+          /* hull-name decals: "ANGLO-EASTERN" with the gold logo */
+          const decal = (key, text, color, logo) => {
+            const c = document.createElement("canvas");
+            c.width = 1024;
+            c.height = 128;
+            const x = c.getContext("2d"),
+              hh = 128;
+            let tx = 512;
+            if (logo) {
+              const r = hh * 0.4,
+                cx = hh * 0.5 + 4,
+                cy = hh / 2;
+              x.strokeStyle = "#e8a91c";
+              x.lineWidth = hh * 0.07;
+              x.beginPath();
+              x.arc(cx, cy, r, 0, 6.2832);
+              x.stroke();
+              x.beginPath();
+              x.moveTo(cx - r, cy);
+              x.lineTo(cx + r, cy);
+              x.moveTo(cx, cy - r);
+              x.lineTo(cx, cy + r);
+              x.stroke();
+              x.beginPath();
+              x.ellipse(cx, cy, r * 0.55, r, 0, 0, 6.2832);
+              x.stroke();
+              tx = (1024 + hh) / 2;
+            }
+            let fs = hh * 0.86;
+            x.font = "bold " + fs + "px Arial, Helvetica, sans-serif";
+            const maxW = (1024 - (logo ? hh : 0)) * 0.95,
+              tw = x.measureText(text).width;
+            if (tw > maxW) fs *= maxW / tw;
+            x.font = "bold " + Math.round(fs) + "px Arial, Helvetica, sans-serif";
+            x.textAlign = "center";
+            x.textBaseline = "middle";
+            x.fillStyle = color;
+            x.fillText(text, tx, hh * 0.54);
+            const tex = new THREE.CanvasTexture(c);
+            tex.anisotropy = 4;
+            mats[key] = new THREE.MeshStandardMaterial({
+              map: tex,
+              transparent: true,
+              roughness: 0.6,
+              metalness: 0,
+              depthWrite: false,
+              side: THREE.DoubleSide,
+            });
+          };
+          decal("dcLarge", "ANGLO-EASTERN", "#13294b", true);
+          decal("dcTug", "ANGLO EASTERN", "#ffffff", true);
+          decal("dcFish", "ANGLO-EASTERN", "#ffffff", true);
+          decal("dcYacht", "ANGLO-EASTERN", "#13294b", true);
+          const lc = document.createElement("canvas");
+          lc.width = 128;
+          lc.height = 128;
+          const lx = lc.getContext("2d");
+          lx.strokeStyle = "#e8a91c";
+          lx.lineWidth = 10;
+          lx.beginPath();
+          lx.arc(64, 64, 52, 0, 6.2832);
+          lx.stroke();
+          lx.beginPath();
+          lx.moveTo(12, 64);
+          lx.lineTo(116, 64);
+          lx.moveTo(64, 12);
+          lx.lineTo(64, 116);
+          lx.stroke();
+          lx.beginPath();
+          lx.ellipse(64, 64, 29, 52, 0, 0, 6.2832);
+          lx.stroke();
+          const lt = new THREE.CanvasTexture(lc);
+          lt.anisotropy = 4;
+          mats.dcLogo = new THREE.MeshStandardMaterial({
+            map: lt,
             transparent: true,
             roughness: 0.6,
             metalness: 0,
             depthWrite: false,
             side: THREE.DoubleSide,
           });
+          /* main sail with the logo printed on it (the texture is squashed in y to suit the tall, narrow sail) */
+          const sc = document.createElement("canvas");
+          sc.width = 512;
+          sc.height = 512;
+          const sx = sc.getContext("2d");
+          sx.fillStyle = "#f5f5f1";
+          sx.fillRect(0, 0, 512, 512);
+          sx.save();
+          sx.scale(1, 0.24);
+          sx.strokeStyle = "#e8a91c";
+          sx.lineWidth = 12;
+          sx.beginPath();
+          sx.arc(256, 880, 60, 0, 6.2832);
+          sx.stroke();
+          sx.beginPath();
+          sx.moveTo(196, 880);
+          sx.lineTo(316, 880);
+          sx.moveTo(256, 820);
+          sx.lineTo(256, 940);
+          sx.stroke();
+          sx.fillStyle = "#13294b";
+          sx.font = "bold 86px Arial, Helvetica, sans-serif";
+          sx.textAlign = "center";
+          sx.fillText("ANGLO-", 256, 1230);
+          sx.fillText("EASTERN", 256, 1440);
+          sx.restore();
+          const st = new THREE.CanvasTexture(sc);
+          st.anisotropy = 4;
+          const st2 = new THREE.CanvasTexture(sc); // mirrored copy for the face that is seen from starboard
+          st2.anisotropy = 4;
+          st2.wrapS = THREE.RepeatWrapping;
+          st2.repeat.x = -1;
+          st2.offset.x = 1;
+          mats.vmSailLogo = new THREE.MeshStandardMaterial({
+            map: st2,
+            roughness: 0.9,
+            metalness: 0,
+            side: THREE.FrontSide,
+          });
+          mats.vmSailLogoB = new THREE.MeshStandardMaterial({
+            map: st,
+            roughness: 0.9,
+            metalness: 0,
+            side: THREE.BackSide,
+          });
         }
-        function buildContainerShip(L, W, H, D) {
-          csMats();
-          const g = new THREE.Group();
-          const rake = 1.8,
-            z0 = -L / 2 + rake,
-            z1 = L / 2,
-            N = 44,
-            SPLIT = 0.9; // height of the red / blue paint line above the sea
-          const sm = (a, b, x) => {
-            const u = Math.min(1, Math.max(0, (x - a) / (b - a)));
-            return u * u * (3 - 2 * u);
-          };
-          const T = (z) => (z - z0) / (z1 - z0), // 0 at the stem, 1 at the transom
-            zAt = (t) => z0 + t * (z1 - z0);
-          const hw = (t) => W * Math.max(0.025, Math.pow(sm(0, 0.34, t), 0.55)) * (1 - 0.36 * sm(0.82, 1, t)), // waterline half-beam
-            hd = (t) => hw(t) * (1.02 + 0.28 * (1 - sm(0, 0.5, t))), // deck-edge half-beam (flare)
-            sheer = (t) => H + 1.2 * Math.pow(1 - sm(0, 0.32, t), 2), // deck height, rising to the forecastle
-            keel = (t) => D * (0.3 + 0.7 * sm(0, 0.38, t)) * (1 - 0.3 * sm(0.84, 1, t));
-          const mir = (p) => [-p[0], p[1], p[2]];
-
-          /* one half cross-section per station: red below the paint line, blue above it */
-          const station = (t) => {
-            const bw = hw(t),
-              bd = hd(t),
-              h = sheer(t),
-              d = keel(t),
-              z = zAt(t),
-              rb = Math.min(bw * 0.55, d * 0.7);
-            const rk = (y) => -rake * Math.max(0, 1 - t / 0.14) * ((y + d) / (h + d)); // raked stem
-            const P = [[0, -d]];
-            for (let k = 0; k <= 3; k++) {
-              const a = (k * Math.PI) / 6;
-              P.push([bw - rb + rb * Math.sin(a), -d + rb - rb * Math.cos(a)]);
-            }
-            P.push([bw, 0]);
-            P.push([bw + ((bd - bw) * SPLIT) / h, SPLIT]);
-            const red = P.map(([x, y]) => [x, y, z + rk(y)]);
-            return { red, blue: [red[red.length - 1], [bd, h, z + rk(h)]] };
-          };
-          const S = [];
-          for (let i = 0; i <= N; i++) S.push(station(i / N));
-          const ringRed = (s) => [...s.red.slice(1).reverse().map(mir), ...s.red];
-
-          const grid = (rows) => {
-            const m = rows[0].length,
-              pos = [],
-              idx = [];
-            rows.forEach((r) => r.forEach((p) => pos.push(p[0], p[1], p[2])));
-            for (let i = 0; i < rows.length - 1; i++)
-              for (let j = 0; j < m - 1; j++) {
-                const a = i * m + j,
-                  b = a + 1,
-                  c = a + m,
-                  d = c + 1;
-                idx.push(a, c, b, b, c, d);
-              }
-            const geo = new THREE.BufferGeometry();
-            geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-            geo.setIndex(idx);
-            geo.computeVertexNormals();
-            return geo;
-          };
-          const fan = (pts) => {
-            const n = pts.length,
-              c = [0, 0, 0],
-              idx = [];
-            pts.forEach((p) => {
-              c[0] += p[0] / n;
-              c[1] += p[1] / n;
-              c[2] += p[2] / n;
-            });
-            const pos = [...c];
-            pts.forEach((p) => pos.push(p[0], p[1], p[2]));
-            for (let i = 0; i < n; i++) idx.push(0, i + 1, ((i + 1) % n) + 1);
-            const geo = new THREE.BufferGeometry();
-            geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
-            geo.setIndex(idx);
-            geo.computeVertexNormals();
-            return geo;
-          };
-          g.add(new THREE.Mesh(grid(S.map(ringRed)), mats.csBottom));
-          g.add(new THREE.Mesh(grid(S.map((s) => s.blue)), mats.csTop));
-          g.add(new THREE.Mesh(grid(S.map((s) => s.blue.map(mir))), mats.csTop));
-          g.add(new THREE.Mesh(grid(S.map((s) => [mir(s.blue[1]), s.blue[1]])), mats.csDeck));
-          [0, N].forEach((i) => {
-            const s = S[i],
-              sp = s.blue[0],
-              dk = s.blue[1];
-            g.add(new THREE.Mesh(fan(ringRed(s)), mats.csBottom));
-            g.add(new THREE.Mesh(fan([mir(sp), sp, dk, mir(dk)]), mats.csTop));
-          });
-          const bulb = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), mats.csBottom); // bulbous bow
-          bulb.scale.set(0.62, 0.8, 1.9);
-          bulb.position.set(0, -0.95, z0 + 0.2);
-          g.add(bulb);
-          g.add(box(0.14, 2.1, 1.0, 0, -1.0, L / 2 - 1.1, mats.csDark)); // rudder
-
-          /* guard rails along both sides and round the bow */
-          const rail = (yo) => {
-            const pts = [];
-            for (let i = N; i >= 0; i--) {
-              const t = i / N;
-              pts.push([hd(t) * 0.985, sheer(t) + yo, zAt(t) - rake * Math.max(0, 1 - t / 0.14)]);
-            }
-            for (let i = 0; i <= N; i++) {
-              const t = i / N;
-              pts.push([-hd(t) * 0.985, sheer(t) + yo, zAt(t) - rake * Math.max(0, 1 - t / 0.14)]);
-            }
-            return lineObj(pts, "#69757b", false);
-          };
-          g.add(rail(0.3), rail(0.62));
-
-          /* hull name decal, readable from outside on both sides */
-          [-1, 1].forEach((sg) => {
-            const zc = L * 0.03,
-              tt = T(zc),
-              yc = 2.05;
-            const xs = hw(tt) + ((hd(tt) - hw(tt)) * yc) / sheer(tt) + 0.04;
-            const p = new THREE.Mesh(new THREE.PlaneGeometry(8.8, 1.1), mats.csDecal);
-            p.position.set(sg * xs, yc, zc);
-            p.rotation.y = sg > 0 ? Math.PI / 2 : -Math.PI / 2;
-            g.add(p);
-          });
-
-          /* containers: one merged mesh, vertex colours, a few tiers higher in the middle than at the sides */
-          const rnd = (() => {
-            let s = ((Math.random() * 2147483646) | 0) + 1;
-            return () => (s = (s * 48271) % 2147483647) / 2147483647;
-          })();
-          const PAL = ["#2d63c8", "#2d63c8", "#d23b32", "#d23b32", "#2fa862", "#e8e8e2", "#9aa3a8", "#e08a1e", "#1f3f7a"];
-          const cp = [],
-            cn = [],
-            cc = [],
-            ci = [],
-            tc = new THREE.Color();
-          const FACES = [
-            [[1, 0, 0], [[1, -1, -1], [1, 1, -1], [1, 1, 1], [1, -1, 1]], 1.0],
-            [[-1, 0, 0], [[-1, -1, 1], [-1, 1, 1], [-1, 1, -1], [-1, -1, -1]], 1.0],
-            [[0, 1, 0], [[-1, 1, -1], [-1, 1, 1], [1, 1, 1], [1, 1, -1]], 1.12],
-            [[0, 0, 1], [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]], 0.88],
-            [[0, 0, -1], [[1, -1, -1], [-1, -1, -1], [-1, 1, -1], [1, 1, -1]], 0.88],
-          ];
-          const pushBox = (cx, cy, cz, sx, sy, sz, hex) => {
-            tc.set(hex);
-            const v = 0.86 + 0.14 * rnd();
-            FACES.forEach(([n, cs, f]) => {
-              const b = cp.length / 3;
-              cs.forEach((q) => {
-                cp.push(cx + (q[0] * sx) / 2, cy + (q[1] * sy) / 2, cz + (q[2] * sz) / 2);
-                cn.push(n[0], n[1], n[2]);
-                cc.push(Math.min(1, tc.r * v * f), Math.min(1, tc.g * v * f), Math.min(1, tc.b * v * f));
-              });
-              ci.push(b, b + 1, b + 2, b, b + 2, b + 3);
-            });
-          };
-          const zh = L * 0.265, // accommodation block centre
-            hl = 3.9,
-            bayP = 1.0,
-            th = 0.5,
-            cw0 = 0.52;
-          const bays = [];
-          for (let z = -L * 0.335; z <= L * 0.2 - 0.5; z += bayP) bays.push(z);
-          for (let z = zh + 2.5; z <= L / 2 - 2.1; z += bayP) bays.push(z);
-          const baseCol = {};
-          bays.forEach((zb, bi) => {
-            const uw = hd(T(zb)) * 0.8;
-            if (uw < 0.85) return;
-            const nc = Math.min(11, Math.floor((2 * uw) / cw0)),
-              cw = (2 * uw) / nc,
-              yb = sheer(T(zb - bayP / 2));
-            for (let c = 0; c < nc; c++) {
-              const xc = -uw + cw * (c + 0.5),
-                edge = Math.abs(xc) / uw;
-              let n = Math.round(6.4 - 2.2 * edge * edge + (rnd() - 0.5) * 1.6);
-              if (zb < -L * 0.22) n -= 1;
-              n = Math.max(2, Math.min(7, n));
-              const key = (bi >> 1) + "_" + (c >> 1);
-              if (baseCol[key] === undefined) baseCol[key] = (rnd() * PAL.length) | 0;
-              for (let k = 0; k < n; k++) {
-                const hex = rnd() < 0.28 ? PAL[(rnd() * PAL.length) | 0] : PAL[baseCol[key]];
-                pushBox(xc, yb + th * (k + 0.5), zb, cw * 0.94, th * 0.94, bayP * 0.9, hex);
-              }
-            }
-          });
-          const cg = new THREE.BufferGeometry();
-          cg.setAttribute("position", new THREE.Float32BufferAttribute(cp, 3));
-          cg.setAttribute("normal", new THREE.Float32BufferAttribute(cn, 3));
-          cg.setAttribute("color", new THREE.Float32BufferAttribute(cc, 3));
-          cg.setIndex(ci);
-          g.add(new THREE.Mesh(cg, mats.csCont));
-
-          /* accommodation block, bridge, funnel, mast */
-          const y0 = H,
-            tierH = 0.82,
-            hwd = hd(T(zh)) * 0.74,
-            zf = zh - hl / 2,
-            zaft = zh + hl / 2;
-          for (let k = 0; k < 5; k++) {
-            const zfk = zf + k * 0.22,
-              len = zaft - zfk,
-              zc = (zfk + zaft) / 2,
-              yc = y0 + tierH * (k + 0.5);
-            g.add(box(2 * hwd, tierH * 0.98, len, 0, yc, zc, mats.csWhite));
-            g.add(box(2 * hwd * 0.9, 0.26, 0.05, 0, yc + 0.1, zfk - 0.01, mats.csGlass));
-            [-1, 1].forEach((sg) =>
-              g.add(box(0.05, 0.24, len * 0.8, sg * (hwd + 0.01), yc + 0.1, zc + 0.1, mats.csGlass)),
-            );
-          }
-          const yt = y0 + tierH * 5, // roof of the top tier
-            zfb = zf + 4 * 0.22 - 0.22, // bridge front, overhanging
-            bw2 = hwd + 0.55,
-            bz = zfb + 0.9;
-          g.add(box(2 * bw2, 0.78, 1.8, 0, yt + 0.39, bz, mats.csWhite)); // bridge deck with wings
-          g.add(box(2 * bw2 * 0.96, 0.3, 0.05, 0, yt + 0.5, zfb - 0.01, mats.csGlass));
-          [-1, 1].forEach((sg) => g.add(box(0.05, 0.3, 1.5, sg * (bw2 + 0.01), yt + 0.5, bz, mats.csGlass)));
-          const yr = yt + 0.78;
-          g.add(box(1.2, 0.35, 0.8, 0, yr + 0.175, bz + 0.1, mats.csWhite)); // wheelhouse top
-          g.add(cyl(0.07, 3.6, 0, yr + 0.35 + 1.8, bz + 0.1, mats.csGrey, 6)); // mast
-          g.add(box(1.0, 0.05, 0.14, 0, yr + 0.35 + 3.4, bz + 0.1, mats.csDark)); // radar
-          g.add(box(0.9, 0.05, 0.05, 0, yr + 0.35 + 2.6, bz + 0.1, mats.csGrey)); // yardarm
-          const fz = zaft - 0.9; // funnel
-          const fun = new THREE.Mesh(new THREE.CylinderGeometry(0.58, 0.72, 2.4, 14), mats.csWhite);
-          fun.scale.x = 0.85;
-          fun.position.set(0, y0 + tierH * 5 + 1.2, fz);
-          g.add(fun);
-          const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.58, 0.58, 0.55, 14), mats.csDark);
-          cap.scale.x = 0.85;
-          cap.position.set(0, y0 + tierH * 5 + 2.4 - 0.275, fz);
-          g.add(cap);
-          [-1, 1].forEach((sg) => {
-            const lx = sg * (hwd + 0.42),
-              ly = y0 + tierH * 2 + 0.25;
-            g.add(box(0.5, 0.42, 1.7, lx, ly, zh + 0.15, mats.csBoat)); // lifeboat
-            g.add(box(0.62, 0.06, 1.9, lx, ly - 0.26, zh + 0.15, mats.csGrey)); // davit platform
-          });
-
-          /* two deck cranes on the port side, and the forecastle gear */
-          [-4.2, -9.0].forEach((zc) => {
-            const t = T(zc),
-              xc = -hd(t) * 0.93,
-              hb = sheer(t);
-            g.add(box(0.5, 4.8, 0.5, xc, hb + 2.4, zc, mats.csCrane));
-            g.add(box(0.8, 0.6, 0.8, xc, hb + 5.0, zc, mats.csCrane));
-            g.add(boom(xc, hb + 5.0, zc, xc + 1.6, hb + 6.6, zc - 1.7, 0.09, mats.csCrane));
-            g.add(lineObj([[xc + 1.6, hb + 6.6, zc - 1.7], [xc, hb + 5.7, zc + 0.3]], "#c9d1d6", false));
-            g.add(lineObj([[xc + 1.6, hb + 6.6, zc - 1.7], [xc + 1.1, hb + 3.9, zc - 1.2]], "#c9d1d6", false));
-          });
-          const zw = -L / 2 + 3.2;
-          g.add(box(1.0, 0.4, 0.8, 0, sheer(T(zw)) + 0.2, zw, mats.csDark)); // windlass
-          g.add(cyl(0.06, 1.8, 0, sheer(T(-L / 2 + 2.0)) + 0.9, -L / 2 + 2.0, mats.csGrey, 6)); // jackstaff
-          return g;
-        }
-
-        /* ---- realistic tug, trawler and sailing yacht, plus anchor chain and grounded shoal --------------------
-                                 loftHull() is the same lofted hull as the container ship, with the shape set by options.
-                                 Same model units: bow is -Z, starboard is +X, y = 0 is the sea. */
         function vmMats() {
-          if (mats.vmTugTop) return;
           csMats();
-          const std = (o) =>
-            new THREE.MeshStandardMaterial(
-              Object.assign({ roughness: 0.55, metalness: 0.15, side: THREE.DoubleSide }, o),
-            );
-          mats.vmTugTop = std({ color: "#243a5e" });
-          mats.vmTugBot = std({ color: "#9e2b2b", roughness: 0.7 });
-          mats.vmTugDeck = std({ color: "#59656b", roughness: 0.85 });
-          mats.vmRed = std({ color: "#c0392b" });
-          mats.vmFishTop = std({ color: "#2d5a8c" });
-          mats.vmFishBot = std({ color: "#7c2a28", roughness: 0.7 });
-          mats.vmFishDeck = std({ color: "#6d6a62", roughness: 0.85 });
-          mats.vmYTop = std({ color: "#f4f6f7", roughness: 0.35 });
-          mats.vmYBot = std({ color: "#1f3a6e", roughness: 0.6 });
-          mats.vmYDeck = std({ color: "#b98a52", roughness: 0.8 });
-          mats.vmBgTop = std({ color: "#7b3b2e" });
-          mats.vmBgBot = std({ color: "#3f2a26", roughness: 0.8 });
-          mats.vmBgDeck = std({ color: "#6b6b66", roughness: 0.85 });
-          mats.vmC0 = std({ color: "#2d63c8" });
-          mats.vmC1 = std({ color: "#d23b32" });
-          mats.vmC2 = std({ color: "#9aa3a8" });
-          mats.vmC3 = std({ color: "#e08a1e" });
-          mats.vmSand = std({ color: "#b9a374", roughness: 1, metalness: 0, transparent: true, opacity: 0.95 });
-          mats.vmShallow = std({ color: "#8fd6c8", roughness: 1, metalness: 0, transparent: true, opacity: 0.38, depthWrite: false });
-          mats.vmRock = std({ color: "#4a4a46", roughness: 0.95, metalness: 0, flatShading: true });
-          mats.vmRing = new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.4, depthWrite: false, side: THREE.DoubleSide });
-          mats.vmChain = new THREE.LineDashedMaterial({ color: "#3a3f44", dashSize: 0.22, gapSize: 0.1 });
         }
         function loftHull(g, o) {
           const { L, W, H, D } = o,
@@ -4104,10 +4013,20 @@ void main(){
           };
           const T = (z) => (z - z0) / (z1 - z0),
             zAt = (t) => z0 + t * (z1 - z0);
-          const hw = (t) => W * Math.max(0.025, Math.pow(sm(0, o.bowLen, t), o.bowPow)) * (1 - o.sternTaper * sm(1 - o.sternLen, 1, t)),
-            hd = (t) => hw(t) * (1 + o.flareBase + o.flare * (1 - sm(0, o.flareLen, t))),
-            sheer = (t) => H + o.sheerRise * Math.pow(1 - sm(0, o.sheerLen, t), 2) + (o.sternRise || 0) * sm(0.85, 1, t),
-            keel = (t) => D * (o.keelBow + (1 - o.keelBow) * sm(0, 0.38, t)) * (1 - o.keelStern * sm(0.84, 1, t));
+          const hw = (t) =>
+              W *
+              Math.max(0.025, Math.pow(sm(0, o.bowLen, t), o.bowPow)) *
+              (1 - o.sternTaper * sm(1 - o.sternLen, 1, t)),
+            hd = (t) =>
+              hw(t) * (1 + o.flareBase + o.flare * (1 - sm(0, o.flareLen, t))),
+            sheer = (t) =>
+              H +
+              o.sheerRise * Math.pow(1 - sm(0, o.sheerLen, t), 2) +
+              (o.sternRise || 0) * sm(0.85, 1, t),
+            keel = (t) =>
+              D *
+              (o.keelBow + (1 - o.keelBow) * sm(0, 0.38, t)) *
+              (1 - o.keelStern * sm(0.84, 1, t));
           const mir = (p) => [-p[0], p[1], p[2]];
           const station = (t) => {
             const bw = hw(t),
@@ -4125,7 +4044,12 @@ void main(){
             P.push([bw, 0]);
             P.push([bw + ((bd - bw) * SPLIT) / h, SPLIT]);
             const red = P.map(([x, y]) => [x, y, z + rk(y)]);
-            return { red, blue: [red[red.length - 1], [bd, h, z + rk(h)]] };
+            const side = (y) => [
+              (bw + ((bd - bw) * y) / h) * 1.006 + 0.004,
+              y,
+              z + rk(y),
+            ]; // a point on the side, just proud of the plating
+            return { red, side, blue: [red[red.length - 1], [bd, h, z + rk(h)]] };
           };
           const S = [];
           for (let i = 0; i <= N; i++) S.push(station(i / N));
@@ -4170,7 +4094,9 @@ void main(){
           g.add(new THREE.Mesh(grid(S.map(ringRed)), o.bottom));
           g.add(new THREE.Mesh(grid(S.map((s) => s.blue)), o.top));
           g.add(new THREE.Mesh(grid(S.map((s) => s.blue.map(mir))), o.top));
-          g.add(new THREE.Mesh(grid(S.map((s) => [mir(s.blue[1]), s.blue[1]])), o.deck));
+          g.add(
+            new THREE.Mesh(grid(S.map((s) => [mir(s.blue[1]), s.blue[1]])), o.deck),
+          );
           [0, N].forEach((i) => {
             const s = S[i],
               sp = s.blue[0],
@@ -4178,38 +4104,123 @@ void main(){
             g.add(new THREE.Mesh(fan(ringRed(s)), o.bottom));
             g.add(new THREE.Mesh(fan([mir(sp), sp, dk, mir(dk)]), o.top));
           });
+          if (o.stripe) {
+            g.add(
+              new THREE.Mesh(
+                grid(S.map((s) => [s.side(o.stripe.y0), s.side(o.stripe.y1)])),
+                o.stripe.mat,
+              ),
+            );
+            g.add(
+              new THREE.Mesh(
+                grid(
+                  S.map((s) => [mir(s.side(o.stripe.y0)), mir(s.side(o.stripe.y1))]),
+                ),
+                o.stripe.mat,
+              ),
+            );
+          }
+          const zEdge = (t) => zAt(t) - rake * Math.max(0, 1 - t / rl);
           const rail = (yo) => {
             const pts = [];
             for (let i = N; i >= 0; i--) {
               const t = i / N;
-              pts.push([hd(t) * 0.985, sheer(t) + yo, zAt(t) - rake * Math.max(0, 1 - t / rl)]);
+              pts.push([hd(t) * 0.985, sheer(t) + yo, zEdge(t)]);
             }
             for (let i = 0; i <= N; i++) {
               const t = i / N;
-              pts.push([-hd(t) * 0.985, sheer(t) + yo, zAt(t) - rake * Math.max(0, 1 - t / rl)]);
+              pts.push([-hd(t) * 0.985, sheer(t) + yo, zEdge(t)]);
             }
             return lineObj(pts, "#69757b", false);
           };
           (o.rails || []).forEach((yo) => g.add(rail(yo)));
+          if (o.posts) {
+            const pp = [];
+            for (let i = 0; i <= N; i += 2) {
+              const t = i / N;
+              [-1, 1].forEach((sg) =>
+                pp.push(
+                  sg * hd(t) * 0.985,
+                  sheer(t),
+                  zEdge(t),
+                  sg * hd(t) * 0.985,
+                  sheer(t) + o.posts,
+                  zEdge(t),
+                ),
+              );
+            }
+            const pg = new THREE.BufferGeometry();
+            pg.setAttribute("position", new THREE.Float32BufferAttribute(pp, 3));
+            g.add(
+              new THREE.LineSegments(
+                pg,
+                new THREE.LineBasicMaterial({ color: "#aab4ba" }),
+              ),
+            );
+          }
           return { hw, hd, sheer, T, zAt };
         }
-        /* a sail with some belly: head A, tack B, clew C (x = to starboard) */
-        function sailMesh(A, B, C, belly, m) {
+        /* name plate that follows the hull side exactly (so the bow or stern curve can never cut letters off) */
+        function sideDecal(g, h, mat, zc, yc, w, hh) {
+          [-1, 1].forEach((sg) => {
+            const nz = 24,
+              pos = [],
+              uv = [],
+              idx = [];
+            for (let i = 0; i <= nz; i++) {
+              const f = i / nz,
+                z = zc - w / 2 + w * f,
+                t = h.T(z),
+                hwv = h.hw(t),
+                hdv = h.hd(t),
+                sh = h.sheer(t);
+              for (let k = 0; k <= 1; k++) {
+                const y = yc - hh / 2 + hh * k,
+                  x = hwv + ((hdv - hwv) * y) / sh;
+                pos.push(sg * (x * 1.006 + 0.045), y, z);
+                uv.push(sg < 0 ? f : 1 - f, k); // reads bow-to-stern on the port side, stern-to-bow on starboard
+              }
+            }
+            for (let i = 0; i < nz; i++) {
+              const a = i * 2;
+              idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3);
+            }
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+            geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+            geo.setIndex(idx);
+            geo.computeVertexNormals();
+            g.add(new THREE.Mesh(geo, mat));
+          });
+        }
+        function sailMesh(A, B, C, belly, m, withUV) {
           const nu = 8,
             nv = 6,
             pos = [],
+            uv = [],
             idx = [];
           for (let i = 0; i <= nu; i++) {
             const u = i / nu;
-            const lf = [B[0] + (A[0] - B[0]) * u, B[1] + (A[1] - B[1]) * u, B[2] + (A[2] - B[2]) * u],
-              lc = [C[0] + (A[0] - C[0]) * u, C[1] + (A[1] - C[1]) * u, C[2] + (A[2] - C[2]) * u];
+            const lf = [
+                B[0] + (A[0] - B[0]) * u,
+                B[1] + (A[1] - B[1]) * u,
+                B[2] + (A[2] - B[2]) * u,
+              ],
+              lc = [
+                C[0] + (A[0] - C[0]) * u,
+                C[1] + (A[1] - C[1]) * u,
+                C[2] + (A[2] - C[2]) * u,
+              ];
             for (let j = 0; j <= nv; j++) {
               const v = j / nv;
               pos.push(
-                lf[0] + (lc[0] - lf[0]) * v + belly * Math.sin(Math.PI * v) * (1 - 0.45 * u),
+                lf[0] +
+                  (lc[0] - lf[0]) * v +
+                  belly * Math.sin(Math.PI * v) * (1 - 0.45 * u),
                 lf[1] + (lc[1] - lf[1]) * v,
                 lf[2] + (lc[2] - lf[2]) * v,
               );
+              uv.push(v, u);
             }
           }
           for (let i = 0; i < nu; i++)
@@ -4222,188 +4233,889 @@ void main(){
             }
           const geo = new THREE.BufferGeometry();
           geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+          if (withUV) geo.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
           geo.setIndex(idx);
           geo.computeVertexNormals();
           return new THREE.Mesh(geo, m);
         }
+        /* a string of signal flags hung between two points */
+        function bunting(g, A, B, sag, n) {
+          const cols = [
+              "#f2c61b",
+              "#2d63c8",
+              "#d23b32",
+              "#2fa862",
+              "#ffffff",
+              "#e08a1e",
+              "#f2c61b",
+              "#1f3f7a",
+            ],
+            pts = [],
+            pos = [],
+            col = [],
+            c = new THREE.Color();
+          for (let i = 0; i <= n; i++) {
+            const s = i / n;
+            pts.push([
+              A[0] + (B[0] - A[0]) * s,
+              A[1] + (B[1] - A[1]) * s - sag * Math.sin(Math.PI * s),
+              A[2] + (B[2] - A[2]) * s,
+            ]);
+          }
+          g.add(lineObj(pts, "#cfd6da", false));
+          const dl = Math.hypot(B[0] - A[0], B[2] - A[2]) || 1,
+            dx = ((B[0] - A[0]) / dl) * 0.17,
+            dz = ((B[2] - A[2]) / dl) * 0.17;
+          for (let i = 1; i < n; i++) {
+            const p = pts[i];
+            c.set(cols[i % cols.length]);
+            [
+              [0, 0, 0],
+              [dx, 0, dz],
+              [dx, -0.3, dz],
+              [0, 0, 0],
+              [dx, -0.3, dz],
+              [0, -0.3, 0],
+            ].forEach((q) => {
+              pos.push(p[0] + q[0], p[1] + q[1], p[2] + q[2]);
+              col.push(c.r, c.g, c.b);
+            });
+          }
+          const geo = new THREE.BufferGeometry();
+          geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+          geo.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+          geo.computeVertexNormals();
+          g.add(new THREE.Mesh(geo, mats.csCont));
+        }
         const winBox = (w, h, d, x, y, z) => box(w, h, d, x, y, z, mats.csGlass);
+        const ringObj = (R, r, m, x, y, z) => {
+          const o = new THREE.Mesh(new THREE.TorusGeometry(R, r, 8, 14), m);
+          o.position.set(x, y, z);
+          return o;
+        };
 
-        /* ---- tug with a tow -------------------------------------------------------------------------------- */
+        /* ---- container ship (type "large"): cyan hull, red bottom, forward bridge, twin funnels ------------- */
+        function buildContainerShip(L, W, H, D) {
+          csMats();
+          const g = new THREE.Group();
+          const rake = 1.8,
+            z0 = -L / 2 + rake;
+          const h = loftHull(g, {
+            L,
+            W,
+            H,
+            D,
+            N: 44,
+            rake,
+            rakeLen: 0.14,
+            bowLen: 0.34,
+            bowPow: 0.55,
+            sternLen: 0.18,
+            sternTaper: 0.36,
+            flareBase: 0.02,
+            flare: 0.28,
+            flareLen: 0.5,
+            sheerRise: 1.2,
+            sheerLen: 0.32,
+            keelBow: 0.3,
+            keelStern: 0.3,
+            split: 0.9,
+            top: mats.csTop,
+            bottom: mats.csBottom,
+            deck: mats.csDeck,
+            rails: [0.3, 0.62],
+          });
+          const T = h.T,
+            hd = h.hd,
+            sheer = h.sheer;
+          const bulb = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 20, 14),
+            mats.csBottom,
+          );
+          bulb.scale.set(0.62, 0.8, 1.9);
+          bulb.position.set(0, -0.95, z0 + 0.2);
+          g.add(bulb);
+          g.add(box(0.14, 2.1, 1.0, 0, -1.0, L / 2 - 1.1, mats.csDark)); // rudder
+          sideDecal(g, h, mats.dcLarge, L * 0.1, 2.15, 14, 1.75);
+          /* forecastle: red deck, bulwark, windlasses and the white lattice foremast */
+          for (let z = -L / 2 + 0.6; z < -L * 0.3; z += 0.9) {
+            const t = T(z),
+              bd = hd(t) * 0.97,
+              ys = sheer(t);
+            [-1, 1].forEach((sg) =>
+              g.add(box(0.07, 0.6, 0.95, sg * bd, ys + 0.3, z, mats.csDeck)),
+            );
+          }
+          const zw = -L / 2 + 3.2,
+            yw = sheer(T(zw));
+          g.add(box(1.6, 0.5, 0.9, 0, yw + 0.25, zw, mats.csDeck));
+          [-1, 1].forEach((sg) => {
+            const d = cyl(0.3, 0.7, sg * 0.9, yw + 0.45, zw, mats.csDeck, 10);
+            d.rotation.z = Math.PI / 2;
+            g.add(d);
+          });
+          const zm = -L / 2 + 5.2,
+            ym = sheer(T(zm));
+          g.add(cyl(0.09, 6.0, 0, ym + 3.0, zm, mats.csWhite, 8));
+          [
+            [-0.45, -0.4],
+            [0.45, -0.4],
+            [0, 0.5],
+          ].forEach(([lx, lz]) =>
+            g.add(boom(lx, ym, zm + lz, 0, ym + 4.6, zm, 0.05, mats.csWhite)),
+          );
+          g.add(box(1.0, 0.05, 0.3, 0, ym + 5.2, zm, mats.csDark));
+          g.add(box(0.7, 0.05, 0.05, 0, ym + 4.2, zm, mats.csWhite));
+          /* containers: one merged mesh with vertex colours */
+          const rnd = (() => {
+            let s = ((Math.random() * 2147483646) | 0) + 1;
+            return () => (s = (s * 48271) % 2147483647) / 2147483647;
+          })();
+          const PAL = [
+            "#eaeae5",
+            "#eaeae5",
+            "#d4d8d8",
+            "#d4d8d8",
+            "#2d63c8",
+            "#d23b32",
+            "#e8c21c",
+            "#2fa862",
+            "#e08a1e",
+            "#1f3f7a",
+            "#8b9aa3",
+            "#7a4aa0",
+          ];
+          const cp = [],
+            cn = [],
+            cc = [],
+            ci = [],
+            tc = new THREE.Color();
+          const FACES = [
+            [
+              [1, 0, 0],
+              [
+                [1, -1, -1],
+                [1, 1, -1],
+                [1, 1, 1],
+                [1, -1, 1],
+              ],
+              1.0,
+            ],
+            [
+              [-1, 0, 0],
+              [
+                [-1, -1, 1],
+                [-1, 1, 1],
+                [-1, 1, -1],
+                [-1, -1, -1],
+              ],
+              1.0,
+            ],
+            [
+              [0, 1, 0],
+              [
+                [-1, 1, -1],
+                [-1, 1, 1],
+                [1, 1, 1],
+                [1, 1, -1],
+              ],
+              1.12,
+            ],
+            [
+              [0, 0, 1],
+              [
+                [-1, -1, 1],
+                [1, -1, 1],
+                [1, 1, 1],
+                [-1, 1, 1],
+              ],
+              0.88,
+            ],
+            [
+              [0, 0, -1],
+              [
+                [1, -1, -1],
+                [-1, -1, -1],
+                [-1, 1, -1],
+                [1, 1, -1],
+              ],
+              0.88,
+            ],
+          ];
+          const pushBox = (cx, cy, cz, sx, sy, sz, hex) => {
+            tc.set(hex);
+            const v = 0.86 + 0.14 * rnd();
+            FACES.forEach(([n, cs, f]) => {
+              const b = cp.length / 3;
+              cs.forEach((q) => {
+                cp.push(
+                  cx + (q[0] * sx) / 2,
+                  cy + (q[1] * sy) / 2,
+                  cz + (q[2] * sz) / 2,
+                );
+                cn.push(n[0], n[1], n[2]);
+                cc.push(
+                  Math.min(1, tc.r * v * f),
+                  Math.min(1, tc.g * v * f),
+                  Math.min(1, tc.b * v * f),
+                );
+              });
+              ci.push(b, b + 1, b + 2, b, b + 2, b + 3);
+            });
+          };
+          const zb = -L * 0.1,
+            hl = 3.0; // bridge block
+          const fzs = [L * 0.27, L * 0.37]; // twin funnels
+          const bayP = 1.0,
+            th = 0.5,
+            cw0 = 0.52,
+            baseCol = {};
+          const bays = [];
+          for (let z = -L * 0.32; z <= L / 2 - 2.0; z += bayP) {
+            if (z > zb - hl / 2 - 0.6 && z < zb + hl / 2 + 0.6) continue;
+            bays.push(z);
+          }
+          bays.forEach((zb2, bi) => {
+            const uw = hd(T(zb2)) * 0.8;
+            if (uw < 0.85) return;
+            const nc = Math.min(11, Math.floor((2 * uw) / cw0)),
+              cw = (2 * uw) / nc,
+              yb = sheer(T(zb2 - bayP / 2));
+            for (let c = 0; c < nc; c++) {
+              const xc = -uw + cw * (c + 0.5),
+                edge = Math.abs(xc) / uw;
+              if (fzs.some((fz) => Math.abs(xc) < 0.95 && Math.abs(zb2 - fz) < 1.25))
+                continue; // the funnel stands here
+              let n = Math.round(6.8 - 2.4 * edge * edge + (rnd() - 0.5) * 1.8);
+              if (zb2 < -L * 0.2) n -= 2;
+              else if (zb2 > zb) n += 1;
+              n = Math.max(2, Math.min(8, n));
+              const key = (bi >> 1) + "_" + (c >> 1);
+              if (baseCol[key] === undefined) baseCol[key] = (rnd() * PAL.length) | 0;
+              for (let k = 0; k < n; k++) {
+                const hex =
+                  rnd() < 0.3 ? PAL[(rnd() * PAL.length) | 0] : PAL[baseCol[key]];
+                pushBox(
+                  xc,
+                  yb + th * (k + 0.5),
+                  zb2,
+                  cw * 0.94,
+                  th * 0.94,
+                  bayP * 0.9,
+                  hex,
+                );
+              }
+            }
+            if (bi % 3 === 0)
+              [-1, 1].forEach((sg) =>
+                pushBox(
+                  sg * (uw + 0.08),
+                  yb + th * 3.5,
+                  zb2 - bayP / 2,
+                  0.08,
+                  th * 7,
+                  0.08,
+                  "#c43a2a",
+                ),
+              ); // red cell guides
+          });
+          const cg = new THREE.BufferGeometry();
+          cg.setAttribute("position", new THREE.Float32BufferAttribute(cp, 3));
+          cg.setAttribute("normal", new THREE.Float32BufferAttribute(cn, 3));
+          cg.setAttribute("color", new THREE.Float32BufferAttribute(cc, 3));
+          cg.setIndex(ci);
+          g.add(new THREE.Mesh(cg, mats.csCont));
+          /* bridge block forward of amidships: four white tiers, wide bridge wings, radar mast */
+          const y0 = H,
+            tierH = 0.85,
+            hwd = hd(T(zb)) * 0.8,
+            zf = zb - hl / 2,
+            zaft = zb + hl / 2;
+          for (let k = 0; k < 4; k++) {
+            const zfk = zf + k * 0.2,
+              len = zaft - zfk,
+              zc = (zfk + zaft) / 2,
+              yc = y0 + tierH * (k + 0.5);
+            g.add(box(2 * hwd, tierH * 0.98, len, 0, yc, zc, mats.csWhite));
+            g.add(winBox(2 * hwd * 0.9, 0.26, 0.05, 0, yc + 0.1, zfk - 0.01));
+            [-1, 1].forEach((sg) =>
+              g.add(winBox(0.05, 0.24, len * 0.8, sg * (hwd + 0.01), yc + 0.1, zc)),
+            );
+          }
+          const yt = y0 + tierH * 4,
+            bw2 = hd(T(zb)) + 0.25,
+            zfb = zf + 3 * 0.2 - 0.3,
+            bz = zfb + 1.0;
+          g.add(box(2 * bw2, 0.8, 2.0, 0, yt + 0.4, bz, mats.csWhite));
+          g.add(winBox(2 * bw2 * 0.96, 0.32, 0.05, 0, yt + 0.5, zfb - 0.01));
+          [-1, 1].forEach((sg) =>
+            g.add(winBox(0.05, 0.32, 1.7, sg * (bw2 + 0.01), yt + 0.5, bz)),
+          );
+          const yr = yt + 0.8;
+          g.add(box(1.6, 0.4, 1.0, 0, yr + 0.2, bz + 0.1, mats.csWhite));
+          g.add(cyl(0.09, 3.2, 0, yr + 0.4 + 1.6, bz + 0.1, mats.csWhite, 8));
+          g.add(box(1.2, 0.06, 0.5, 0, yr + 0.4 + 1.9, bz + 0.1, mats.csGrey));
+          g.add(box(1.1, 0.05, 0.14, 0, yr + 0.4 + 3.3, bz + 0.1, mats.csDark));
+          [-1, 1].forEach((sg) => {
+            g.add(
+              box(
+                0.5,
+                0.42,
+                1.7,
+                sg * (hwd + 0.42),
+                y0 + tierH * 2 + 0.25,
+                zb + 0.15,
+                mats.csBoat,
+              ),
+            );
+            g.add(
+              box(
+                0.62,
+                0.06,
+                1.9,
+                sg * (hwd + 0.42),
+                y0 + tierH * 2 - 0.01,
+                zb + 0.15,
+                mats.csGrey,
+              ),
+            );
+          });
+          /* two light-blue funnels with black exhaust tops */
+          fzs.forEach((fz) => {
+            g.add(box(1.5, 5.4, 1.7, 0, y0 + 2.7, fz, mats.csTop));
+            [-1, 1].forEach((sg) => {
+              const lg = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.0, 1.0),
+                mats.dcLogo,
+              );
+              lg.position.set(sg * 0.77, y0 + 4.4, fz);
+              lg.rotation.y = sg > 0 ? Math.PI / 2 : -Math.PI / 2;
+              g.add(lg);
+            });
+            [-0.36, 0.36].forEach((fx) =>
+              g.add(cyl(0.26, 0.5, fx, y0 + 5.65, fz, mats.csDark, 10)),
+            );
+          });
+          g.add(
+            box(
+              2.4,
+              0.5,
+              1.2,
+              0,
+              sheer(T(L / 2 - 1.2)) + 0.25,
+              L / 2 - 1.2,
+              mats.csDeck,
+            ),
+          ); // stern mooring deck
+          return g;
+        }
+
+        /* ---- tug with tow: navy hull, white house, tyre fenders ---------------------------------------------- */
         function buildTugShip(L, W, H, D) {
-          vmMats();
+          csMats();
           const g = new THREE.Group();
           const h = loftHull(g, {
-            L, W, H, D, rake: 0.8, rakeLen: 0.18, bowLen: 0.42, bowPow: 0.6, sternLen: 0.22, sternTaper: 0.3,
-            flareBase: 0.02, flare: 0.1, flareLen: 0.4, sheerRise: 0.55, sheerLen: 0.3, keelBow: 0.6, keelStern: 0,
-            split: 0.7, top: mats.vmTugTop, bottom: mats.vmTugBot, deck: mats.vmTugDeck, rails: [0.35],
+            L,
+            W,
+            H,
+            D,
+            rake: 0.8,
+            rakeLen: 0.18,
+            bowLen: 0.42,
+            bowPow: 0.6,
+            sternLen: 0.22,
+            sternTaper: 0.3,
+            flareBase: 0.02,
+            flare: 0.1,
+            flareLen: 0.4,
+            sheerRise: 0.55,
+            sheerLen: 0.3,
+            keelBow: 0.6,
+            keelStern: 0,
+            split: 0.7,
+            top: mats.vmTugTop,
+            bottom: mats.vmTugBot,
+            deck: mats.vmTugDeck,
+            rails: [0.35],
           });
           const y0 = H,
             zh = -L * 0.04,
             hl = 4.4,
             hwid = h.hd(h.T(zh)) * 0.74;
-          g.add(box(2 * hwid, 1.7, hl, 0, y0 + 0.85, zh, mats.csWhite)); // deckhouse
+          sideDecal(g, h, mats.dcTug, 1.6, 1.2, 7.0, 0.88);
+          /* round tyre fenders along both sides and a cluster on the bow */
+          for (let z = -L / 2 + 3.4; z < L / 2 - 1.2; z += 1.3) {
+            const t = h.T(z),
+              xs = h.hd(t) * 1.0 + 0.1;
+            [-1, 1].forEach((sg) => {
+              const f = ringObj(0.3, 0.12, mats.csDark, sg * xs, y0 - 0.45, z);
+              f.rotation.y = Math.PI / 2;
+              g.add(f);
+            });
+          }
+          [-0.5, 0, 0.5].forEach((fx) =>
+            g.add(
+              ringObj(0.28, 0.12, mats.csDark, fx, h.sheer(0) - 0.35, -L / 2 + 0.05),
+            ),
+          );
+          g.add(box(2 * hwid, 1.7, hl, 0, y0 + 0.85, zh, mats.csWhite));
           g.add(winBox(2 * hwid * 0.9, 0.4, 0.05, 0, y0 + 0.95, zh - hl / 2 - 0.01));
-          [-1, 1].forEach((sg) => g.add(winBox(0.05, 0.4, hl * 0.7, sg * (hwid + 0.01), y0 + 0.95, zh)));
-          const ww = 2 * hwid * 0.86,
+          [-1, 1].forEach((sg) =>
+            g.add(winBox(0.05, 0.4, hl * 0.7, sg * (hwid + 0.01), y0 + 0.95, zh)),
+          );
+          const ww = 2 * hwid * 0.9,
             zw = zh - 0.7;
-          g.add(box(ww, 1.2, 2.6, 0, y0 + 2.3, zw, mats.csWhite)); // wheelhouse
-          g.add(winBox(ww * 0.94, 0.55, 0.05, 0, y0 + 2.4, zw - 1.31));
-          [-1, 1].forEach((sg) => g.add(winBox(0.05, 0.55, 2.2, sg * (ww / 2 + 0.01), y0 + 2.4, zw)));
-          g.add(winBox(ww * 0.94, 0.55, 0.05, 0, y0 + 2.4, zw + 1.31));
-          g.add(box(ww + 0.3, 0.1, 2.9, 0, y0 + 2.95, zw, mats.csWhite)); // roof
-          g.add(cyl(0.2, 0.3, 0, y0 + 3.15, zw - 0.9, mats.csDark, 8)); // searchlight
-          g.add(cyl(0.08, 5.4, 0, y0 + 3.0 + 2.7, zw + 0.3, mats.csGrey, 6)); // mast
-          g.add(box(1.0, 0.05, 0.14, 0, y0 + 7.4, zw + 0.3, mats.csDark)); // radar
+          g.add(box(ww, 1.2, 2.6, 0, y0 + 2.3, zw, mats.csWhite));
+          g.add(winBox(ww * 0.94, 0.6, 0.05, 0, y0 + 2.4, zw - 1.31));
+          [-1, 1].forEach((sg) =>
+            g.add(winBox(0.05, 0.6, 2.2, sg * (ww / 2 + 0.01), y0 + 2.4, zw)),
+          );
+          g.add(winBox(ww * 0.94, 0.6, 0.05, 0, y0 + 2.4, zw + 1.31));
+          g.add(box(ww + 0.3, 0.1, 2.9, 0, y0 + 2.95, zw, mats.csWhite));
+          [-1, 1].forEach((sg) => {
+            const lb = ringObj(
+              0.22,
+              0.07,
+              mats.csBoat,
+              sg * (ww / 2 + 0.03),
+              y0 + 2.0,
+              zw - 0.6,
+            );
+            lb.rotation.y = Math.PI / 2;
+            g.add(lb);
+          });
+          g.add(cyl(0.2, 0.3, 0, y0 + 3.15, zw - 0.9, mats.csDark, 8));
+          g.add(cyl(0.08, 5.4, 0, y0 + 3.0 + 2.7, zw + 0.3, mats.csGrey, 6));
+          g.add(box(1.0, 0.05, 0.14, 0, y0 + 7.4, zw + 0.3, mats.csDark));
           const fz = zh + 1.3;
-          g.add(cyl(0.55, 2.0, 0, y0 + 1.7 + 1.0, fz, mats.vmRed, 14)); // funnel
+          g.add(cyl(0.55, 2.0, 0, y0 + 1.7 + 1.0, fz, mats.vmNavy, 14)); // funnel
           g.add(cyl(0.56, 0.45, 0, y0 + 1.7 + 1.78, fz, mats.csDark, 14));
+          [-1, 1].forEach((sg) => {
+            // gold logo on both sides of the funnel
+            const lg = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.8), mats.dcLogo);
+            lg.position.set(sg * 0.63, y0 + 1.7 + 1.0, fz);
+            lg.rotation.y = sg > 0 ? Math.PI / 2 : -Math.PI / 2;
+            g.add(lg);
+          });
           const zA = L * 0.2,
             bdA = h.hd(h.T(zA)) * 0.78;
-          [-1, 1].forEach((sg) => g.add(box(0.18, 2.2, 0.18, sg * bdA, y0 + 1.1, zA, mats.csCrane))); // towing arch
+          [-1, 1].forEach((sg) =>
+            g.add(box(0.18, 2.2, 0.18, sg * bdA, y0 + 1.1, zA, mats.csCrane)),
+          );
           g.add(box(2 * bdA, 0.18, 0.18, 0, y0 + 2.2, zA, mats.csCrane));
-          g.add(box(1.4, 0.55, 1.0, 0, y0 + 0.275, zA - 1.3, mats.csGrey)); // towing winch
-          g.add(box(1.4, 0.8, 0.45, 0, h.sheer(0) - 0.5, -L / 2 + 0.2, mats.csDark)); // push knee
+          g.add(box(1.4, 0.55, 1.0, 0, y0 + 0.275, zA - 1.3, mats.csGrey));
+          [-1, 1].forEach((sg) =>
+            g.add(
+              cyl(0.12, 0.35, sg * 1.2, y0 + 0.2, -L / 2 + 2.2, mats.vmBronze, 8),
+            ),
+          ); // bollards
           const sz = L / 2,
             bz = sz + 36,
-            nose = sz + 30;
-          const rope = [];
+            nose = sz + 30,
+            rope = [];
           for (let i = 0; i <= 12; i++) {
             const s = i / 12;
-            rope.push([0, y0 + 2.0 + (1.6 - y0 - 2.0) * s - 1.1 * Math.sin(Math.PI * s), zA + 0.1 + (nose + 9 - zA - 0.1) * s]);
+            rope.push([
+              0,
+              y0 + 2.0 + (1.6 - y0 - 2.0) * s - 1.1 * Math.sin(Math.PI * s),
+              zA + 0.1 + (nose + 9 - zA - 0.1) * s,
+            ]);
           }
           g.add(lineObj(rope, "#c9b48a", false));
-          /* the barge on the end of the line: lofted, raked ends, cargo on deck */
           const bg = new THREE.Group();
           loftHull(bg, {
-            L: 12, W: 3, H: 1.2, D: 0.8, rake: 0.4, rakeLen: 0.08, bowLen: 0.09, bowPow: 0.5, sternLen: 0.09,
-            sternTaper: 0.15, flareBase: 0, flare: 0.05, flareLen: 0.2, sheerRise: 0, sheerLen: 0.2, keelBow: 0.7,
-            keelStern: 0, split: 0.5, top: mats.vmBgTop, bottom: mats.vmBgBot, deck: mats.vmBgDeck, rails: [0.25],
+            L: 12,
+            W: 3,
+            H: 1.2,
+            D: 0.8,
+            rake: 0.4,
+            rakeLen: 0.08,
+            bowLen: 0.09,
+            bowPow: 0.5,
+            sternLen: 0.09,
+            sternTaper: 0.15,
+            flareBase: 0,
+            flare: 0.05,
+            flareLen: 0.2,
+            sheerRise: 0,
+            sheerLen: 0.2,
+            keelBow: 0.7,
+            keelStern: 0,
+            split: 0.5,
+            top: mats.vmBgTop,
+            bottom: mats.vmBgBot,
+            deck: mats.vmBgDeck,
+            rails: [0.25],
           });
           const cm = [mats.vmC0, mats.vmC1, mats.vmC2, mats.vmC3];
           for (let c = -1; c <= 1; c++)
             for (let b = 0; b < 5; b++) {
               const n = 1 + ((b + c + 3) % 2);
               for (let k = 0; k < n; k++)
-                bg.add(box(1.5, 0.55, 1.7, c * 1.65, 1.2 + 0.3 + k * 0.58, -3.8 + b * 1.9, cm[(b * 2 + c + k + 4) % 4]));
+                bg.add(
+                  box(
+                    1.5,
+                    0.55,
+                    1.7,
+                    c * 1.65,
+                    1.2 + 0.3 + k * 0.58,
+                    -3.8 + b * 1.9,
+                    cm[(b * 2 + c + k + 4) % 4],
+                  ),
+                );
             }
           bg.position.set(0, 0, bz);
           g.add(bg);
-          g.add(lineObj([[0, 1.5, nose + 9 - 0.4], [-2.2, 1.3, nose + 9 + 1.4]], "#c9b48a", false)); // bridle
-          g.add(lineObj([[0, 1.5, nose + 9 - 0.4], [2.2, 1.3, nose + 9 + 1.4]], "#c9b48a", false));
+          g.add(
+            lineObj(
+              [
+                [0, 1.5, nose + 9 - 0.4],
+                [-2.2, 1.3, nose + 9 + 1.4],
+              ],
+              "#c9b48a",
+              false,
+            ),
+          );
+          g.add(
+            lineObj(
+              [
+                [0, 1.5, nose + 9 - 0.4],
+                [2.2, 1.3, nose + 9 + 1.4],
+              ],
+              "#c9b48a",
+              false,
+            ),
+          );
           return g;
         }
 
-        /* ---- stern trawler --------------------------------------------------------------------------------- */
+        /* ---- fishing vessel: navy workboat, white two-tier house, blue roof, bunting ------------------------- */
         function buildTrawler(L, W, H, D) {
-          vmMats();
+          csMats();
           const g = new THREE.Group();
           const h = loftHull(g, {
-            L, W, H, D, rake: 1.1, rakeLen: 0.16, bowLen: 0.4, bowPow: 0.7, sternLen: 0.2, sternTaper: 0.25,
-            flareBase: 0.03, flare: 0.18, flareLen: 0.45, sheerRise: 0.9, sheerLen: 0.32, keelBow: 0.45, keelStern: 0.1,
-            split: 0.8, top: mats.vmFishTop, bottom: mats.vmFishBot, deck: mats.vmFishDeck, rails: [0.9],
+            L,
+            W,
+            H,
+            D,
+            rake: 1.2,
+            rakeLen: 0.16,
+            bowLen: 0.38,
+            bowPow: 0.6,
+            sternLen: 0.2,
+            sternTaper: 0.22,
+            flareBase: 0.03,
+            flare: 0.22,
+            flareLen: 0.45,
+            sheerRise: 1.0,
+            sheerLen: 0.28,
+            keelBow: 0.45,
+            keelStern: 0.1,
+            split: 0.8,
+            top: mats.vmFishTop,
+            bottom: mats.vmFishBot,
+            deck: mats.vmFishDeck,
+            rails: [0.9],
+            stripe: { y0: 0.82, y1: 0.95, mat: mats.vmWhiteLine },
           });
-          const zh = -L * 0.2,
-            yb = h.sheer(h.T(zh)),
-            hwid = h.hd(h.T(zh)) * 0.78,
-            hl = 3.2;
-          g.add(box(2 * hwid, 1.5, hl, 0, yb + 0.75, zh, mats.csWhite)); // deckhouse
-          g.add(winBox(2 * hwid * 0.9, 0.35, 0.05, 0, yb + 0.85, zh - hl / 2 - 0.01));
-          [-1, 1].forEach((sg) => g.add(winBox(0.05, 0.35, hl * 0.7, sg * (hwid + 0.01), yb + 0.85, zh)));
-          const ww = 2 * hwid * 0.86,
-            zw = zh - 0.5;
-          g.add(box(ww, 1.0, 2.0, 0, yb + 2.0, zw, mats.csWhite)); // wheelhouse
-          g.add(winBox(ww * 0.94, 0.45, 0.05, 0, yb + 2.1, zw - 1.01));
-          [-1, 1].forEach((sg) => g.add(winBox(0.05, 0.45, 1.7, sg * (ww / 2 + 0.01), yb + 2.1, zw)));
-          g.add(box(ww + 0.25, 0.08, 2.25, 0, yb + 2.54, zw, mats.csWhite));
-          g.add(cyl(0.07, 5.4, 0, yb + 2.58 + 2.7, zw + 0.2, mats.csGrey, 6)); // mast
-          g.add(box(0.9, 0.05, 0.12, 0, yb + 7.5, zw + 0.2, mats.csDark)); // radar
-          g.add(box(0.8, 0.05, 0.05, 0, yb + 6.4, zw + 0.2, mats.csGrey));
-          g.add(cyl(0.36, 1.5, 0, yb + 1.5 + 0.75, zh + 1.1, mats.vmRed, 12)); // funnel
-          g.add(cyl(0.37, 0.35, 0, yb + 1.5 + 1.33, zh + 1.1, mats.csDark, 12));
-          for (let z = -6.4; z < L / 2 - 0.3; z += 0.9) {
-            if (z > -4.2 && z < -0.6) continue; // the deckhouse stands here
+          sideDecal(g, h, mats.dcFish, 2.6, 1.6, 5.0, 0.7);
+          for (let z = -6.5; z < L / 2 - 0.3; z += 0.9) {
             const t = h.T(z),
               bd = h.hd(t) * 0.97,
               ys = h.sheer(t);
-            [-1, 1].forEach((sg) => g.add(box(0.06, 0.55, 0.95, sg * bd, ys + 0.275, z, mats.vmFishTop))); // bulwark
+            [-1, 1].forEach((sg) =>
+              g.add(box(0.07, 0.55, 0.95, sg * bd, ys + 0.275, z, mats.vmFishTop)),
+            );
           }
-          const yS = h.sheer(h.T(3.2));
-          const drum = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 1.5, 14), mats.csBoat); // net drum
-          drum.rotation.z = Math.PI / 2;
-          drum.position.set(0, yS + 0.9, 3.2);
-          g.add(drum);
+          const zh = -0.6,
+            yb = h.sheer(h.T(zh)),
+            hwid = h.hd(h.T(zh)) * 0.8;
+          g.add(box(2 * hwid, 1.6, 5.4, 0, yb + 0.8, zh, mats.csWhite)); // lower house
           [-1, 1].forEach((sg) => {
-            const fl = cyl(0.8, 0.08, sg * 0.78, yS + 0.9, 3.2, mats.csDark, 14);
-            fl.rotation.z = Math.PI / 2;
-            g.add(fl);
-            g.add(box(0.1, 0.9, 0.9, sg * 0.9, yS + 0.45, 3.2, mats.csGrey));
+            g.add(
+              box(
+                0.05,
+                0.85,
+                0.5,
+                sg * (hwid + 0.02),
+                yb + 0.5,
+                zh + 1.2,
+                mats.csGrey,
+              ),
+            );
+            g.add(
+              box(
+                0.05,
+                0.85,
+                0.5,
+                sg * (hwid + 0.02),
+                yb + 0.5,
+                zh - 1.2,
+                mats.csGrey,
+              ),
+            );
           });
-          g.add(box(1.8, 0.28, 1.4, 0, yb + 0.14, 0.4, mats.csDark)); // fish hold hatch
-          g.add(cyl(0.12, 3.4, 0, yb + 1.7, -1.0, mats.csGrey, 8)); // kingpost and derrick
-          g.add(boom(0, yb + 3.3, -1.0, 1.9, yb + 1.6, 1.1, 0.07, mats.csGrey));
-          g.add(lineObj([[1.9, yb + 1.6, 1.1], [1.5, yb + 0.5, 1.3]], "#c9d1d6", false));
-          for (let i = 0; i < 6; i++) {
-            const f = new THREE.Mesh(new THREE.SphereGeometry(0.26, 8, 6), mats.csBoat); // floats
-            f.position.set(((i % 3) - 1) * 0.6, yS + 0.3 + Math.floor(i / 3) * 0.45, 5.0);
-            g.add(f);
-          }
-          g.add(box(0.5, 0.4, 0.5, -1.0, yS + 0.2, 1.9, mats.vmC3));
-          g.add(box(0.5, 0.4, 0.5, 1.05, yS + 0.2, 2.0, mats.vmC0));
-          g.add(box(0.5, 0.4, 0.5, 1.05, yS + 0.6, 2.0, mats.vmC3));
-          g.add(box(2 * h.hd(h.T(L / 2 - 0.1)) * 0.5, 1.0, 0.05, 0, yS - 0.7, L / 2 - 0.02, mats.csDark)); // stern ramp opening
+          const ww = 2 * hwid * 0.92,
+            zw = zh - 0.9;
+          g.add(box(ww, 1.15, 3.4, 0, yb + 1.6 + 0.575, zw, mats.csWhite)); // wheelhouse
+          g.add(winBox(ww * 0.9, 0.5, 0.05, 0, yb + 2.3, zw - 1.71));
+          [-1, 1].forEach((sg) =>
+            g.add(winBox(0.05, 0.5, 2.8, sg * (ww / 2 + 0.01), yb + 2.3, zw)),
+          );
+          const yR = yb + 2.75;
+          g.add(box(ww + 0.35, 0.1, 3.8, 0, yR + 0.05, zw, mats.vmFishRoof)); // blue roof
+          const rx = ww / 2 + 0.1,
+            rz0 = zw - 1.8,
+            rz1 = zw + 1.8;
+          [0.45, 0.22].forEach((yo) =>
+            g.add(
+              lineObj(
+                [
+                  [-rx, yR + yo, rz0],
+                  [rx, yR + yo, rz0],
+                  [rx, yR + yo, rz1],
+                  [-rx, yR + yo, rz1],
+                  [-rx, yR + yo, rz0],
+                ],
+                "#e8eef0",
+                false,
+              ),
+            ),
+          );
+          [-1, 1].forEach((sg) =>
+            g.add(ringObj(0.22, 0.06, mats.csBoat, sg * 0.7, yb + 2.1, zw - 1.76)),
+          );
+          g.add(cyl(0.07, 3.2, 0, yR + 1.6, zw - 0.2, mats.csWhite, 6)); // radar mast
+          g.add(boom(-0.5, yR, zw + 0.2, 0, yR + 2.2, zw - 0.2, 0.04, mats.csWhite));
+          g.add(boom(0.5, yR, zw + 0.2, 0, yR + 2.2, zw - 0.2, 0.04, mats.csWhite));
+          const dome = new THREE.Mesh(
+            new THREE.SphereGeometry(0.24, 10, 8),
+            mats.csWhite,
+          );
+          dome.position.set(0.1, yR + 2.4, zw - 0.2);
+          g.add(dome);
+          g.add(box(0.8, 0.05, 0.1, 0, yR + 3.15, zw - 0.2, mats.csDark));
+          g.add(box(0.7, 0.4, 0.5, 0.3, yR + 0.3, zw + 1.1, mats.vmBronze)); // locker
+          g.add(cyl(0.05, 1.8, -0.9, yR + 1.0, zw + 1.5, mats.csGrey, 6)); // davit on the roof aft
+          g.add(
+            boom(
+              -0.9,
+              yR + 1.9,
+              zw + 1.5,
+              -1.7,
+              yR + 1.2,
+              zw + 2.3,
+              0.04,
+              mats.csGrey,
+            ),
+          );
+          const fmz = -4.5,
+            fmy = h.sheer(h.T(fmz)),
+            fmTop = fmy + 7.6;
+          g.add(cyl(0.12, 7.6, 0, fmy + 3.8, fmz, mats.csWhite, 8)); // white mast ahead of the house
+          g.add(box(0.9, 0.05, 0.05, 0, fmy + 5.6, fmz, mats.csWhite));
+          g.add(box(0.03, 0.4, 0.6, 0, fmTop - 0.25, fmz + 0.35, mats.vmC0)); // blue flag
+          g.add(
+            lineObj(
+              [
+                [0, fmTop - 0.2, fmz],
+                [0, h.sheer(0.0) + 0.5, -L / 2 + 0.3],
+              ],
+              "#cfd6da",
+              false,
+            ),
+          );
+          g.add(
+            lineObj(
+              [
+                [0, fmTop - 0.5, fmz],
+                [0.7, yR + 0.1, zw - 1.6],
+              ],
+              "#cfd6da",
+              false,
+            ),
+          );
+          const apx = 0.9,
+            apz = zw + 1.7;
+          g.add(cyl(0.04, 1.8, apx, yR + 0.9, apz, mats.csWhite, 6));
+          g.add(box(0.03, 0.3, 0.45, apx, yR + 1.6, apz + 0.25, mats.csCrane)); // yellow flag
+          bunting(g, [0, fmTop - 0.45, fmz], [0, yR + 3.0, zw - 0.2], 0.9, 11);
+          bunting(g, [0, yR + 3.0, zw - 0.2], [apx, yR + 1.75, apz], 0.5, 8);
+          const zbw = -5.9,
+            ybw = h.sheer(h.T(zbw));
+          g.add(box(1.0, 0.35, 0.7, 0, ybw + 0.18, zbw, mats.vmBronze)); // windlass
+          [-1, 1].forEach((sg) => {
+            const d = cyl(0.2, 0.5, sg * 0.6, ybw + 0.35, zbw, mats.vmBronze, 10);
+            d.rotation.z = Math.PI / 2;
+            g.add(d);
+          });
+          [
+            [-0.5, -5.1],
+            [0.5, -5.1],
+            [-0.9, 5.2],
+            [0.9, 5.2],
+            [-0.9, 6.8],
+            [0.9, 6.8],
+          ].forEach(([bx, bzz]) =>
+            g.add(cyl(0.14, 0.4, bx, h.sheer(h.T(bzz)) + 0.2, bzz, mats.vmBronze, 8)),
+          ); // bollards
+          g.add(box(1.8, 0.28, 1.4, 0, h.sheer(h.T(3.6)) + 0.14, 3.6, mats.csDark));
           return g;
         }
 
-        /* ---- sailing yacht (sloop) ------------------------------------------------------------------------- */
+        /* ---- sailing yacht: white hull, blue line, teak deck, logo on the main sail ----------------------- */
         function buildYacht(L, W, H, D) {
-          vmMats();
+          csMats();
           const g = new THREE.Group();
           const h = loftHull(g, {
-            L, W, H, D: 1.0, rake: 0.9, rakeLen: 0.2, bowLen: 0.5, bowPow: 0.85, sternLen: 0.3, sternTaper: 0.4,
-            flareBase: 0, flare: 0.14, flareLen: 0.5, sheerRise: 0.3, sheerLen: 0.35, sternRise: 0.08, keelBow: 0.3,
-            keelStern: 0.3, split: 0.22, top: mats.vmYTop, bottom: mats.vmYBot, deck: mats.vmYDeck, rails: [0.5],
+            L,
+            W,
+            H,
+            D: 1.0,
+            rake: 0.9,
+            rakeLen: 0.2,
+            bowLen: 0.5,
+            bowPow: 0.85,
+            sternLen: 0.3,
+            sternTaper: 0.4,
+            flareBase: 0,
+            flare: 0.14,
+            flareLen: 0.5,
+            sheerRise: 0.3,
+            sheerLen: 0.35,
+            sternRise: 0.08,
+            keelBow: 0.3,
+            keelStern: 0.3,
+            split: 0.22,
+            top: mats.vmYTop,
+            bottom: mats.vmYBot,
+            deck: mats.vmYDeck,
+            rails: [0.28, 0.52],
+            posts: 0.52,
+            stripe: { y0: 0.5, y1: 0.62, mat: mats.vmYStripe },
           });
-          /* fin keel with a bulb, and the rudder */
+          sideDecal(g, h, mats.dcYacht, 0.8, 1.05, 5.2, 0.65);
           const sh = new THREE.Shape();
           sh.moveTo(-0.2, -0.9);
           sh.lineTo(1.9, -0.9);
           sh.lineTo(1.3, -2.5);
           sh.lineTo(0.2, -2.5);
           sh.lineTo(-0.2, -0.9);
-          const fin = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.2, bevelEnabled: false }), mats.vmYBot);
+          const fin = new THREE.Mesh(
+            new THREE.ExtrudeGeometry(sh, { depth: 0.2, bevelEnabled: false }),
+            mats.csGrey,
+          );
           fin.rotation.y = -Math.PI / 2;
           fin.position.set(0.1, 0, -0.4);
           g.add(fin);
-          const bulb = new THREE.Mesh(new THREE.SphereGeometry(1, 14, 10), mats.csDark);
+          const bulb = new THREE.Mesh(
+            new THREE.SphereGeometry(1, 14, 10),
+            mats.csDark,
+          );
           bulb.scale.set(0.3, 0.24, 1.1);
           bulb.position.set(0, -2.55, 0.85);
           g.add(bulb);
-          g.add(box(0.08, 1.4, 0.6, 0, -0.9, L / 2 - 0.9, mats.vmYBot));
+          g.add(box(0.08, 1.4, 0.6, 0, -0.9, L / 2 - 0.9, mats.csGrey));
           const yD = h.sheer(h.T(0.3)),
             cw = h.hd(h.T(0.3)) * 1.1;
-          g.add(box(cw, 0.55, 4.8, 0, yD + 0.275, 0.3, mats.vmYTop)); // coachroof
-          g.add(winBox(0.05, 0.22, 3.6, cw / 2 + 0.01, yD + 0.33, 0.3));
-          g.add(winBox(0.05, 0.22, 3.6, -cw / 2 - 0.01, yD + 0.33, 0.3));
+          g.add(box(cw, 0.55, 4.8, 0, yD + 0.275, 0.3, mats.vmYTop));
+          g.add(box(cw * 0.9, 0.06, 4.4, 0, yD + 0.58, 0.3, mats.vmWood)); // teak coachroof top
+          [-1, 1].forEach((sg) => {
+            for (let i = 0; i < 3; i++)
+              g.add(
+                winBox(
+                  0.05,
+                  0.2,
+                  0.8,
+                  sg * (cw / 2 + 0.01),
+                  yD + 0.32,
+                  -1.1 + i * 1.2,
+                ),
+              );
+          });
           g.add(winBox(cw * 0.8, 0.2, 0.05, 0, yD + 0.35, -2.11));
-          g.add(box(0.9, 0.12, 0.9, 0, yD + 0.06, -4.2, mats.vmYTop)); // fore hatch
-          g.add(box(cw * 0.9, 0.05, 2.6, 0, h.sheer(h.T(4.6)) + 0.03, 4.6, mats.csDark)); // cockpit
-          g.add(cyl(0.3, 0.05, 0, yD + 0.45, 6.2, mats.csDark, 12)); // wheel
+          g.add(box(0.7, 0.1, 0.7, 0, yD + 0.64, -0.2, mats.vmYTop)); // hatch
+          g.add(box(0.9, 0.12, 0.9, 0, yD + 0.06, -4.2, mats.vmYTop));
+          g.add(
+            box(cw * 0.9, 0.05, 2.6, 0, h.sheer(h.T(4.6)) + 0.03, 4.6, mats.csDark),
+          );
+          g.add(cyl(0.3, 0.05, 0, yD + 0.45, 6.2, mats.csDark, 12));
           const mz = -0.9;
-          g.add(cyl(0.12, 15.4, 0, H + 7.7, mz, mats.csGrey, 8)); // mast
-          g.add(box(1.5, 0.06, 0.06, 0, H + 6.0, mz, mats.csGrey)); // spreaders
-          g.add(box(1.1, 0.06, 0.06, 0, H + 10.5, mz, mats.csGrey));
-          g.add(box(0.14, 0.14, 5.6, 0, H + 1.7, mz + 3.0, mats.csGrey)); // boom
-          g.add(sailMesh([0, H + 14.6, mz + 0.15], [0, H + 1.9, mz + 0.15], [0.45, H + 1.8, mz + 5.7], 0.55, mats.sail)); // main
+          g.add(cyl(0.12, 15.4, 0, H + 7.7, mz, mats.vmWood, 8));
+          g.add(box(1.5, 0.06, 0.06, 0, H + 6.0, mz, mats.vmWood));
+          g.add(box(1.1, 0.06, 0.06, 0, H + 10.5, mz, mats.vmWood));
+          g.add(box(0.14, 0.14, 5.6, 0, H + 1.7, mz + 3.0, mats.vmWood));
+          g.add(
+            sailMesh(
+              [0, H + 14.6, mz + 0.15],
+              [0, H + 1.9, mz + 0.15],
+              [0.45, H + 1.8, mz + 5.7],
+              0.55,
+              mats.vmSailLogo,
+              true,
+            ),
+          );
+          g.add(
+            sailMesh(
+              [0, H + 14.6, mz + 0.15],
+              [0, H + 1.9, mz + 0.15],
+              [0.45, H + 1.8, mz + 5.7],
+              0.55,
+              mats.vmSailLogoB,
+              true,
+            ),
+          );
           const F = [0, H + 13.6, mz - 0.1],
             B = [0, H + 0.9, -L / 2 + 0.4];
-          const lerp3 = (a, b, f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
-          g.add(sailMesh(lerp3(F, B, 0.04), lerp3(B, F, 0.03), [0.55, H + 2.2, mz + 0.9], 0.45, mats.sail)); // genoa
-          g.add(lineObj([F, B], "#aab4ba", false)); // forestay
-          g.add(lineObj([[0, H + 15.2, mz], [0, H + 0.7, L / 2 - 0.3]], "#aab4ba", false)); // backstay
+          const lerp3 = (a, b, f) => [
+            a[0] + (b[0] - a[0]) * f,
+            a[1] + (b[1] - a[1]) * f,
+            a[2] + (b[2] - a[2]) * f,
+          ];
+          g.add(
+            sailMesh(
+              lerp3(F, B, 0.04),
+              lerp3(B, F, 0.03),
+              [0.55, H + 2.2, mz + 0.9],
+              0.45,
+              mats.vmSail,
+              false,
+            ),
+          );
+          g.add(lineObj([F, B], "#aab4ba", false));
+          g.add(
+            lineObj(
+              [
+                [0, H + 15.2, mz],
+                [0, H + 0.7, L / 2 - 0.3],
+              ],
+              "#aab4ba",
+              false,
+            ),
+          );
           [-1, 1].forEach((sg) => {
             const bd = h.hd(h.T(mz)) * 0.95;
-            g.add(lineObj([[0, H + 10.5, mz], [sg * 0.55, H + 6.0, mz], [sg * bd, H + 0.4, mz - 0.2]], "#aab4ba", false));
-            g.add(lineObj([[0, H + 6.0, mz], [sg * bd, H + 0.4, mz + 0.5]], "#aab4ba", false));
+            g.add(
+              lineObj(
+                [
+                  [0, H + 10.5, mz],
+                  [sg * 0.55, H + 6.0, mz],
+                  [sg * bd, H + 0.4, mz - 0.2],
+                ],
+                "#aab4ba",
+                false,
+              ),
+            );
+            g.add(
+              lineObj(
+                [
+                  [0, H + 6.0, mz],
+                  [sg * bd, H + 0.4, mz + 0.5],
+                ],
+                "#aab4ba",
+                false,
+              ),
+            );
           });
           return g;
         }
@@ -4430,32 +5142,52 @@ void main(){
             const bz = -L / 2 + 0.3;
             const chain = new THREE.Line(
               new THREE.BufferGeometry().setFromPoints(
-                [[0, y0 - 0.4, bz], [0, y0 * 0.45, bz - 0.5], [0, 0, bz - 1.4], [0, -2.5, bz - 5], [0, -6, bz - 14]].map(
-                  (a) => new THREE.Vector3(a[0], a[1], a[2]),
-                ),
+                [
+                  [0, y0 - 0.4, bz],
+                  [0, y0 * 0.45, bz - 0.5],
+                  [0, 0, bz - 1.4],
+                  [0, -2.5, bz - 5],
+                  [0, -6, bz - 14],
+                ].map((a) => new THREE.Vector3(a[0], a[1], a[2])),
               ),
               mats.vmChain,
             );
             chain.computeLineDistances();
             s.moorA.add(chain);
-            const ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.8, 24).rotateX(-Math.PI / 2), mats.vmRing);
+            const ring = new THREE.Mesh(
+              new THREE.RingGeometry(0.5, 0.8, 24).rotateX(-Math.PI / 2),
+              mats.vmRing,
+            );
             ring.position.set(0, 0.06, bz - 1.4);
             s.moorA.add(ring);
             const rx = Wd * 3 + 2,
               rz = L * 0.62;
-            const shallow = new THREE.Mesh(new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2), mats.vmShallow);
+            const shallow = new THREE.Mesh(
+              new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2),
+              mats.vmShallow,
+            );
             shallow.scale.set(rx * 1.5, 1, rz * 1.4);
             shallow.position.y = 0.06;
-            const sand = new THREE.Mesh(new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2), mats.vmSand);
+            const sand = new THREE.Mesh(
+              new THREE.CircleGeometry(1, 48).rotateX(-Math.PI / 2),
+              mats.vmSand,
+            );
             sand.scale.set(rx, 1, rz);
             sand.position.y = 0.28;
             s.moorG.add(shallow, sand);
             for (let i = 0; i < 9; i++) {
               const a = (i / 9) * 6.2832 + s.ph,
-                r = 0.5 + ((i * 37) % 10) / 10 * 0.7;
-              const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(r, 0), mats.vmRock);
+                r = 0.5 + (((i * 37) % 10) / 10) * 0.7;
+              const rock = new THREE.Mesh(
+                new THREE.DodecahedronGeometry(r, 0),
+                mats.vmRock,
+              );
               rock.scale.y = 0.7;
-              rock.position.set(Math.cos(a) * rx * 0.95, 0.3 + r * 0.2, Math.sin(a) * rz * 0.95);
+              rock.position.set(
+                Math.cos(a) * rx * 0.95,
+                0.3 + r * 0.2,
+                Math.sin(a) * rz * 0.95,
+              );
               rock.rotation.set(i, i * 2, i * 3);
               s.moorG.add(rock);
             }
@@ -4669,8 +5401,8 @@ void main(){
           return t;
         }
         /* ---- sun, moon and stars: a sky layer that follows the camera (world-fixed directions, drawn over the dome) ------------
-                                 Day: sun disc + glow (low and orange at sunset, pale and dim in fog). Night: moon, and a star field that twinkles.
-                                 The sun direction also drives the sea glint, so the glitter path lies under the sun (or the moon at night). */
+                                       Day: sun disc + glow (low and orange at sunset, pale and dim in fog). Night: moon, and a star field that twinkles.
+                                       The sun direction also drives the sea glint, so the glitter path lies under the sun (or the moon at night). */
         let sky = null,
           skyOn = true,
           skyEl = 0.31;
@@ -4682,8 +5414,14 @@ void main(){
           _sc = new THREE.Color(),
           _sc2 = new THREE.Color();
         /* Sea state and ship motion. The same 10 waves the ocean shader draws are sampled on the CPU (same directions, same
-           formula, same clock), so every ship heaves, pitches and rolls on the waves you can see. Visual only. */
-        const SEA_LV = { calm: 0.5, slight: 1.0, moderate: 1.4, rough: 1.9, very: 2.5 }; // wave size factor (uAmp)
+                 formula, same clock), so every ship heaves, pitches and rolls on the waves you can see. Visual only. */
+        const SEA_LV = {
+          calm: 0.5,
+          slight: 1.0,
+          moderate: 1.4,
+          rough: 1.9,
+          very: 2.5,
+        }; // wave size factor (uAmp)
         const sea = { level: "slight", amp: 1.0, motion: true };
         const SEA_DIRS = [];
         for (let i = 0; i < 10; i++) {
@@ -4691,7 +5429,12 @@ void main(){
             ang = 0.5 + (x - Math.floor(x) - 0.5) * 1.9;
           SEA_DIRS.push(new THREE.Vector2(Math.cos(ang), Math.sin(ang)));
         }
-        const SEA_GAIN = { large: { p: 1.1, r: 1.2 }, tug: { p: 1.3, r: 1.5 }, fishing: { p: 1.4, r: 1.7 }, sail: { p: 1.6, r: 2.0 } };
+        const SEA_GAIN = {
+          large: { p: 1.1, r: 1.2 },
+          tug: { p: 1.3, r: 1.5 },
+          fishing: { p: 1.4, r: 1.7 },
+          sail: { p: 1.6, r: 2.0 },
+        };
         const softLim = (a, x) => a * Math.tanh(x / a); // smooth limit: rough seas never throw a ship off the sea
         let camMot = 0; // how much the camera follows the ship's motion (bridge 1, chase 0.3, orbit 0)
         /* wave height (nm) at a world point p (x east, z = -north), current drift removed; amp = uAmp of the shader */
@@ -4706,7 +5449,14 @@ void main(){
               k = 6.2831853 / wl,
               om = Math.sqrt((9.81 * 6.2831853) / (wl * 1852)),
               d = SEA_DIRS[i],
-              env = 0.6 + 0.4 * Math.sin((qx * Math.sin(i * 3.1) + qz * Math.cos(i * 3.1)) * k * 0.13 + i * 1.9 + t * 0.05),
+              env =
+                0.6 +
+                0.4 *
+                  Math.sin(
+                    (qx * Math.sin(i * 3.1) + qz * Math.cos(i * 3.1)) * k * 0.13 +
+                      i * 1.9 +
+                      t * 0.05,
+                  ),
               sl = 0.034 * Math.pow(0.93, i) * amp * env,
               ph = k * (d.x * qx + d.y * qz) + om * t + i * 1.7;
             h += (sl / k) * Math.sin(ph);
@@ -4720,13 +5470,23 @@ void main(){
             G = SEA_GAIN[type],
             amp = mats.ocean.uniforms.uAmp.value,
             c = rad(v.course),
-            fx = Math.sin(c), fz = -Math.cos(c), // bow direction
-            sx = Math.cos(c), sz = Math.sin(c), // starboard direction
-            x = v.x, z = -v.y,
+            fx = Math.sin(c),
+            fz = -Math.cos(c), // bow direction
+            sx = Math.cos(c),
+            sz = Math.sin(c), // starboard direction
+            x = v.x,
+            z = -v.y,
             H = (a, b) => seaH(x + fx * a + sx * b, z + fz * a + sz * b, now, amp),
-            hb = H(Lr / 2, 0), hs = H(-Lr / 2, 0), hst = H(0, Lr * 0.25), hp = H(0, -Lr * 0.25), hc = H(0, 0);
+            hb = H(Lr / 2, 0),
+            hs = H(-Lr / 2, 0),
+            hst = H(0, Lr * 0.25),
+            hp = H(0, -Lr * 0.25),
+            hc = H(0, 0);
           const hv = softLim(0.006, (hc * 2 + hb + hs + hst + hp) / 6),
-            e = Math.min(60, (sc * MODEL_DIMS[type][0]) / Lr); // drawn size / true size, so a magnified ship heaves in proportion
+            e = Math.max(
+              1,
+              Math.min(60, (sc * MODEL_DIMS[type][0]) / (Lr * SHIP_MAG)),
+            ); // size beyond the standard SHIP_MAG drawing, so the ship rides the real water surface instead of heaving SHIP_MAG times too far
           return {
             hv, // true heave, nm (used by the camera)
             heave: hv * e, // heave in scene units for the model
@@ -4744,7 +5504,7 @@ void main(){
           if (o.motion !== undefined) sea.motion = !!o.motion;
         }
         /* Ocean current (visual only): kn = rate, set = direction the water flows TOWARDS (degrees true). The water pattern is moved
-           by kn x simulated hours, so it keeps pace with the ships whatever the time speed and stops when paused. */
+                 by kn x simulated hours, so it keeps pace with the ships whatever the time speed and stops when paused. */
         let cur = { kn: 0, set: 90 },
           curOff = new THREE.Vector2(),
           curLast = null;
@@ -4768,14 +5528,18 @@ void main(){
         function moonTint(col, kind, w) {
           if (w <= 0 || moonF <= 0) return col;
           const vis = Math.min(1, env.starVis); // no moonlight under thick cloud, fog or rain
-          return col.lerp(_mt.set(kind === "zen" ? "#0b1220" : "#1a2436"), w * moonF * vis * (kind === "zen" ? 0.5 : 0.6));
+          return col.lerp(
+            _mt.set(kind === "zen" ? "#0b1220" : "#1a2436"),
+            w * moonF * vis * (kind === "zen" ? 0.5 : 0.6),
+          );
         }
         function setMoon(name) {
           const m = MOON_PH[name];
           if (!m) return;
           moonPhase = name;
           moonF = m.b;
-          const mix = (a, b, k) => "#" + new THREE.Color(a).lerp(new THREE.Color(b), k).getHexString();
+          const mix = (a, b, k) =>
+            "#" + new THREE.Color(a).lerp(new THREE.Color(b), k).getHexString();
           OCEAN_C.deep[1] = mix("#030202", "#0a1c30", 0.9 * moonF); // moonlit water is dark blue, a new-moon sea is black
           OCEAN_C.shallow[1] = mix("#0e0706", "#1d3b57", 0.85 * moonF);
           OCEAN_C.sun[1] = "#dfe6f2"; // silver moon path instead of the red night glint
@@ -4852,7 +5616,7 @@ void main(){
           const paintMoon = (f) => {
             const g = moonCv.getContext("2d"),
               n = 256,
-              R = n / 2 * 0.94,
+              R = (n / 2) * 0.94,
               rx = Math.max(0.5, R * Math.abs(1 - 2 * f));
             g.clearRect(0, 0, n, n);
             g.globalAlpha = 0.08; // earthshine on the dark part
@@ -4981,15 +5745,17 @@ void main(){
             base * (0.8 + 0.2 * Math.sin(now * 1.7)) * (1 - 0.55 * moonF); // a bright moon washes out the faint stars
           sky.bright.material.opacity =
             base * (0.72 + 0.28 * Math.sin(now * 2.9 + 1.3)) * (1 - 0.2 * moonF);
-          sky.faint.material.size = sky.faint.userData.size * pr * (1 + 0.3 * (1 - moonF)); // new moon: bigger, brighter stars
-          sky.bright.material.size = sky.bright.userData.size * pr * (1 + 0.3 * (1 - moonF));
+          sky.faint.material.size =
+            sky.faint.userData.size * pr * (1 + 0.3 * (1 - moonF)); // new moon: bigger, brighter stars
+          sky.bright.material.size =
+            sky.bright.userData.size * pr * (1 + 0.3 * (1 - moonF));
           sky.faint.visible = sky.bright.visible = base > 0.01;
         }
 
         /* ---- Rain and snow: GPU-animated particles in a box that follows the camera ---------------------------------
-                       Every drop has a fixed random start in [0,1)^3; the vertex shader moves it down with the clock and wraps it
-                       round the camera, so nothing is updated on the CPU. The box size follows the camera distance (bridge: fixed
-                       and small), so the look is the same at any zoom. VISUAL ONLY: never read by Sim. */
+                             Every drop has a fixed random start in [0,1)^3; the vertex shader moves it down with the clock and wraps it
+                             round the camera, so nothing is updated on the CPU. The box size follows the camera distance (bridge: fixed
+                             and small), so the look is the same at any zoom. VISUAL ONLY: never read by Sim. */
         const RAIN_VS = `
 attribute float aEnd;
 uniform vec3 uCam; uniform float uS, uH, uTime, uRate, uLen;
@@ -5166,7 +5932,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* Lamp list for one vessel, in model units: [{x, y, z, col, r}].  JSON layout first (position tokens from
-                                 COLREG.lightLayout, the same maths as the 2D drawJSONLights), else the fallback set by condition then type. */
+                                       COLREG.lightLayout, the same maths as the 2D drawJSONLights), else the fallback set by condition then type. */
         const RAM_ACTS = ["dredging", "cable", "mine_clearance", "replenishment"]; // Rule 3(g), same list as sim.js
         function lampSpec(v) {
           const type = v.type,
@@ -5864,9 +6630,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* ---- view controller: a drag anywhere on the sea moves the view -------------------------------------------------
-                                 Orbit view:  one finger / left button = pan (the sea follows the pointer), right button / middle / Shift / Ctrl = turn and tilt,
-                                              wheel or pinch = zoom, two-finger twist = turn, two-finger slide up / down = tilt.
-                                 Chase / bridge: a drag looks around.  A press on a ship is taken by input.js first (it drags the ship instead). */
+                                       Orbit view:  one finger / left button = pan (the sea follows the pointer), right button / middle / Shift / Ctrl = turn and tilt,
+                                                    wheel or pinch = zoom, two-finger twist = turn, two-finger slide up / down = tilt.
+                                       Chase / bridge: a drag looks around.  A press on a ship is taken by input.js first (it drags the ship instead). */
         function recenter() {
           startTrans();
           orbit.focus = -1;
@@ -6058,19 +6824,45 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           sail: { w: 1.4, h: 0.45, roll: 0.07, pitch: 0.03 },
         };
         /* ---- Activity rigs: what each Activity looks like (fishing, towing, pushing, dredging, cable, mine clearance, pilotage,
-           replenishment). Visual only. Everything is built in model units: bow -Z, stern +Z, starboard +X. Floating things go
-           in s.flat (they stay at sea level), deck gear in s.model (it moves with the ship). ----------------------------- */
-        const ACT_RIG = { fishing: 1, towing: 1, pushing: 1, dredging: 1, cable: 1, mine_clearance: 1, pilotage: 1, replenishment: 1 };
+                 replenishment). Visual only. Everything is built in model units: bow -Z, stern +Z, starboard +X. Floating things go
+                 in s.flat (they stay at sea level), deck gear in s.model (it moves with the ship). ----------------------------- */
+        const ACT_RIG = {
+          fishing: 1,
+          towing: 1,
+          pushing: 1,
+          dredging: 1,
+          cable: 1,
+          mine_clearance: 1,
+          pilotage: 1,
+          replenishment: 1,
+        };
         let AM = null;
         function actMats() {
           if (AM) return AM;
           const lamb = (c) => new THREE.MeshLambertMaterial({ color: c });
           return (AM = {
             rope: new THREE.LineBasicMaterial({ color: "#2b2b2b" }),
-            steel: lamb("#8b949b"), orange: lamb("#d9792b"), yellow: lamb("#d8b73a"), white: lamb("#e8ecef"),
-            barge: lamb("#6c5a3c"), red: lamb("#e24b2a"), supply: lamb("#5b6670"), dark: lamb("#4a5058"),
-            net: new THREE.MeshBasicMaterial({ color: "#d6e2e8", wireframe: true, transparent: true, opacity: 0.8 }),
-            fx: new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }),
+            steel: lamb("#8b949b"),
+            orange: lamb("#d9792b"),
+            yellow: lamb("#d8b73a"),
+            white: lamb("#e8ecef"),
+            barge: lamb("#6c5a3c"),
+            red: lamb("#e24b2a"),
+            supply: lamb("#5b6670"),
+            dark: lamb("#4a5058"),
+            net: new THREE.MeshBasicMaterial({
+              color: "#d6e2e8",
+              wireframe: true,
+              transparent: true,
+              opacity: 0.8,
+            }),
+            fx: new THREE.MeshBasicMaterial({
+              color: "#ffffff",
+              transparent: true,
+              opacity: 0,
+              depthWrite: false,
+              side: THREE.DoubleSide,
+            }),
           });
         }
         const rBox = (m, w, h, l, x, y, z) => {
@@ -6081,17 +6873,26 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         const rLine = (n) => {
           const pts = [];
           for (let i = 0; i < n; i++) pts.push(new THREE.Vector3());
-          const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), AM.rope);
+          const l = new THREE.Line(
+            new THREE.BufferGeometry().setFromPoints(pts),
+            AM.rope,
+          );
           l.frustumCulled = false;
           l.userData.n = n;
           return l;
         };
         /* a hanging rope / hose from a to b that sags by `sag` in the middle */
         const rSag = (l, a, b, sag) => {
-          const n = l.userData.n, pos = l.geometry.attributes.position;
+          const n = l.userData.n,
+            pos = l.geometry.attributes.position;
           for (let i = 0; i < n; i++) {
             const t = i / (n - 1);
-            pos.setXYZ(i, a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t - sag * 4 * t * (1 - t), a[2] + (b[2] - a[2]) * t);
+            pos.setXYZ(
+              i,
+              a[0] + (b[0] - a[0]) * t,
+              a[1] + (b[1] - a[1]) * t - sag * 4 * t * (1 - t),
+              a[2] + (b[2] - a[2]) * t,
+            );
           }
           pos.needsUpdate = true;
         };
@@ -6100,7 +6901,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           if (!r) return;
           s.model.remove(r.grp);
           s.flat.remove(r.flt);
-          [r.grp, r.flt].forEach((g) => g.traverse((o) => o.geometry && o.geometry.dispose()));
+          [r.grp, r.flt].forEach((g) =>
+            g.traverse((o) => o.geometry && o.geometry.dispose()),
+          );
           r.own.forEach((m) => m.dispose());
           s.rig = null;
         }
@@ -6122,18 +6925,35 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           let upd = () => {};
           if (key === "fishing") {
             // A-frame on the stern, warps to a trawl net that streams astern, floats on the headline and gulls following
-            const gz = st - L * 0.08, netL = L * 1.3, mouthR = W * 0.9, mz = st + L * 0.15;
-            [-1, 1].forEach((k) => grp.add(rBox(M.steel, 0.4, 4, 0.4, k * W * 0.6, y0 + 2, gz)));
+            const gz = st - L * 0.08,
+              netL = L * 1.3,
+              mouthR = W * 0.9,
+              mz = st + L * 0.15;
+            [-1, 1].forEach((k) =>
+              grp.add(rBox(M.steel, 0.4, 4, 0.4, k * W * 0.6, y0 + 2, gz)),
+            );
             grp.add(rBox(M.steel, W * 1.5, 0.4, 0.4, 0, y0 + 4, gz));
-            const net = new THREE.Mesh(new THREE.ConeGeometry(mouthR, netL, 8, 3, true).rotateX(Math.PI / 2), M.net);
+            const net = new THREE.Mesh(
+              new THREE.ConeGeometry(mouthR, netL, 8, 3, true).rotateX(Math.PI / 2),
+              M.net,
+            );
             net.position.set(0, 0.3, mz + netL / 2);
             flt.add(net);
             for (let i = 0; i < 5; i++) {
-              const a = Math.PI * (i / 4), f = new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 6), M.red);
-              f.position.set(Math.cos(a) * mouthR, Math.sin(a) * mouthR * 0.5, -netL / 2);
+              const a = Math.PI * (i / 4),
+                f = new THREE.Mesh(new THREE.SphereGeometry(0.35, 8, 6), M.red);
+              f.position.set(
+                Math.cos(a) * mouthR,
+                Math.sin(a) * mouthR * 0.5,
+                -netL / 2,
+              );
               net.add(f);
             }
-            const warps = [-1, 1].map(() => { const l = rLine(8); flt.add(l); return l; });
+            const warps = [-1, 1].map(() => {
+              const l = rLine(8);
+              flt.add(l);
+              return l;
+            });
             const birds = [];
             for (let i = 0; i < 4; i++) {
               const b = rLine(3);
@@ -6144,39 +6964,83 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               const sw = Math.sin(t * 0.6);
               net.rotation.y = 0.07 * sw;
               net.position.x = sw * W * 0.15;
-              warps.forEach((l, k) => rSag(l, [(k ? 1 : -1) * W * 0.6, y0 + 4, gz], [(k ? 1 : -1) * mouthR * 0.9 + net.position.x, 0.4, mz], 0.5));
+              warps.forEach((l, k) =>
+                rSag(
+                  l,
+                  [(k ? 1 : -1) * W * 0.6, y0 + 4, gz],
+                  [(k ? 1 : -1) * mouthR * 0.9 + net.position.x, 0.4, mz],
+                  0.5,
+                ),
+              );
               birds.forEach((b, i) => {
-                const a = t * 0.8 + i * 1.57, R = L * 0.5, fl = Math.sin(t * 9 + i * 2) * 0.6;
-                b.position.set(Math.cos(a) * R * 1.2, y0 + 6 + Math.sin(t * 0.5 + i) * 1.2, st + L * 0.5 + Math.sin(a) * R);
+                const a = t * 0.8 + i * 1.57,
+                  R = L * 0.5,
+                  fl = Math.sin(t * 9 + i * 2) * 0.6;
+                b.position.set(
+                  Math.cos(a) * R * 1.2,
+                  y0 + 6 + Math.sin(t * 0.5 + i) * 1.2,
+                  st + L * 0.5 + Math.sin(a) * R,
+                );
                 b.rotation.y = -a;
                 const p = b.geometry.attributes.position;
-                p.setXYZ(0, -1.3, fl, 0); p.setXYZ(1, 0, 0, 0); p.setXYZ(2, 1.3, fl, 0);
+                p.setXYZ(0, -1.3, fl, 0);
+                p.setXYZ(1, 0, 0, 0);
+                p.setXYZ(2, 1.3, fl, 0);
                 p.needsUpdate = true;
               });
             };
           } else if (key === "towing") {
             // a barge on a long tow line astern, swinging gently
-            const bl = L * 0.9, bw = W * 1.6, bz = st + L * 1.5 + bl / 2, bg = new THREE.Group(), tl = rLine(8);
-            bg.add(rBox(M.barge, bw, 1.5, bl, 0, 0.55, 0), rBox(M.white, bw * 0.5, 1.1, bl * 0.18, 0, 1.6, bl * 0.3));
+            const bl = L * 0.9,
+              bw = W * 1.6,
+              bz = st + L * 1.5 + bl / 2,
+              bg = new THREE.Group(),
+              tl = rLine(8);
+            bg.add(
+              rBox(M.barge, bw, 1.5, bl, 0, 0.55, 0),
+              rBox(M.white, bw * 0.5, 1.1, bl * 0.18, 0, 1.6, bl * 0.3),
+            );
             flt.add(bg, tl);
             upd = (t) => {
-              const sw = Math.sin(t * 0.5), yaw = 0.14 * Math.sin(t * 0.5 + 0.6);
+              const sw = Math.sin(t * 0.5),
+                yaw = 0.14 * Math.sin(t * 0.5 + 0.6);
               bg.position.set(sw * W * 0.45, 0.08 * Math.sin(t * 1.1), bz);
               bg.rotation.y = yaw;
               bg.rotation.z = 0.04 * Math.sin(t * 0.9);
-              rSag(tl, [0, y0 * 0.55, st - 0.5], [bg.position.x - (bl / 2) * Math.sin(yaw), 1.0, bz - (bl / 2) * Math.cos(yaw)], 0.6 + 0.3 * Math.sin(t * 0.7));
+              rSag(
+                tl,
+                [0, y0 * 0.55, st - 0.5],
+                [
+                  bg.position.x - (bl / 2) * Math.sin(yaw),
+                  1.0,
+                  bz - (bl / 2) * Math.cos(yaw),
+                ],
+                0.6 + 0.3 * Math.sin(t * 0.7),
+              );
             };
           } else if (key === "pushing") {
             // a barge pushed ahead, locked to the bow
-            const bl = L * 0.85, bw = Math.min(W * 1.9, W + 2.5), pz = -(L / 2 + bl / 2 - 0.8);
+            const bl = L * 0.85,
+              bw = Math.min(W * 1.9, W + 2.5),
+              pz = -(L / 2 + bl / 2 - 0.8);
             const barge = rBox(M.barge, bw, 1.6, bl, 0, 0.6, pz);
             grp.add(barge, rBox(M.red, bw * 0.7, 1.2, bl * 0.55, 0, 1.9, pz));
-            [-1, 1].forEach((k) => grp.add(rBox(M.dark, 0.8, 1.2, 1.2, k * W * 0.45, 1.0, -L / 2 + 0.6)));
-            upd = (t) => { barge.position.y = 0.6 + 0.04 * Math.sin(t * 3); };
+            [-1, 1].forEach((k) =>
+              grp.add(rBox(M.dark, 0.8, 1.2, 1.2, k * W * 0.45, 1.0, -L / 2 + 0.6)),
+            );
+            upd = (t) => {
+              barge.position.y = 0.6 + 0.04 * Math.sin(t * 3);
+            };
           } else if (key === "dredging") {
             // suction pipe over the side and a brown sediment plume that spreads astern
-            const gx = W * 0.8, pipe = rLine(6), discs = [];
-            grp.add(rBox(M.orange, 0.5, 3.5, 0.5, gx, y0 + 1.75, L * 0.05), rBox(M.orange, W * 0.5, 0.4, 0.4, gx + W * 0.2, y0 + 3.4, L * 0.05), pipe);
+            const gx = W * 0.8,
+              pipe = rLine(6),
+              discs = [];
+            grp.add(
+              rBox(M.orange, 0.5, 3.5, 0.5, gx, y0 + 1.75, L * 0.05),
+              rBox(M.orange, W * 0.5, 0.4, 0.4, gx + W * 0.2, y0 + 3.4, L * 0.05),
+              pipe,
+            );
             const dg = new THREE.CircleGeometry(1, 18).rotateX(-Math.PI / 2);
             for (let i = 0; i < 5; i++) {
               const d = new THREE.Mesh(dg, fx("#a08a62"));
@@ -6185,26 +7049,57 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             }
             upd = (t) => {
               const ez = L * 0.2 + Math.sin(t * 0.5) * L * 0.05;
-              rSag(pipe, [gx + W * 0.2, y0 + 3.4, L * 0.05], [W * 1.9, -1.5, ez], 0.6);
+              rSag(
+                pipe,
+                [gx + W * 0.2, y0 + 3.4, L * 0.05],
+                [W * 1.9, -1.5, ez],
+                0.6,
+              );
               discs.forEach((d, i) => {
                 const u = (t * 0.12 + i / 5) % 1;
-                d.position.set(W * 1.9 + 0.3 * Math.sin(t + i), 0.12, ez + u * L * 1.7);
+                d.position.set(
+                  W * 1.9 + 0.3 * Math.sin(t + i),
+                  0.12,
+                  ez + u * L * 1.7,
+                );
                 d.scale.setScalar(W * (0.5 + u * 2.0));
                 d.material.opacity = 0.34 * (1 - u) * Math.min(1, u * 8);
               });
             };
           } else if (key === "cable") {
             // cable paid out over the stern sheave from a spinning drum, with marker buoys sliding astern
-            const drum = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, W * 1.2, 14).rotateZ(Math.PI / 2), M.orange),
-              sheave = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.6, 12).rotateZ(Math.PI / 2), M.steel),
-              cab = rLine(10), buoys = [], a = [0, y0 + 1.5, st + 0.5], b = [0, 0.3, st + L * 0.5], c = [0, 0.15, st + L * 2.4];
+            const drum = new THREE.Mesh(
+                new THREE.CylinderGeometry(1.5, 1.5, W * 1.2, 14).rotateZ(
+                  Math.PI / 2,
+                ),
+                M.orange,
+              ),
+              sheave = new THREE.Mesh(
+                new THREE.CylinderGeometry(1.1, 1.1, 0.6, 12).rotateZ(Math.PI / 2),
+                M.steel,
+              ),
+              cab = rLine(10),
+              buoys = [],
+              a = [0, y0 + 1.5, st + 0.5],
+              b = [0, 0.3, st + L * 0.5],
+              c = [0, 0.15, st + L * 2.4];
             drum.position.set(0, y0 + 1.2, L * 0.1);
             sheave.position.set(...a);
             grp.add(drum, sheave);
             const p = cab.geometry.attributes.position;
             for (let i = 0; i < 10; i++) {
-              if (i < 4) { const t = i / 3; p.setXYZ(i, 0, a[1] + (b[1] - a[1]) * t - 1.0 * 4 * t * (1 - t), a[2] + (b[2] - a[2]) * t); }
-              else { const t = (i - 3) / 6; p.setXYZ(i, 0, b[1] + (c[1] - b[1]) * t, b[2] + (c[2] - b[2]) * t); }
+              if (i < 4) {
+                const t = i / 3;
+                p.setXYZ(
+                  i,
+                  0,
+                  a[1] + (b[1] - a[1]) * t - 1.0 * 4 * t * (1 - t),
+                  a[2] + (b[2] - a[2]) * t,
+                );
+              } else {
+                const t = (i - 3) / 6;
+                p.setXYZ(i, 0, b[1] + (c[1] - b[1]) * t, b[2] + (c[2] - b[2]) * t);
+              }
             }
             p.needsUpdate = true;
             flt.add(cab);
@@ -6215,15 +7110,30 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             }
             upd = (t) => {
               drum.rotation.x = t * 1.2;
-              buoys.forEach((m, i) => { const u = (t * 0.18 + i / 6) % 1; m.position.set(0, 0.3, b[2] + u * (c[2] - b[2])); });
+              buoys.forEach((m, i) => {
+                const u = (t * 0.18 + i / 6) % 1;
+                m.position.set(0, 0.3, b[2] + u * (c[2] - b[2]));
+              });
             };
           } else if (key === "mine_clearance") {
             // sweep sled on a line astern, and a periodic water column where a mine is cleared off the starboard bow
-            const sz = st + L * 1.5, sled = rBox(M.yellow, W * 0.8, 0.8, L * 0.45, 0, 0.35, sz), tl = rLine(6);
+            const sz = st + L * 1.5,
+              sled = rBox(M.yellow, W * 0.8, 0.8, L * 0.45, 0, 0.35, sz),
+              tl = rLine(6);
             const ball = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 6), M.red);
             ball.position.set(0, 1.0, sz);
-            const ring = new THREE.Mesh(new THREE.RingGeometry(0.55, 1, 28).rotateX(-Math.PI / 2), fx()),
-              col = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 1, 1, 10, 1, true).translate(0, 0.5, 0), fx());
+            const ring = new THREE.Mesh(
+                new THREE.RingGeometry(0.55, 1, 28).rotateX(-Math.PI / 2),
+                fx(),
+              ),
+              col = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.5, 1, 1, 10, 1, true).translate(
+                  0,
+                  0.5,
+                  0,
+                ),
+                fx(),
+              );
             [ring, col].forEach((o) => o.position.set(W * 5, 0.2, -L * 0.8));
             flt.add(sled, ball, tl, ring, col);
             rSag(tl, [0, y0 * 0.5, st], [0, 0.7, sz - L * 0.225], 0.5);
@@ -6233,40 +7143,82 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               if (ph < 1) {
                 ring.scale.setScalar(1 + ph * W * 3);
                 ring.material.opacity = 0.75 * (1 - ph);
-                col.scale.set(1 + ph * 2, 8 * Math.sin(ph * Math.PI * 0.5) * (1 - ph * 0.5), 1 + ph * 2);
+                col.scale.set(
+                  1 + ph * 2,
+                  8 * Math.sin(ph * Math.PI * 0.5) * (1 - ph * 0.5),
+                  1 + ph * 2,
+                );
                 col.material.opacity = 0.6 * (1 - ph);
               }
             };
           } else if (key === "pilotage") {
             // pilot boat alongside to starboard, pilot ladder over the side
-            const pb = new THREE.Group(), lad = rLine(2);
-            pb.add(rBox(M.orange, W * 0.6, 0.8, L * 0.3, 0, 0.3, 0), rBox(M.white, W * 0.42, 0.8, L * 0.11, 0, 1.1, -L * 0.02));
+            const pb = new THREE.Group(),
+              lad = rLine(2);
+            pb.add(
+              rBox(M.orange, W * 0.6, 0.8, L * 0.3, 0, 0.3, 0),
+              rBox(M.white, W * 0.42, 0.8, L * 0.11, 0, 1.1, -L * 0.02),
+            );
             flt.add(pb);
             grp.add(lad);
             const lp = lad.geometry.attributes.position;
-            lp.setXYZ(0, W * 0.98, y0, L * 0.1); lp.setXYZ(1, W * 0.98, 0.2, L * 0.1);
+            lp.setXYZ(0, W * 0.98, y0, L * 0.1);
+            lp.setXYZ(1, W * 0.98, 0.2, L * 0.1);
             lp.needsUpdate = true;
-            for (let i = 1; i <= 5; i++) grp.add(rBox(M.steel, 0.6, 0.12, 0.12, W * 0.98, y0 - (y0 - 0.2) * (i / 6), L * 0.1));
+            for (let i = 1; i <= 5; i++)
+              grp.add(
+                rBox(
+                  M.steel,
+                  0.6,
+                  0.12,
+                  0.12,
+                  W * 0.98,
+                  y0 - (y0 - 0.2) * (i / 6),
+                  L * 0.1,
+                ),
+              );
             upd = (t) => {
-              pb.position.set(W + W * 0.65 + 0.1 * W * Math.sin(t * 0.6), 0.1 * Math.sin(t * 1.8), L * 0.1 + 0.15 * L * Math.sin(t * 0.35));
+              pb.position.set(
+                W + W * 0.65 + 0.1 * W * Math.sin(t * 0.6),
+                0.1 * Math.sin(t * 1.8),
+                L * 0.1 + 0.15 * L * Math.sin(t * 0.35),
+              );
               pb.rotation.z = 0.09 * Math.sin(t * 1.4);
               pb.rotation.x = 0.05 * Math.sin(t * 1.9);
             };
           } else if (key === "replenishment") {
             // a supply ship alongside to starboard, three hoses between the ships and a transfer trolley running along one
-            const sv = new THREE.Group(), hoses = [0, 1, 2].map(() => { const l = rLine(8); flt.add(l); return l; });
-            sv.add(rBox(M.supply, W * 0.9, 1.7, L * 0.75, 0, 0.6, 0), rBox(M.white, W * 0.7, 1.8, L * 0.14, 0, 2.3, L * 0.22), rBox(M.steel, 0.3, 3.2, 0.3, 0, 3.0, L * 0.22));
+            const sv = new THREE.Group(),
+              hoses = [0, 1, 2].map(() => {
+                const l = rLine(8);
+                flt.add(l);
+                return l;
+              });
+            sv.add(
+              rBox(M.supply, W * 0.9, 1.7, L * 0.75, 0, 0.6, 0),
+              rBox(M.white, W * 0.7, 1.8, L * 0.14, 0, 2.3, L * 0.22),
+              rBox(M.steel, 0.3, 3.2, 0.3, 0, 3.0, L * 0.22),
+            );
             const trol = rBox(M.red, 0.7, 0.7, 0.7, 0, 0, 0);
             flt.add(sv, trol);
             upd = (t) => {
-              const sx = W * 2.5 + 0.2 * Math.sin(t * 0.5), sz = -L * 0.05 + 0.06 * L * Math.sin(t * 0.3);
+              const sx = W * 2.5 + 0.2 * Math.sin(t * 0.5),
+                sz = -L * 0.05 + 0.06 * L * Math.sin(t * 0.3);
               sv.position.set(sx, 0.08 * Math.sin(t + 1), sz);
               sv.rotation.z = 0.03 * Math.sin(t * 0.9);
-              const zi = [-L * 0.15, 0, L * 0.15], u = (t * 0.22) % 1;
+              const zi = [-L * 0.15, 0, L * 0.15],
+                u = (t * 0.22) % 1;
               hoses.forEach((h, i) => {
-                const a = [W * 0.6, y0 + 2.2, zi[i]], b = [sx - W * 0.45, 2.7, sz + zi[i]], sag = 1.2 + 0.4 * Math.sin(t * 0.8 + i);
+                const a = [W * 0.6, y0 + 2.2, zi[i]],
+                  b = [sx - W * 0.45, 2.7, sz + zi[i]],
+                  sag = 1.2 + 0.4 * Math.sin(t * 0.8 + i);
                 rSag(h, a, b, sag);
-                if (i === 1) trol.position.set(a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u - sag * 4 * u * (1 - u) - 0.5, a[2] + (b[2] - a[2]) * u);
+                if (i === 1)
+                  trol.position.set(
+                    a[0] + (b[0] - a[0]) * u,
+                    a[1] + (b[1] - a[1]) * u - sag * 4 * u * (1 - u) - 0.5,
+                    a[2] + (b[2] - a[2]) * u,
+                  );
               });
             };
           }
@@ -6285,7 +7237,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           }
           return v.special === "nuc" || v.special === "ram" || v.special === "cbd"
             ? v.special
-            : RAM_ACTS.indexOf(v.act) >= 0 ? "ram" : "";
+            : RAM_ACTS.indexOf(v.act) >= 0
+              ? "ram"
+              : "";
         }
         /* RAM: a working boom that slews slowly, with a line paid out into the sea (dredging, cable work, replenishment) */
         let ramMat = null;
@@ -6303,11 +7257,24 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             pivot = new THREE.Group(),
             tip = new THREE.Group();
           g.position.set(0, y0 + 0.2, L * 0.12);
-          g.add(new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.6, 0.9).translate(0, 0.8, 0), ramMat)); // post
+          g.add(
+            new THREE.Mesh(
+              new THREE.BoxGeometry(0.9, 1.6, 0.9).translate(0, 0.8, 0),
+              ramMat,
+            ),
+          ); // post
           pivot.position.y = 1.6;
-          pivot.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, len).translate(0, 0, -len / 2), ramMat)); // boom
+          pivot.add(
+            new THREE.Mesh(
+              new THREE.BoxGeometry(0.5, 0.5, len).translate(0, 0, -len / 2),
+              ramMat,
+            ),
+          ); // boom
           g.add(pivot, tip);
-          const cable = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 1, 6).translate(0, -0.5, 0), ramMat);
+          const cable = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.1, 0.1, 1, 6).translate(0, -0.5, 0),
+            ramMat,
+          );
           tip.add(cable);
           g.userData = { pivot, tip, cable, len, base: g.position.y + 1.6 };
           s.model.add(g);
@@ -6327,7 +7294,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           const b = BOB[v.type] || BOB.large,
             T = now * b.w + s.ph;
           if (sea.motion) {
-            const m = shipMotion(v, sc), k = 0.5 * sea.amp; // wave-driven, plus a little of the ship's own slow rocking
+            const m = shipMotion(v, sc),
+              k = 0.5 * sea.amp; // wave-driven, plus a little of the ship's own slow rocking
             s.model.position.y = m.heave + Math.sin(T) * b.h * sc * k;
             s.model.rotation.x = m.pitch + Math.sin(T * 0.61 + 0.9) * b.pitch * k;
             s.model.rotation.z = m.roll + Math.sin(T * 0.83 + 1.7) * b.roll * k;
@@ -6352,8 +7320,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               // not under command: wallows, sheers and, with no way on, spins slowly as she drifts
               s.model.rotation.z += Math.sin(tt * 0.9) * 0.12;
               s.model.rotation.x += Math.sin(tt * 0.7 + 1) * 0.04;
-              s.root.rotation.y +=
-                (mw ? 0.2 * Math.sin(tt * 0.35) + 0.1 * Math.sin(tt * 0.13) : now * 0.035 + s.ph);
+              s.root.rotation.y += mw
+                ? 0.2 * Math.sin(tt * 0.35) + 0.1 * Math.sin(tt * 0.13)
+                : now * 0.035 + s.ph;
             } else if (sk === "cbd") {
               // constrained by draught: deep, heavy and steady, down by the stern
               s.model.rotation.z *= 0.5;
@@ -6375,7 +7344,10 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               ty = 1.6 + Math.sin(al) * u.len,
               tz = -Math.cos(al) * Math.cos(psi) * u.len;
             u.tip.position.set(tx, ty, tz);
-            u.cable.scale.y = Math.max(1, u.base - 1.6 + ty + 2.5 + 1.2 * Math.sin(now * 0.8 + s.ph)); // line paid out into the sea
+            u.cable.scale.y = Math.max(
+              1,
+              u.base - 1.6 + ty + 2.5 + 1.2 * Math.sin(now * 0.8 + s.ph),
+            ); // line paid out into the sea
             w.visible = true;
           } else if (s.work) s.work.visible = false;
           {
@@ -6391,8 +7363,10 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           s.halo.position.y = 0.02 * sc;
           /* foam and wake grow with speed; none when stopped, anchored or aground */
           s.wakeMat.opacity = clamp((v.speed - 0.3) / 9, 0, 1) * 0.9 * alpha;
-          if (sk === "nuc") s.wakeMat.opacity *= 0.3; // no steerage way
-          else if (sk === "cbd") s.wakeMat.opacity = Math.min(1, s.wakeMat.opacity * 1.25); // squat wake
+          if (sk === "nuc")
+            s.wakeMat.opacity *= 0.3; // no steerage way
+          else if (sk === "cbd")
+            s.wakeMat.opacity = Math.min(1, s.wakeMat.opacity * 1.25); // squat wake
           s.wakeMat.color.copy(mats.wakeCol);
           s.wake.visible = s.wakeMat.opacity > 0.01;
           if (status !== s.status) {
@@ -6546,8 +7520,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* Tag text after "Own": MY role, taken from the COLREG encounter of every target
-                       (r.enc = own ship's duty towards that target). Several targets can give different
-                       roles, e.g. give-way to T1 and stand-on to T3, so they are grouped by role. */
+                             (r.enc = own ship's duty towards that target). Several targets can give different
+                             roles, e.g. give-way to T1 and stand-on to T3, so they are grouped by role. */
         function ownRole(res) {
           const g = [],
             so = [],
@@ -6647,7 +7621,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           }
           const fsh = orbit.focus >= 0 ? ships[orbit.focus] : ownShip,
             fmot = sea.motion && fsh && fsh.mot ? fsh.mot : null;
-          camMot += ((view === "bridge" ? 1 : view === "chase" ? 0.3 : 0) - camMot) * (1 - Math.exp(-dt * 5));
+          camMot +=
+            ((view === "bridge" ? 1 : view === "chase" ? 0.3 : 0) - camMot) *
+            (1 - Math.exp(-dt * 5));
           if (fmot && camMot > 0.001) {
             want.pos.y += fmot.hv * camMot; // the eye rises and falls with the ship
             want.target.y += fmot.hv * camMot;
@@ -6680,7 +7656,10 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           const unitAt = (x, y, z, type) => {
             // true ship size, but never smaller than ~16 px long
             const L = MODEL_DIMS[type][0];
-            return Math.max(REAL_NM[type] / L, (pxAt(x, y, z) * 16) / L);
+            return Math.max(
+              (REAL_NM[type] * SHIP_MAG) / L,
+              (pxAt(x, y, z) * SHIP_MIN_PX) / L,
+            );
           };
 
           /* ships (floating origin: own at 0,0,0) */
@@ -6779,11 +7758,20 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             U_.uZen.value.lerp(_eZ.set(env.zen), tw);
             if (env.seaDeep) {
               // water body colour, rebuilt from the day/night base every frame (lerp alone would pile up)
-              U_.uDeep.value.set(OCEAN_C.deep[0]).lerp(_m2.set(OCEAN_C.deep[1]), nw).lerp(_eH.set(env.seaDeep), tw);
-              U_.uShallow.value.set(OCEAN_C.shallow[0]).lerp(_m2.set(OCEAN_C.shallow[1]), nw).lerp(_eH.set(env.seaShallow), tw);
+              U_.uDeep.value
+                .set(OCEAN_C.deep[0])
+                .lerp(_m2.set(OCEAN_C.deep[1]), nw)
+                .lerp(_eH.set(env.seaDeep), tw);
+              U_.uShallow.value
+                .set(OCEAN_C.shallow[0])
+                .lerp(_m2.set(OCEAN_C.shallow[1]), nw)
+                .lerp(_eH.set(env.seaShallow), tw);
             }
             if (env.glit > 0)
-              U_.uSunCol.value.set(OCEAN_C.sun[0]).lerp(_m2.set(OCEAN_C.sun[1]), nw).lerp(_eH.set(env.sunCol), tw);
+              U_.uSunCol.value
+                .set(OCEAN_C.sun[0])
+                .lerp(_m2.set(OCEAN_C.sun[1]), nw)
+                .lerp(_eH.set(env.sunCol), tw);
           }
           U_.uGlit.value = env.glit * (1 - nw) + nw * 0.9 * moonF; // broad silver moon path at night
           updateSky(dt);
@@ -6869,64 +7857,64 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== input.js ======== */
       /* ===========================================================================
-                                 input.js  -  pointer, wheel and keyboard input for the 3D COLREG simulator
-                                 Needs, already loaded:  three.js r128 (UMD),  sim.js (Sim),  scene3d.js (Scene3D)
-                                 Global: Input.   No simulation maths lives here: every change goes through
-                                 Sim.moveTarget / Sim.toggle / Sim.reset / Sim.setSettings and
-                                 Scene3D.setConfig / setView / setNight.
+                                       input.js  -  pointer, wheel and keyboard input for the 3D COLREG simulator
+                                       Needs, already loaded:  three.js r128 (UMD),  sim.js (Sim),  scene3d.js (Scene3D)
+                                       Global: Input.   No simulation maths lives here: every change goes through
+                                       Sim.moveTarget / Sim.toggle / Sim.reset / Sim.setSettings and
+                                       Scene3D.setConfig / setView / setNight.
 
-                                 Usage (after Scene3D.init):
-                                   Input.init(canvas, { onAction(name, detail) { ...refresh your UI... } });
+                                       Usage (after Scene3D.init):
+                                         Input.init(canvas, { onAction(name, detail) { ...refresh your UI... } });
 
-                                 POINTER (primary button / touch / pen)
-                                   - A THREE.Raycaster goes from the pointer through the camera to the sea plane
-                                     (y = 0).  Hit testing compares the pointer with each ship's projected screen
-                                     position (24 px for a mouse, 38 px for touch, the 2D values), nearest target
-                                     first, then own ship.
-                                   - Press on a target: select it and start a drag.  The ship keeps the offset
-                                     between the pointer and its centre (the 2D "grab" offset), and moves only after
-                                     the pointer has travelled a few px, so a tap selects without nudging it.
-                                     The new position is clamped to the placement limit (distance from own ship
-                                     <= settings.range) and written with Sim.moveTarget(i, x, y), which is what the 2D
-                                     pointermove did to tg[drag].x / .y.
-                                   - Press on own ship: select own (sel = -1).  Own ship is not draggable.
-                                   - While a ship is held, the orbit camera is switched off (Scene3D.orbit.enabled =
-                                     false) and the press never reaches Scene3D's own orbit handler; on release it is
-                                     switched back on.  A press on empty sea orbits as before.
-                                   - Only one pointer may start a ship drag; a second finger is ignored, and a ship
-                                     drag never starts while another pointer is already down.
-                                   - Dragging is off in the bridge view (the sea is seen at a grazing angle); selecting
-                                     still works there.
-                                   - Hover (mouse): cursor 'grab' over a target, 'pointer' over own ship.
-                                 WHEEL  (captured before Scene3D's own wheel handler, which therefore never runs)
-                                   - Zoom in orbit, chase and bridge (Scene3D.zoomBy), Shift + wheel too.
-                                 KEYBOARD
-                                   Space  start / pause    only when focus is on the page body or the canvas
-                                   R      reset            N  day / night
-                                   1 orbit  2 chase  3 bridge  C centre the view
-                                   Esc    closes the info panel (default #zpanel, button #zinfo; or opts.onEscape)
-                                   Letters and digits are ignored while typing in an input / select / textarea,
-                                   and with Ctrl / Alt / Meta held.
+                                       POINTER (primary button / touch / pen)
+                                         - A THREE.Raycaster goes from the pointer through the camera to the sea plane
+                                           (y = 0).  Hit testing compares the pointer with each ship's projected screen
+                                           position (24 px for a mouse, 38 px for touch, the 2D values), nearest target
+                                           first, then own ship.
+                                         - Press on a target: select it and start a drag.  The ship keeps the offset
+                                           between the pointer and its centre (the 2D "grab" offset), and moves only after
+                                           the pointer has travelled a few px, so a tap selects without nudging it.
+                                           The new position is clamped to the placement limit (distance from own ship
+                                           <= settings.range) and written with Sim.moveTarget(i, x, y), which is what the 2D
+                                           pointermove did to tg[drag].x / .y.
+                                         - Press on own ship: select own (sel = -1).  Own ship is not draggable.
+                                         - While a ship is held, the orbit camera is switched off (Scene3D.orbit.enabled =
+                                           false) and the press never reaches Scene3D's own orbit handler; on release it is
+                                           switched back on.  A press on empty sea orbits as before.
+                                         - Only one pointer may start a ship drag; a second finger is ignored, and a ship
+                                           drag never starts while another pointer is already down.
+                                         - Dragging is off in the bridge view (the sea is seen at a grazing angle); selecting
+                                           still works there.
+                                         - Hover (mouse): cursor 'grab' over a target, 'pointer' over own ship.
+                                       WHEEL  (captured before Scene3D's own wheel handler, which therefore never runs)
+                                         - Zoom in orbit, chase and bridge (Scene3D.zoomBy), Shift + wheel too.
+                                       KEYBOARD
+                                         Space  start / pause    only when focus is on the page body or the canvas
+                                         R      reset            N  day / night
+                                         1 orbit  2 chase  3 bridge  C centre the view
+                                         Esc    closes the info panel (default #zpanel, button #zinfo; or opts.onEscape)
+                                         Letters and digits are ignored while typing in an input / select / textarea,
+                                         and with Ctrl / Alt / Meta held.
 
-                                 Options
-                                   hit            { fine: 24, coarse: 38 }       hit radius, px
-                                   dragThreshold  { fine: 3,  coarse: 8 }        px before a press becomes a drag
-                                   infoPanel, infoButton   element or selector   (defaults '#zpanel', '#zinfo')
-                                   onEscape()     return true if you closed something yourself
-                                   getState()     default Sim.getState
-                                   getCamera()    default Scene3D.getCamera, else captured (see below)
-                                   onAction(name, detail)  called AFTER the default action:
-                                      'select' {sel}   'dragstart' {sel}   'drag' {sel,x,y}   'dragend' {sel}
-                                      'range' {range}  'toggle' {running}  'reset'  'night' {night}
-                                      'view' {view}    'escape'
+                                       Options
+                                         hit            { fine: 24, coarse: 38 }       hit radius, px
+                                         dragThreshold  { fine: 3,  coarse: 8 }        px before a press becomes a drag
+                                         infoPanel, infoButton   element or selector   (defaults '#zpanel', '#zinfo')
+                                         onEscape()     return true if you closed something yourself
+                                         getState()     default Sim.getState
+                                         getCamera()    default Scene3D.getCamera, else captured (see below)
+                                         onAction(name, detail)  called AFTER the default action:
+                                            'select' {sel}   'dragstart' {sel}   'drag' {sel,x,y}   'dragend' {sel}
+                                            'range' {range}  'toggle' {running}  'reset'  'night' {night}
+                                            'view' {view}    'escape'
 
-                                 Assumptions about scene3d.js: own ship sits at the scene origin (floating origin)
-                                 and a vessel at sim (x, y) is drawn at (x - own.x, 0, -(y - own.y)).
-                                 The camera is read from opts.getCamera() or Scene3D.getCamera() if either exists;
-                                 otherwise it is captured from the PerspectiveCamera that scene3d.js updates every
-                                 frame, so scene3d.js needs no change.  (Adding  getCamera: () => camera  to the
-                                 Scene3D export is a one-line way to make it explicit.)
-                                 =========================================================================== */
+                                       Assumptions about scene3d.js: own ship sits at the scene origin (floating origin)
+                                       and a vessel at sim (x, y) is drawn at (x - own.x, 0, -(y - own.y)).
+                                       The camera is read from opts.getCamera() or Scene3D.getCamera() if either exists;
+                                       otherwise it is captured from the PerspectiveCamera that scene3d.js updates every
+                                       frame, so scene3d.js needs no change.  (Adding  getCamera: () => camera  to the
+                                       Scene3D export is a one-line way to make it explicit.)
+                                       =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -6987,10 +7975,10 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             t.isContentEditable);
 
         /* The camera, in order of preference:
-                                   1. opts.getCamera()           2. Scene3D.getCamera()
-                                   3. the PerspectiveCamera that scene3d.js updates every frame (captured from
-                                      THREE.PerspectiveCamera.prototype.updateProjectionMatrix, because in r128
-                                      WebGLRenderer.render is a per-instance method and cannot be wrapped). */
+                                         1. opts.getCamera()           2. Scene3D.getCamera()
+                                         3. the PerspectiveCamera that scene3d.js updates every frame (captured from
+                                            THREE.PerspectiveCamera.prototype.updateProjectionMatrix, because in r128
+                                            WebGLRenderer.render is a per-instance method and cannot be wrapped). */
         function hookCamera() {
           if ((o && o.getCamera) || (S() && typeof S().getCamera === "function"))
             return;
@@ -7425,30 +8413,30 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== ui.js ======== */
       /* ===========================================================================
-                                 ui.js  -  the side panel of the 3D COLREG CPA/TCPA simulator
-                                 Ported from colreg_2d_fixed.html (ui(), types(), syncT(), setZone(), zinfo(),
-                                 setMode() and the slider / button handlers) with the same behaviour and the
-                                 same CSS colour classes (SAFE CAUTION DANGER COLLISION COLLIDED GW SO KC CK dimtxt).
+                                       ui.js  -  the side panel of the 3D COLREG CPA/TCPA simulator
+                                       Ported from colreg_2d_fixed.html (ui(), types(), syncT(), setZone(), zinfo(),
+                                       setMode() and the slider / button handlers) with the same behaviour and the
+                                       same CSS colour classes (SAFE CAUTION DANGER COLLISION COLLIDED GW SO KC CK dimtxt).
 
-                                 Needs, already loaded:  colreg.js (COLREG), sim.js (Sim), scene3d.js (Scene3D)
-                                 Optional:               input.js (Input) - keyboard, wheel and 3D pointer input
-                                 Global: UI
+                                       Needs, already loaded:  colreg.js (COLREG), sim.js (Sim), scene3d.js (Scene3D)
+                                       Optional:               input.js (Input) - keyboard, wheel and 3D pointer input
+                                       Global: UI
 
-                                 All simulation changes go through Sim (setSettings, applyZone, toggle, reset,
-                                 placeTarget, setTargetCourse/Speed, setVesselType/Config).  Nothing is computed
-                                 here: every number shown comes from Sim.getState().
+                                       All simulation changes go through Sim (setSettings, applyZone, toggle, reset,
+                                       placeTarget, setTargetCourse/Speed, setVesselType/Config).  Nothing is computed
+                                       here: every number shown comes from Sim.getState().
 
-                                 API
-                                   UI.init({ night })          wire the panel; call once, after Sim.init()
-                                   UI.update(state)            refresh tables, banner, log, outputs (main.js: every 4th frame)
-                                   UI.refreshAll()             rebuild everything (after Reset or a new scenario)
-                                   UI.onAction(name, detail)   hook for Input.init({ onAction }): select, view, night,
-                                                               range, reset, toggle
-                                   UI.setSel(i) / UI.getSel()  selected vessel, -1 = own ship, 0..2 = T1..T3
-                                   UI.setMode(night)           day / night (page theme + Scene3D.setNight)
+                                       API
+                                         UI.init({ night })          wire the panel; call once, after Sim.init()
+                                         UI.update(state)            refresh tables, banner, log, outputs (main.js: every 4th frame)
+                                         UI.refreshAll()             rebuild everything (after Reset or a new scenario)
+                                         UI.onAction(name, detail)   hook for Input.init({ onAction }): select, view, night,
+                                                                     range, reset, toggle
+                                         UI.setSel(i) / UI.getSel()  selected vessel, -1 = own ship, 0..2 = T1..T3
+                                         UI.setMode(night)           day / night (page theme + Scene3D.setNight)
 
-                                 Keyboard (Space, R, N, 1-4, Esc), the wheel and pointer picking belong to input.js.
-                                 =========================================================================== */
+                                       Keyboard (Space, R, N, 1-4, Esc), the wheel and pointer picking belong to input.js.
+                                       =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -7677,9 +8665,21 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             row.className = "row";
             row.dataset.i = v.i;
             row.innerHTML =
-              '<span class="spl" title="Select ' + v.n + '">' + v.n + "</span>" +
-              '<input type="range" min="0" max="' + SPD_MAX + '" step="0.5" aria-label="Speed of ' + v.n + ' in knots">' +
-              '<span style="display:flex;align-items:center;gap:3px"><input class="num spn" type="number" min="0" max="' + SPD_MAX + '" step="0.1" inputmode="decimal" aria-label="Speed of ' + v.n + ' in knots"><span class="kn">kn</span></span>';
+              '<span class="spl" title="Select ' +
+              v.n +
+              '">' +
+              v.n +
+              "</span>" +
+              '<input type="range" min="0" max="' +
+              SPD_MAX +
+              '" step="0.5" aria-label="Speed of ' +
+              v.n +
+              ' in knots">' +
+              '<span style="display:flex;align-items:center;gap:3px"><input class="num spn" type="number" min="0" max="' +
+              SPD_MAX +
+              '" step="0.1" inputmode="decimal" aria-label="Speed of ' +
+              v.n +
+              ' in knots"><span class="kn">kn</span></span>';
             const rg = row.querySelector('input[type="range"]'),
               nb = row.querySelector(".spn");
             const apply = (raw) => {
@@ -7703,7 +8703,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             nb.onchange = () => {
               // on leaving the box, show the clamped / rounded value the simulation really uses
               const x = apply(nb.value);
-              nb.value = (x === false ? vesselOf(Sim.getState(), v.i).speed : x).toFixed(1);
+              nb.value = (
+                x === false ? vesselOf(Sim.getState(), v.i).speed : x
+              ).toFixed(1);
             };
             row.querySelector(".spl").onclick = () => setSel(v.i);
             box.appendChild(row);
@@ -7770,14 +8772,29 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               return;
             }
             const d = k === "ArrowUp" ? 1 : -1,
-              sp = Math.max(0, Math.min(SPD_MAX, Math.round((v.speed + d * (big ? 2 : 0.5)) * 10) / 10));
+              sp = Math.max(
+                0,
+                Math.min(
+                  SPD_MAX,
+                  Math.round((v.speed + d * (big ? 2 : 0.5)) * 10) / 10,
+                ),
+              );
             Sim.setSettings({ ownSpeed: sp });
             keyHud(name + "  " + sp.toFixed(1) + " kn");
           } else {
             const d = k === "ArrowRight" ? 1 : -1, // right = starboard = course increases
-              c = Math.round((((v.course + d * (big ? 5 : 1)) % 360) + 360) % 360 * 10) / 10;
+              c =
+                Math.round(
+                  ((((v.course + d * (big ? 5 : 1)) % 360) + 360) % 360) * 10,
+                ) / 10;
             Sim.setSettings({ ownCourse: c });
-            keyHud(name + "  " + (d > 0 ? "to starboard " : "to port ") + pad3(c) + "\u00b0");
+            keyHud(
+              name +
+                "  " +
+                (d > 0 ? "to starboard " : "to port ") +
+                pad3(c) +
+                "\u00b0",
+            );
           }
           syncSliders();
           outputs();
@@ -8011,13 +9028,21 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             spa.onchange = () => {
               window.specialAnim = spa.checked;
               Sim.setSettings({ specialSim: spa.checked });
-              keyHud(spa.checked ? "Special status and activity animation on" : "Special status and activity animation off");
+              keyHud(
+                spa.checked
+                  ? "Special status and activity animation on"
+                  : "Special status and activity animation off",
+              );
             };
           const asw = $("arrowship");
           if (asw)
             asw.onchange = () => {
               window.arrowsSteer = asw.checked;
-              keyHud(asw.checked ? "Arrows control your own ship" : "Arrows move the camera");
+              keyHud(
+                asw.checked
+                  ? "Arrows control your own ship"
+                  : "Arrows move the camera",
+              );
             };
           $("zone").onchange = (e) => setZone(e.target.value);
 
@@ -8115,7 +9140,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             Scene3D.setCurrent({ kn: +cp.value, set: +cd.value });
             if (arrow) arrow.style.transform = "rotate(" + cd.value + "deg)";
             if (arrow) arrow.style.opacity = +cp.value > 0 ? "1" : "0.35";
-            if (out) out.textContent = String(Math.round(+cd.value)).padStart(3, "0") + "\u00b0";
+            if (out)
+              out.textContent =
+                String(Math.round(+cd.value)).padStart(3, "0") + "\u00b0";
           };
           cp.addEventListener("change", apply);
           cd.addEventListener("input", apply);
@@ -8533,19 +9560,19 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== main.js ======== */
       /* ===========================================================================
-                                 main.js  -  boot sequence and frame loop of the 3D COLREG CPA/TCPA simulator
-                                 Load order (this file):  three r128 -> embedded data -> colreg -> sim -> scene3d -> input -> ui -> main
+                                       main.js  -  boot sequence and frame loop of the 3D COLREG CPA/TCPA simulator
+                                       Load order (this file):  three r128 -> embedded data -> colreg -> sim -> scene3d -> input -> ui -> main
 
-                                 boot():  Sim.init()   loads colreg.json (built-in 9-state fallback if it is missing or
-                                                       the page is opened from file://), then builds a random scenario
-                                          UI.init()    side panel, tables, sliders, theme
-                                          Scene3D.init + Input.init   3D scene, pointer / wheel / keyboard
-                                          requestAnimationFrame(loop)
+                                       boot():  Sim.init()   loads colreg.json (built-in 9-state fallback if it is missing or
+                                                             the page is opened from file://), then builds a random scenario
+                                                UI.init()    side panel, tables, sliders, theme
+                                                Scene3D.init + Input.init   3D scene, pointer / wheel / keyboard
+                                                requestAnimationFrame(loop)
 
-                                 loop(): same order as the 2D loop():
-                                          Sim.step(dt)  ->  Scene3D.updateScene(state)  ->  every 4th frame UI.update(state)
-                                 If WebGL is not available the side panel and the simulation still run; a message is shown.
-                                 =========================================================================== */
+                                       loop(): same order as the 2D loop():
+                                                Sim.step(dt)  ->  Scene3D.updateScene(state)  ->  every 4th frame UI.update(state)
+                                       If WebGL is not available the side panel and the simulation still run; a message is shown.
+                                       =========================================================================== */
       (function () {
         "use strict";
 
