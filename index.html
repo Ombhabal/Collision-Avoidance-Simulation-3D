@@ -3034,6 +3034,8 @@
           nightTarget = 0,
           nw = 0,
           blendDirty = true; // raw 0..1 fade, its target, eased value used for blending
+        let lampW = 0,
+          lw = 0; // same fade for the LAMPS: on at night OR in restricted visibility (Rule 20), eased value in lw
         let palDay = PAL_DAY,
           palNight = PAL_NIGHT,
           dome = null,
@@ -3086,6 +3088,7 @@
             sunDeg: 7,
             glowDeg: 40,
             starVis: 0.15,
+            lights: 1, // restricted visibility: navigation lights on, even by day
           },
           dense: {
             fogMul: 0.05,
@@ -3099,6 +3102,7 @@
             sunDeg: 9,
             glowDeg: 45,
             starVis: 0,
+            lights: 1,
           },
         };
         /* Rain and snow: overcast grey sky, no sun or stars, short visibility, falling particles (see buildPrecip). */
@@ -3116,6 +3120,7 @@
           starVis: 0,
           waveMul: 1.35,
           glint: 0.05,
+          lights: 1,
           precip: "rain",
           pAmt: 1,
           seaSky: 1,
@@ -3134,6 +3139,7 @@
           starVis: 0,
           waveMul: 0.9,
           glint: 0.05,
+          lights: 1,
           precip: "snow",
           pAmt: 1,
           seaSky: 1,
@@ -3142,6 +3148,7 @@
           // fields the older presets do not set (so a switch never keeps a stale value)
           ENV_PRESETS[k] = Object.assign(
             {
+              lights: 0, // 1 = navigation lights on by day too (restricted visibility)
               waveMul: 1,
               glint: 1,
               precip: "",
@@ -4775,6 +4782,7 @@ void main(){
             rails: [0.25],
           });
           sideDecal(bg, bgHull, mats.dcLogo, 0, 0.62, 0.9, 0.9); // gold logo on both sides of the barge
+          bg.userData.mounts = bargeMounts(bgHull, 12);
           const cm = [mats.vmC0, mats.vmC1, mats.vmC2, mats.vmC3];
           for (let c = -1; c <= 1; c++)
             for (let b = 0; b < 5; b++) {
@@ -5229,6 +5237,17 @@ void main(){
         }
 
         /* ---- activity vessels (pilot boat, supply ship, towed / pushed barge), built as real hulls ----------- */
+        /* Where a barge carries its lights: sidelights on the deck corners at the bow end and a sternlight at the stern end, both in the free
+           deck beyond the container stacks. Barge-local coordinates, taken from the hull's own deck width and height. */
+        function bargeMounts(h, bl) {
+          const zb = bl / 2 - 0.65,
+            at = (z, sg) => {
+              const t = h.T(z),
+                base = h.sheer(t);
+              return { x: sg * (h.hd(t) - 0.3), y: base + 1.15, z, base };
+            };
+          return { port: at(-zb, -1), stbd: at(-zb, 1), stern: Object.assign(at(zb, 1), { x: 0 }) };
+        }
         function buildRigBarge(g, bl, hwHint) {
           csMats();
           const hw = Math.max(hwHint, bl / 5);
@@ -5257,6 +5276,7 @@ void main(){
             rails: [0.22],
           });
           sideDecal(g, bgHull, mats.dcLogo, 0, 0.5, 0.7, 0.7); // gold logo on both sides of the barge
+          g.userData.mounts = bargeMounts(bgHull, bl);
           const cm = [mats.vmC0, mats.vmC1, mats.vmC2, mats.vmC3],
             nb = Math.max(2, Math.floor((bl * 0.8) / 1.7)),
             cw = (2 * hw * 0.8) / 3;
@@ -6354,6 +6374,72 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         /* Lamp list for one vessel, in model units: [{x, y, z, col, r}].  JSON layout first (position tokens from
                                              COLREG.lightLayout, the same maths as the 2D drawJSONLights), else the fallback set by condition then type. */
         const RAM_ACTS = ["dredging", "cable", "mine_clearance", "replenishment"]; // Rule 3(g), same list as sim.js
+        let postMat = null,
+          postGeo = null; // lamp posts share one geometry and material
+        /* Where lamps and day shapes really mount on each model (model units; x starboard, z astern, y up), measured from the
+           models themselves. A MAST role is a span {z, lo, hi} the lamps stack down from the top; a POINT role (aft, stern) is a
+           lamp height {hi, lo} on a short post standing on `base`; wing = the sidelight spot on the bridge (mirrored for port).
+           shape / shapeFwd = the mast span a stack of day shapes hangs on (underway / at anchor or aground). */
+        const ANCH = {
+          large: {
+            mast: { z: -3.5, lo: 7.9, hi: 10.8 }, // radar mast on the bridge
+            fore: { z: -11.8, lo: 4.6, hi: 9.3 }, // foremast
+            mid: { z: -3.5, lo: 7.9, hi: 9.6 },
+            aft: { z: 9.2, lo: 9.3, hi: 9.3 }, // on top of the aft funnel
+            wing: { x: 3.8, y: 7.65, z: -4.0 }, // bridge wings
+            stern: { z: 16.7, lo: 2.7, hi: 4.4, base: 3.2 },
+            shape: { z: -3.5, lo: 7.9, hi: 11.0 },
+            shapeFwd: { z: -11.8, lo: 4.6, hi: 9.8 },
+          },
+          tug: {
+            mast: { z: -1.1, lo: 6.0, hi: 10.6 },
+            fore: { z: -1.1, lo: 6.0, hi: 8.0 },
+            mid: { z: -1.1, lo: 6.0, hi: 9.2 },
+            aft: { z: 3.6, lo: 5.05, hi: 5.05 }, // on the towing gantry
+            wing: { x: 1.85, y: 5.85, z: -2.6 }, // wheelhouse roof corners
+            stern: { z: 8.5, lo: 3.1, hi: 4.2, base: 2.6 },
+            shape: { z: -1.1, lo: 6.0, hi: 10.9 },
+            shapeFwd: { z: -1.1, lo: 6.0, hi: 10.9 },
+          },
+          fishing: {
+            mast: { z: -4.5, lo: 3.4, hi: 9.8 },
+            fore: { z: -4.5, lo: 3.4, hi: 7.6 },
+            mid: { z: -1.7, lo: 5.2, hi: 8.0 },
+            aft: { z: 7.4, lo: 3.1, hi: 4.0, base: 2.4 },
+            wing: { x: 1.55, y: 5.55, z: -3.0 }, // wheelhouse roof corners
+            stern: { z: 7.4, lo: 3.1, hi: 4.0, base: 2.4 },
+            shape: { z: -4.5, lo: 4.2, hi: 10.1 },
+            shapeFwd: { z: -4.5, lo: 4.2, hi: 10.1 },
+          },
+          sail: {
+            mast: { z: -0.9, lo: 3.2, hi: 16.6 },
+            fore: { z: -0.9, lo: 3.2, hi: 9.0 },
+            mid: { z: -0.9, lo: 3.2, hi: 12.0 },
+            aft: { z: 6.2, lo: 2.3, hi: 2.8, base: 2.1 },
+            wing: { x: 0.55, y: 2.75, z: -4.6, base: 1.9 }, // bow rail, on the deck (the bow narrows: deck half-width 0.63 here)
+            stern: { z: 6.2, lo: 2.3, hi: 2.8, base: 2.1 },
+            shape: { z: -0.9, lo: 4.0, hi: 16.8 },
+            shapeFwd: { z: -0.9, lo: 4.0, hi: 16.8 },
+          },
+        };
+        /* One lamp position: role = "mast" | "fore" | "mid" | "aft" | "stern" | "wing" (side -1 port / +1 starboard); k of n lamps
+           stacked, first on top. Returns {x, y, z, base}: base is the height of the post the lamp stands on (none: it sits on a mast
+           or roof). */
+        function lampAt(type, role, k, n, side) {
+          const A = ANCH[type] || ANCH.large;
+          if (role === "wing") {
+            const w = A.wing;
+            return { x: (side || 1) * w.x, y: w.y - k * 0.9, z: w.z, base: k === 0 ? w.base : undefined };
+          }
+          const R = A[role] || A.mast,
+            gap = n > 1 ? Math.min(1.1, (R.hi - R.lo) / (n - 1)) : 0;
+          return {
+            x: role === "stern" && side ? side * 0.6 : 0,
+            y: R.hi - k * gap,
+            z: R.z,
+            base: k === 0 ? R.base : undefined,
+          };
+        }
         function lampSpec(v) {
           const type = v.type,
             [L, Wd] = MODEL_DIMS[type] || MODEL_DIMS.large,
@@ -6364,42 +6450,35 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           const fish = q ? !!q.is_fishing : type === "fishing",
             moving = v.speed > 0.5;
           const out = [],
-            add = (x, y, z, col, r) => out.push({ x, y, z, col, r: r || 1 });
+            /* every lamp is mounted on a real structure of the model (see ANCH): add(role, k, n, colour, size, side) */
+            add = (role, k, n, col, r, side) => {
+              const p = lampAt(type, role, k, n, side);
+              out.push({ x: p.x, y: p.y, z: p.z, base: p.base, col, r: r || 1 });
+            };
           const lay = root.COLREG ? root.COLREG.lightLayout(v) : null;
           if (lay && lay.length) {
-            const hy = {
-                top: mast,
-                forward: y0 + 4.5,
-                mid: y0 + 5,
-                bottom: y0 + 2.2,
-                stern: y0 + 3.5,
-              },
-              g = Math.min(2.5, L * 0.07);
+            const roleOf = { top: "mast", forward: "fore", mid: "mid", bottom: "aft", stern: "stern" };
             for (const l of lay) {
               if (fish && !moving && (l.side !== 0 || l.token === "stern")) continue; // fishing: sidelights + sternlight only when making way
-              const n = l.colours.length;
-              l.colours.forEach((col, k) =>
-                add(
-                  l.side * Wd,
-                  hy[l.token] + ((n - 1) / 2 - k) * g,
-                  l.along * L,
-                  col,
-                  1,
-                ),
-              ); // first colour on top
+              const n = l.colours.length,
+                role =
+                  l.side !== 0 && l.token !== "stern"
+                    ? "wing"
+                    : roleOf[l.token] || "mid";
+              l.colours.forEach((col, k) => add(role, k, n, col, 1, l.side)); // first colour on top
             }
             return out;
           }
-          const sides = (y, z) => {
-            add(-Wd * 0.95, y, z, LAMP.red);
-            add(Wd * 0.95, y, z, LAMP.green);
+          const sides = () => {
+            add("wing", 0, 1, LAMP.red, 1, -1);
+            add("wing", 0, 1, LAMP.green, 1, 1);
           };
           if (cond === "anchor")
-            add(0, y0 + 5.5, -L * 0.3, LAMP.white, 1.3); // white all-round
+            add("fore", 0, 1, LAMP.white, 1.3); // white all-round
           else if (cond === "aground") {
-            add(0, y0 + 8, -L * 0.3, LAMP.white, 1.3);
-            add(0, y0 + 6, -L * 0.3, LAMP.red, 1.1);
-            add(0, y0 + 4, -L * 0.3, LAMP.red, 1.1);
+            add("fore", 0, 3, LAMP.white, 1.3);
+            add("fore", 1, 3, LAMP.red, 1.1);
+            add("fore", 2, 3, LAMP.red, 1.1);
           } else {
             // underway, whether making way or stopped: a stopped power-driven or sailing vessel keeps her masthead,
             // side and stern lights (R23, R25); only a fishing vessel drops her side and stern lights (below)
@@ -6408,31 +6487,24 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
                 : v.special === "ram" || (!q && RAM_ACTS.indexOf(v.act) >= 0),
               sp = q ? (q.is_nuc ? 2 : ramX ? 3 : q.is_cbd ? 3 : 0) : ramX ? 3 : 0; // R27 / R27(b) / R28 all-round stacks
             for (let k = 0; k < sp; k++)
-              add(
-                0,
-                mast - 1 - k * 1.8,
-                -L * 0.12,
-                ramX && k === 1 ? LAMP.white : LAMP.red,
-                1.1,
-              );
+              add("mast", k, sp, ramX && k === 1 ? LAMP.white : LAMP.red, 1.1); // all-round stack on the mast
             if (type === "sail") {
-              sides(y0 + 1.8, -L * 0.38);
-              add(0, y0 + 2.2, L * 0.46, LAMP.white);
+              sides();
+              add("stern", 0, 1, LAMP.white);
             } else if (type === "fishing") {
-              add(0, y0 + 8.6, -L * 0.1, LAMP.green, 1.1);
-              add(0, y0 + 6.8, -L * 0.1, LAMP.white, 1.1); // green over white
+              add("mast", 0, 2, LAMP.green, 1.1);
+              add("mast", 1, 2, LAMP.white, 1.1); // green over white
               if (moving) {
-                sides(y0 + 3.4, -L * 0.2);
-                add(0, y0 + 2.8, L * 0.45, LAMP.white);
+                sides();
+                add("stern", 0, 1, LAMP.white);
               } // sidelights + sternlight only when making way
             } else {
               // large and tug
-              const big = type === "large";
-              add(0, y0 + (big ? 5.5 : 4.4), -L * 0.34, LAMP.white, 1.1); // fore masthead
-              add(0, y0 + (big ? 10 : 7), L * (big ? 0.2 : 0.1), LAMP.white, 1.1); // aft masthead, higher
-              sides(y0 + (big ? 7.2 : 3.6), big ? L * 0.12 : -L * 0.05);
-              add(0, y0 + 2.4, L * 0.5, LAMP.white);
-              if (type === "tug") add(0, y0 + 3.4, L * 0.42, LAMP.yellow, 1.1); // towing light
+              add("fore", 0, 1, LAMP.white, 1.1); // fore masthead
+              add(sp ? "aft" : "mast", 0, 1, LAMP.white, 1.1); // aft masthead, higher (the stack, if any, owns the mast top)
+              sides();
+              add("stern", 0, 1, LAMP.white);
+              if (type === "tug") add("aft", 0, 1, LAMP.yellow, 1.1); // towing light, on the towing gantry
             }
           }
           return out;
@@ -6512,8 +6584,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           return o;
         }
 
-        function newLamp(s) {
-          // pooled: created once, recoloured on every rebuild
+        function newLamp(s, parent) {
+          // pooled: created once, recoloured on every rebuild (parent: a barge, for its own lights)
           const glow = new THREE.Sprite(
             new THREE.SpriteMaterial({
               map: glowTex,
@@ -6539,8 +6611,52 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           );
           core.scale.setScalar(0.55);
           core.renderOrder = 14;
-          s.lampGroup.add(glow, core);
+          (parent || s.lampGroup).add(glow, core);
           return { glow, core, c: new THREE.Color(), on: false, r: 1 };
+        }
+        /* Lights of the barges a ship tows or pushes: sidelights at the bow end, plus a sternlight on a barge in tow (Rule 24). They are
+           children of the barge, so they ride the waves with it. Rebuilt only when the set of barges changes. */
+        function refreshBargeLamps(s) {
+          const list = [],
+            tw = s.body && s.body.userData.tow;
+          if (tw) list.push({ obj: tw.bg, towed: true });
+          if (s.rig)
+            s.rig.fl.forEach((f) => list.push({ obj: f.obj, towed: f.kind === "flat" })); // flat = towed, model = pushed
+          const sig = list.map((b) => b.obj.uuid + (b.towed ? "T" : "P")).join("|");
+          if (sig === s.bSig) return;
+          s.bSig = sig;
+          (s.bLamps || []).forEach((lp) => {
+            lp.glow.parent && lp.glow.parent.remove(lp.glow, lp.core);
+            lp.glow.material.dispose();
+            lp.core.material.dispose();
+          });
+          (s.bPosts || []).forEach((m) => m.parent && m.parent.remove(m));
+          s.bLamps = [];
+          s.bPosts = [];
+          postMat = postMat || new THREE.MeshLambertMaterial({ color: "#59616a" });
+          postGeo = postGeo || new THREE.CylinderGeometry(0.07, 0.07, 1, 6);
+          list.forEach((b) => {
+            const M = b.obj.userData.mounts;
+            if (!M) return;
+            const put = (m, col) => {
+              const lp = newLamp(s, b.obj);
+              lp.glow.position.set(m.x, m.y, m.z);
+              lp.core.position.set(m.x, m.y, m.z);
+              lp.c.set(col);
+              lp.glow.material.color.copy(lp.c);
+              lp.core.material.color.copy(lp.c);
+              lp.on = true;
+              s.bLamps.push(lp);
+              const post = new THREE.Mesh(postGeo, postMat); // short post from the deck up to the lamp
+              post.position.set(m.x, (m.y + m.base) / 2, m.z);
+              post.scale.set(1, m.y - m.base, 1);
+              b.obj.add(post);
+              s.bPosts.push(post);
+            };
+            put(M.port, LAMP.red);
+            put(M.stbd, LAMP.green);
+            if (b.towed) put(M.stern, LAMP.white);
+          });
         }
         /* Rebuild a ship's lamps and shapes only when the signature (type, state, condition, moving) changes. */
         function refreshAids(s, v) {
@@ -6555,6 +6671,19 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           if (sig === s.aidSig) return;
           s.aidSig = sig;
           const spec = lampSpec(v);
+          (s.posts || []).forEach((m) => s.lampGroup.remove(m)); // lamp posts (shared geometry / material)
+          s.posts = [];
+          postMat =
+            postMat || new THREE.MeshLambertMaterial({ color: "#59616a" });
+          postGeo = postGeo || new THREE.CylinderGeometry(0.07, 0.07, 1, 6);
+          spec.forEach((d) => {
+            if (d.base === undefined || d.y - d.base < 0.25) return;
+            const m = new THREE.Mesh(postGeo, postMat); // a short post from the deck up to the lamp
+            m.position.set(d.x, (d.y + d.base) / 2, d.z);
+            m.scale.set(1, d.y - d.base, 1);
+            s.lampGroup.add(m);
+            s.posts.push(m);
+          });
           while (s.lamps.length < spec.length) s.lamps.push(newLamp(s));
           s.lamps.forEach((lp, i) => {
             const d = spec[i];
@@ -6576,27 +6705,42 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           while (s.shapeGroup.children.length)
             s.shapeGroup.remove(s.shapeGroup.children[0]);
           const kinds = shapeKinds(v, cond),
-            [L] = MODEL_DIMS[v.type] || MODEL_DIMS.large,
-            fwd = cond === "anchor" || cond === "aground";
-          const top = fwd ? (HULL_H[v.type] || 3) + 9 : (MAST_Y[v.type] || 14) + 1.5,
-            z = fwd ? -L * 0.3 : -L * 0.05;
+            fwd = cond === "anchor" || cond === "aground",
+            A = ANCH[v.type] || ANCH.large,
+            sp = fwd ? A.shapeFwd : A.shape, // the mast the shapes hang on
+            n = kinds.length,
+            // shrink the stack so it fits on the mast (full size: 3.0 high, 3.4 apart)
+            f = Math.min(1, (sp.hi - sp.lo) / ((Math.max(n, 1) - 1) * 3.4 + 3.0));
           kinds.forEach((k, i) => {
             const m = shapeMesh(k);
-            m.position.set(0, top - i * 3.4, z);
+            m.scale.multiplyScalar(f);
+            // first shape's top at the masthead, hung just in front of the mast
+            m.position.set(0, sp.hi - 1.5 * f - i * 3.4 * f, sp.z - (1.4 * f + 0.1));
             s.shapeGroup.add(m);
           });
         }
         /* Per frame: fade lamps / shapes with the night factor, keep glow sprites a constant screen size, drive the point lights. */
         function updateAids(s, sc, spH, idx) {
-          const on = nw > 0.02;
+          const on = lw > 0.02,
+            dayK = 0.55 + 0.45 * nw; // lit by day (restricted visibility): softer glow, full lamp
           s.lampGroup.visible = on;
-          s.shapeGroup.visible = nw < 0.98;
+          s.shapeGroup.visible = nw < 0.98; // shapes stay up by day, in fog too (Rule 20(b))
+          refreshBargeLamps(s);
+          s.bLamps.forEach((lp) => {
+            lp.glow.visible = lp.core.visible = on;
+            if (on) {
+              lp.glow.scale.setScalar(spH(13 * U) / sc);
+              lp.glow.material.opacity = lw * dayK;
+              lp.core.material.opacity = lw;
+            }
+          });
+          s.bPosts.forEach((m) => (m.visible = on));
           if (on)
             s.lamps.forEach((lp) => {
               if (!lp.on) return;
               lp.glow.scale.setScalar(spH((s.isOwn ? 15 : 13) * lp.r * U) / sc); // parent model is scaled by sc
-              lp.glow.material.opacity = nw;
-              lp.core.material.opacity = nw;
+              lp.glow.material.opacity = lw * dayK;
+              lp.core.material.opacity = lw;
             });
           for (let j = 0; j < 2; j++) {
             const pl = lights.pl[idx * 2 + j],
@@ -6610,7 +6754,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             }
             lp.core.getWorldPosition(pl.position);
             pl.color.copy(lp.c);
-            pl.intensity = nw * (s.isOwn ? 1.2 : 0.9);
+            pl.intensity = lw * dayK * (s.isOwn ? 1.2 : 0.9);
             pl.distance = 55 * sc;
             pl.decay = 2;
           }
@@ -6756,6 +6900,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           if (opts.view) view = opts.view;
           if (opts.sel !== undefined) sel = opts.sel;
           nw = smooth(nightW);
+          lampW = Math.max(nightW, env.lights ? 1 : 0);
+          lw = smooth(lampW);
           applyPalette();
           blendMaterials(nw);
           blendDirty = false;
@@ -8097,6 +8243,16 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             blendMaterials(nw);
             blendDirty = false;
           }
+          /* lamps fade in for night OR restricted visibility (fog, dense fog, rain, snow: Rule 20 lights by day) */
+          const lampTarget = Math.max(nightTarget, env.lights ? 1 : 0);
+          if (lampW !== lampTarget) {
+            const lstp = dt / NIGHT_DUR;
+            lampW =
+              Math.abs(lampTarget - lampW) <= lstp
+                ? lampTarget
+                : lampW + Math.sign(lampTarget - lampW) * lstp;
+          }
+          lw = smooth(lampW);
 
           /* camera pose with smooth transition */
           let want = pose(view, own, dt),
