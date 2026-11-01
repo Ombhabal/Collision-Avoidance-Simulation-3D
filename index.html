@@ -4746,7 +4746,9 @@ void main(){
               zA + 0.1 + (nose + 9 - zA - 0.1) * s,
             ]);
           }
-          g.add(lineObj(rope, "#c9b48a", false));
+          const ropeLine = lineObj(rope, "#c9b48a", false);
+          ropeLine.frustumCulled = false; // its end follows the barge on the waves
+          g.add(ropeLine);
           const bg = new THREE.Group();
           const bgHull = loftHull(bg, {
             L: 12,
@@ -4792,26 +4794,29 @@ void main(){
             }
           bg.position.set(0, 0, bz);
           g.add(bg);
-          g.add(
-            lineObj(
-              [
-                [0, 1.5, nose + 9 - 0.4],
-                [-2.2, 1.3, nose + 9 + 1.4],
-              ],
-              "#c9b48a",
-              false,
+          // bridle: on the barge (barge-local coordinates), so it moves with it
+          [-1, 1].forEach((sg) =>
+            bg.add(
+              lineObj(
+                [
+                  [0, 1.5, nose + 9 - 0.4 - bz],
+                  [sg * 2.2, 1.3, nose + 9 + 1.4 - bz],
+                ],
+                "#c9b48a",
+                false,
+              ),
             ),
           );
-          g.add(
-            lineObj(
-              [
-                [0, 1.5, nose + 9 - 0.4],
-                [2.2, 1.3, nose + 9 + 1.4],
-              ],
-              "#c9b48a",
-              false,
-            ),
-          );
+          /* what placeShip needs to float the barge on the waves and keep the tow rope tied to it */
+          g.userData.tow = {
+            bg,
+            bz,
+            bl: 12,
+            rope: ropeLine,
+            start: [0, y0 + 2.0, zA + 0.1], // rope end on the tug
+            tie: [0, 1.6, nose + 9 - bz], // rope end on the barge (barge-local)
+            afloat: false,
+          };
           return g;
         }
 
@@ -5863,6 +5868,51 @@ void main(){
             pitch: softLim(0.5, Math.atan2(hb - hs, Lr) * G.p),
             roll: softLim(0.5, Math.atan2(hst - hp, Lr * 0.5) * G.r),
           };
+        }
+        /* A barge on a tow line (or pushed ahead) floats on the water WHERE THE BARGE IS. It used to be fixed to the ship, so every pitch
+           or roll of the ship swung a barge 30+ units away up and down (flying, then sinking), and rig barges never rose with the waves.
+           This samples the same waves under the barge, then places it in its parent's frame so it sits on the surface.
+           v = the ship, sc = model scale, pm = parent-to-ship-frame matrix of the barge's parent, lx / lz = where the barge sits in the
+           ship's model units (x starboard, z astern), yaw = its swing relative to the ship (rad), bl = barge length (model units). */
+        const _fm = new THREE.Matrix4(),
+          _fd = new THREE.Matrix4(),
+          _pm = new THREE.Matrix4(),
+          _fq = new THREE.Quaternion(),
+          _fq2 = new THREE.Quaternion(),
+          _fe = new THREE.Euler(),
+          _fp = new THREE.Vector3(),
+          _fs = new THREE.Vector3(),
+          _fy = new THREE.Vector3(0, 1, 0);
+        function floatBarge(v, sc, pm, obj, lx, lz, yaw, bl) {
+          const Lr = (bl * sc) / SHIP_MAG, // true length of the barge (it is drawn SHIP_MAG times bigger)
+            G = SEA_GAIN.large,
+            amp = mats.ocean.uniforms.uAmp.value,
+            c = rad(v.course),
+            ox = lx * sc,
+            oz = lz * sc, // where it sits, nm, in the ship's frame
+            wx = v.x + Math.cos(c) * ox - Math.sin(c) * oz,
+            wz = -v.y + Math.sin(c) * ox + Math.cos(c) * oz, // the same point in the world (x east, z = -north)
+            cb = c - yaw, // the barge's own heading
+            bfx = Math.sin(cb),
+            bfz = -Math.cos(cb),
+            bsx = Math.cos(cb),
+            bsz = Math.sin(cb),
+            H = (a, b) =>
+              seaH(wx + bfx * a + bsx * b, wz + bfz * a + bsz * b, now, amp),
+            hb = H(Lr / 2, 0),
+            hs = H(-Lr / 2, 0),
+            hst = H(0, Lr * 0.25),
+            hp = H(0, -Lr * 0.25),
+            hc = H(0, 0),
+            hv = softLim(0.006, (hc * 2 + hb + hs + hst + hp) / 6),
+            pitch = softLim(0.5, Math.atan2(hb - hs, Lr) * G.p),
+            roll = softLim(0.5, Math.atan2(hst - hp, Lr * 0.5) * G.r);
+          _fe.set(pitch, 0, roll, "XYZ");
+          _fq.setFromEuler(_fe);
+          _fq2.setFromAxisAngle(_fy, yaw).multiply(_fq); // swing first, then tilt about the barge's own axes
+          _fd.compose(_fp.set(ox, hv, oz), _fq2, _fs.set(sc, sc, sc));
+          _fm.copy(pm).invert().multiply(_fd);
+          _fm.decompose(obj.position, obj.quaternion, obj.scale);
         }
         function setSea(o) {
           o = o || {};
@@ -7294,6 +7344,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               return m;
             };
           let upd = () => {};
+          const FL = []; // barges this rig tows or pushes: placeShip floats each on the waves where it is
+          let post = null; // runs after they are placed (re-ties the tow line)
           if (key === "fishing") {
             // A-frame on the stern, warps to a trawl net that streams astern, floats on the headline and gulls following
             const gz = st - L * 0.08,
@@ -7370,22 +7422,30 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             buildRigBarge(bg, bl, bw / 2);
             flt.add(bg, tl);
             if (type === "tug") bg.visible = tl.visible = false; // a tug already tows its own barge
-            upd = (t) => {
-              const sw = Math.sin(t * 0.5),
-                yaw = 0.14 * Math.sin(t * 0.5 + 0.6);
-              bg.position.set(sw * W * 0.45, 0.08 * Math.sin(t * 1.1), bz);
-              bg.rotation.y = yaw;
-              bg.rotation.z = 0.04 * Math.sin(t * 0.9);
+            const fl = { obj: bg, kind: "flat", lx: 0, lz: bz, yaw: 0, bl };
+            let sagNow = 0.6;
+            FL.push(fl);
+            const tie = () =>
               rSag(
                 tl,
                 [0, y0 * 0.55, st - 0.5],
                 [
-                  bg.position.x - (bl / 2) * Math.sin(yaw),
-                  1.0,
-                  bz - (bl / 2) * Math.cos(yaw),
+                  bg.position.x - (bl / 2) * Math.sin(fl.yaw),
+                  1.0 + bg.position.y, // the line follows the barge up and down the waves
+                  bz - (bl / 2) * Math.cos(fl.yaw),
                 ],
-                0.6 + 0.3 * Math.sin(t * 0.7),
+                sagNow,
               );
+            post = tie;
+            upd = (t) => {
+              const sw = Math.sin(t * 0.5),
+                yaw = 0.14 * Math.sin(t * 0.5 + 0.6);
+              bg.position.set(sw * W * 0.45, 0.08 * Math.sin(t * 1.1), bz);
+              bg.rotation.set(0, yaw, 0.04 * Math.sin(t * 0.9)); // (also clears any wave tilt from the last frame)
+              fl.lx = bg.position.x;
+              fl.yaw = yaw;
+              sagNow = 0.6 + 0.3 * Math.sin(t * 0.7);
+              tie();
             };
           } else if (key === "pushing") {
             // a barge pushed ahead, locked to the bow
@@ -7396,11 +7456,13 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             buildRigBarge(barge, bl, bw / 2);
             barge.position.set(0, 0, pz);
             grp.add(barge);
+            FL.push({ obj: barge, kind: "model", lx: 0, lz: pz, yaw: 0, bl });
             [-1, 1].forEach((k) =>
               grp.add(rBox(M.dark, 0.8, 1.2, 1.2, k * W * 0.45, 1.0, -L / 2 + 0.6)),
             );
             upd = (t) => {
-              barge.position.y = 0.04 * Math.sin(t * 3);
+              barge.position.set(0, 0.04 * Math.sin(t * 3), pz);
+              barge.rotation.set(0, 0, 0); // (also clears any wave tilt from the last frame)
             };
           } else if (key === "dredging") {
             // suction pipe over the side and a brown sediment plume that spreads astern
@@ -7609,7 +7671,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           }
           s.model.add(grp);
           s.flat.add(flt);
-          s.rig = { key: key + "|" + type, grp, flt, upd, own };
+          s.rig = { key: key + "|" + type, grp, flt, upd, own, fl: FL, post };
         }
         /* Special status of a vessel: "nuc", "ram", "cbd" or "" */
         function specialKind(v) {
@@ -7744,6 +7806,48 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               s.model.rotation.x = 0.05 + s.model.rotation.x * 0.12;
               s.model.position.y = s.model.position.y * 0.15 + 0.12 * sc;
             }
+          }
+          /* towed / pushed barges ride the waves where THEY are, not the ship's pitch and roll (see floatBarge) */
+          if (s.rig && s.rig.fl.length) {
+            if (sea.motion)
+              s.rig.fl.forEach((f) => {
+                const par = f.kind === "flat" ? s.flat : s.model,
+                  ch = f.kind === "flat" ? s.rig.flt : s.rig.grp;
+                par.updateMatrix();
+                ch.updateMatrix();
+                _pm.copy(par.matrix).multiply(ch.matrix);
+                floatBarge(v, sc, _pm, f.obj, f.lx, f.lz, f.yaw, f.bl);
+              });
+            if (s.rig.post) s.rig.post();
+          }
+          /* the tug's own barge on its tow line */
+          const tw = s.body && s.body.userData.tow;
+          if (tw && (sea.motion || tw.afloat)) {
+            if (sea.motion) {
+              s.model.updateMatrix();
+              s.body.updateMatrix();
+              _pm.copy(s.model.matrix).multiply(s.body.matrix);
+              floatBarge(v, sc, _pm, tw.bg, 0, tw.bz, 0, tw.bl);
+            } else {
+              tw.bg.position.set(0, 0, tw.bz); // motion switched off: back to the flat, straight tow
+              tw.bg.quaternion.identity();
+              tw.bg.scale.set(1, 1, 1);
+            }
+            tw.afloat = sea.motion;
+            tw.bg.updateMatrix();
+            const e = _fp.set(tw.tie[0], tw.tie[1], tw.tie[2]).applyMatrix4(tw.bg.matrix), // rope end on the barge, in the tug's frame
+              a = tw.start,
+              pa = tw.rope.geometry.attributes.position;
+            for (let i = 0; i <= 12; i++) {
+              const u = i / 12;
+              pa.setXYZ(
+                i,
+                a[0] + (e.x - a[0]) * u,
+                a[1] + (e.y - a[1]) * u - 1.1 * Math.sin(Math.PI * u),
+                a[2] + (e.z - a[2]) * u,
+              );
+            }
+            pa.needsUpdate = true;
           }
           s.halo.position.y = 0.02 * sc;
           /* foam and wake grow with speed; none when stopped, anchored or aground */
