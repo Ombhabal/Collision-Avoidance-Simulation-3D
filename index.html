@@ -394,7 +394,7 @@
         display: none;
       }
       /* panel boxes must never be squashed by the flex column; overflow-x:auto otherwise
-                                       lets .box.scroll shrink to just its scrollbar when .side is height-limited */
+                                                         lets .box.scroll shrink to just its scrollbar when .side is height-limited */
       .side > .box {
         flex-shrink: 0;
       }
@@ -678,7 +678,7 @@
             <div class="row"><span>Move</span><div class="btns" id="c-pad" style="grid-column:2/4;margin:0" role="group" aria-label="Move the camera over the sea (hold)"><button type="button" data-m="l" aria-label="Move left" title="key A">&#9664;</button><button type="button" data-m="f" aria-label="Move forward" title="key W">&#9650;</button><button type="button" data-m="b" aria-label="Move back" title="key S">&#9660;</button><button type="button" data-m="r" aria-label="Move right" title="key D">&#9654;</button></div></div>
             <p class="hint" style="margin:2px 0 6px">Works in Orbit, Chase and Bridge: drag to turn and tilt, wheel or pinch to zoom (Orbit zooms toward the pointer). Right-drag or Shift-drag slides the camera over the sea in every view. <b>Double-click</b> a ship to zoom to it, or empty sea to fly there. Keys: W A S D move (Shift = fast), Up / Down change your own ship\u2019s speed and Left / Right its course (untick \u201cArrow keys control my ship\u201d to turn and tilt the camera with them instead), + / - zoom, Q / E roll, F zoom to selected ship, 0 fit all. Centre view resets everything.</p>
           </div>
-          <div class="row"><span>Environment</span><select id="envp" aria-label="Environment preset (visual only)"><option value="clear">Clear day</option><option value="sunset">Sunset</option><option value="fog">Fog (reduced visibility)</option><option value="dense">Dense fog</option><option value="rain">Rain (heavy rain, reduced visibility)</option><option value="snow">Snow (snowfall, reduced visibility)</option></select><span></span></div>
+          <div class="row"><span>Environment</span><select id="envp" aria-label="Environment preset (drawing and simulated visibility)"><option value="clear">Clear day</option><option value="sunset">Sunset</option><option value="fog">Fog (reduced visibility)</option><option value="dense">Dense fog</option><option value="rain">Rain (heavy rain, reduced visibility)</option><option value="snow">Snow (snowfall, reduced visibility)</option></select><span></span></div>
           <div class="row"><span>Effects</span><label style="grid-column:2/4"><input type="checkbox" id="lowfx"> Reduced effects (pixel ratio 1)</label></div>
           <div class="row"><span>Sky</span><label style="grid-column:2/4"><input type="checkbox" id="skyfx" checked> Sun, moon and stars</label></div>
           <div class="row"><span>Sea state</span><select id="seap" aria-label="Sea state: wave size (visual only)"><option value="calm">Calm</option><option value="slight" selected>Slight</option><option value="moderate">Moderate</option><option value="rough">Rough</option><option value="very">Very rough</option></select><span></span></div>
@@ -699,15 +699,22 @@
                 <tr data-z="coast"><td>Coastal / moderate traffic</td><td>0.5 to 1.0 nm</td><td>10 to 15 min</td></tr>
                 <tr data-z="harbour"><td>Harbour / congested waters</td><td>0.2 to 0.5 nm</td><td>5 to 10 min</td></tr></tbody></table>
             <p><b>CPA</b> is the smallest distance the target will pass from you if both ships hold course and speed. <b>TCPA</b> is the time until that closest point.</p>
-            <p><b>COLLISION</b>: the target is closing and its predicted CPA is below the zone minimum (1.0 nm open ocean, 0.5 nm coastal, 0.2 nm harbour), whatever the TCPA. DANGER: CPA is inside your CPA limit and TCPA is at or below the alarm. CAUTION: CPA is inside the limit but TCPA is still beyond the alarm.</p>
+            <p><b>COLLISION</b>: the target is closing, its predicted CPA is below the zone minimum (1.0 nm open ocean, 0.5 nm coastal, 0.2 nm harbour) and the TCPA is at or below the alarm. (A predicted CPA that far ahead is shown as CAUTION.) DANGER: CPA is inside your CPA limit and TCPA is at or below the alarm. CAUTION: CPA is inside the limit but TCPA is still beyond the alarm.</p>
             <p>These bands are guidance, not COLREG rules. Master's standing orders and the company safety management system take priority. Large or slow-turning ships should use the upper end of each band.</p>
           </div>
           <div class="row"><span>Own course</span><input type="range" id="oc" min="0" max="359"><output id="ocv"></output></div>
           <div class="row"><span>Own speed</span><input type="range" id="os" min="0" max="30" step=".5"><output id="osv"></output></div>
+          <div class="row"><span>Wind from</span><input type="range" id="wd" min="0" max="359"><output id="wdv"></output></div>
+          <div class="row"><span>Visibility</span><input type="range" id="vz" min="0.1" max="10" step="0.1"><output id="vzv"></output></div>
+          <div class="row"><span>Wind speed</span><input type="range" id="wk" min="0" max="50" step="1"><output id="wkv"></output></div>
+          <div class="row"><span>Current</span><input type="range" id="ck" min="0" max="5" step="0.1"><output id="ckv"></output></div>
+          <div class="row"><span>Current sets</span><input type="range" id="cs" min="0" max="359"><output id="csv"></output></div>
+          <div class="row"><span>Night</span><label style="grid-column:2/4"><input type="checkbox" id="nt"> Night: vessels are seen by their lights</label></div>
           <div class="row"><span>CPA limit</span><input type="range" id="cl" min=".1" max="3" step=".1" value="1"><output id="clv"></output></div>
           <div class="row"><span>TCPA alarm</span><input type="range" id="tl" min="1" max="40" value="20"><output id="tlv"></output></div>
           <div class="row"><span>Time speed</span><input type="range" id="ms" min="10" max="300" step="10" value="60"><output id="msv"></output></div>
-          <div class="row"><span>Auto action</span><label style="grid-column:2/4"><input type="checkbox" id="ai" checked> Targets act under R8 and R14-R17</label></div></div>
+          <div class="row"><span>Auto action</span><label style="grid-column:2/4"><input type="checkbox" id="ai" checked> Targets act under R8 and R14-R17</label></div>
+          <div class="row"><span>Own autopilot</span><label style="grid-column:2/4"><input type="checkbox" id="ap"> Own ship acts under R8 and R14-R17 (your sliders become the planned route)</label></div></div>
         <div class="box"><h2>Vessel speeds <span class="dimtxt">(knots)</span></h2>
           <div id="spd"></div>
           <div class="row" style="grid-template-columns:1fr;margin-top:4px"><label title="NUC drifts or wanders out of control, CBD turns at half rate and sits deep, RAM works a boom; fishing, towing, pushing, dredging, cable work, mine clearance, pilotage and replenishment show their gear"><input type="checkbox" id="spanim" checked> Animate NUC / RAM / CBD and vessel activities</label></div>
@@ -759,14 +766,14 @@
         <details class="box" id="helpbox"><summary style="cursor:pointer;font-weight:600">Help: controls and symbols</summary>
           <p class="hint"><b>Keys:</b> Space start/pause, R reset (new random scenario), N night, 1 Orbit, 2 Chase, 3 Bridge, C centre view, Esc close panels. Drag the sea to rotate and tilt in every view; right-drag or Shift-drag slides the camera over the sea in every view; W A S D move the camera (Shift = fast); wheel zooms (toward the pointer in Orbit); double-click a ship to zoom to it, double-click the sea to fly there; F zooms to the selected ship, 0 fits all ships; the Camera on list puts the camera on any ship (Chase and Bridge then follow that ship); Up / Down = speed and Left / Right = course of your own ship (or camera turn and tilt when the arrow-control box is unticked), + / - zoom, Q / E roll. Click a ship to select it.</p>
           <p class="hint"><b>CPA</b> = predicted minimum distance between own ship and a target (nm). <b>TCPA</b> = time until that point (min); negative or "opening" means the range is already increasing.</p>
-          <p class="hint"><b>Status:</b> SAFE (CPA above limit), CAUTION (CPA below limit, TCPA beyond alarm), DANGER (below limit, TCPA within alarm), COLLISION (CPA inside collision zone). Colour is always paired with a word or symbol.</p>
+          <p class="hint"><b>Status:</b> SAFE (CPA above limit), CAUTION (CPA below limit, TCPA beyond alarm), DANGER (below limit, TCPA within alarm), COLLISION (CPA inside collision zone and TCPA within alarm). Colour is always paired with a word or symbol.</p>
           <p class="hint"><b>Roles:</b> GIVE-WAY, STAND-ON, KEEP CLEAR (target at anchor or aground). The encounter table assumes both vessels are <i>in sight</i>; in restricted visibility Rule 19 applies instead. This is a training aid with simplified rule tests, not a certification of COLREG compliance.</p>
-          <p class="hint"><b>Environment</b> (sunset, fog, reduced effects) is visual only. The simulation models course and speed only, so heading equals course; wind, current and leeway are not modelled.</p>
+          <p class="hint"><b>Environment</b> presets also set the simulated visibility: in restricted visibility, vessels that are not in sight of one another are handled under Rule 19, not Rules 13-17. <b>Wind</b> and <b>Current</b> move every vessel under way (ground velocity = through-water velocity + current + leeway; anchored and aground vessels stay put and anchored ones swing); the wind direction also decides Rule 12. The simulation models course and speed only, so heading equals course; wind, current and leeway are not modelled.</p>
         </details>
         <div class="box scroll"><table><thead><tr><th>Ship</th><th>Type</th><th>Range</th><th>Brg</th><th>CPA</th><th>TCPA</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table></div>
         <div class="box scroll"><h2>COLREG encounter (your duty as own ship)</h2><table><thead><tr><th>Ship</th><th>Situation</th><th>Your role</th><th>Its role</th><th>Rule</th></tr></thead><tbody id="cr"></tbody></table>
           <p class="hint">Anchored, aground or not-making-way vessels are forced to speed 0. Roles are shown in colour only when the target is not SAFE. In the 3D view, the tag next to a target says whether that target is stand-on or give-way (T3 · stand-on means T3 stands on and you give way). The tag next to Own shows YOUR role in the same way (Own · give-way, or Own · give-way T1 · stand-on T3 when the roles differ per target). "Its role" is what the target must do.</p>
-          <h2 style="margin-top:8px">Avoiding action log</h2><div id="mlog" class="hint" style="white-space:pre-wrap;margin-top:0"></div></div>
+          <h2 style="margin-top:8px">Avoiding action log</h2><div id="mlog" class="hint" style="white-space:pre-wrap;margin-top:0"></div><div id="aptab" class="hint" style="white-space:pre;font-family:monospace;margin-top:4px"></div></div>
       </div></div>
     <div class="dock"><button type="button" id="ptoggle" aria-pressed="true">Hide panel</button><button type="button" id="hbtn" aria-expanded="false" aria-controls="hinttext">? Controls</button></div><div id="hinttext" class="box hintbox" hidden><p class="hint" style="margin:0"><b>Drag anywhere on the sea</b> to rotate and tilt the view (left mouse button or one finger; the Drag does setting in the panel switches this to panning). Right-drag or Shift-drag does the other action. Wheel, or two fingers pinching, zooms; twist two fingers to turn. Double-click (double-tap) a ship to zoom to it or the sea to fly there; W A S D or the Move arrows slide the camera over the ocean in every view. Drag a ship to move it, click your own ship to select it. In the chase view a drag circles your ship, in the bridge view it looks around; the wheel zooms in all views. Keys: Space start / pause, R reset, N day and night, 1 to 3 camera (orbit, chase, bridge), C centre on own ship, H hide the panel.<span id="datanote"></span></p></div>
     <div id="err" role="alert" hidden></div>
@@ -824,7 +831,7 @@
         const mod = (a, n) => ((a % n) + n) % n;
         const cl = (v, a, b) => Math.max(a, Math.min(b, v));
         /* per view: turn (radians, free), tilt (radians, min / max), zoom quantity (smaller = closer) and its limits,
-                                         ys / ts = key direction signs, zref = value that reads as x1 */
+                                                           ys / ts = key direction signs, zref = value that reads as x1 */
         const ACC = {
           orbit: {
             yaw: ["yaw"],
@@ -1038,7 +1045,7 @@
     <script>
       /* ======== embedded COLREG data ======== */
       /* Embedded COLREG data. This is the built-in 9-state set (no lights or shapes: scene3d.js draws its own fallback
-                                             lights and shapes for these). To use your full colreg.json, replace the object below with its contents. */
+                                                               lights and shapes for these). To use your full colreg.json, replace the object below with its contents. */
       window.COLREG_EMBEDDED = {
         states: [
           {
@@ -1203,22 +1210,22 @@
     <script>
       /* ======== colreg.js ======== */
       /* ===========================================================================
-                                             colreg.js  -  COLREG data layer (no DOM, no canvas, no Three.js)
-                                             Ported from colreg_2d_fixed.html, script block 1, with identical logic.
+                                                               colreg.js  -  COLREG data layer (no DOM, no canvas, no Three.js)
+                                                               Ported from colreg_2d_fixed.html, script block 1, with identical logic.
 
-                                             Global: COLREG   (also module.exports under Node)
+                                                               Global: COLREG   (also module.exports under Node)
 
-                                             Load order in the page:  colreg.js  ->  sim.js  ->  ...
+                                                               Load order in the page:  colreg.js  ->  sim.js  ->  ...
 
-                                             Moved over unchanged:   loadCOLREG (as COLREG.load), stateFor, stateLabel,
-                                                                     stateForType, applyCOLREGState, lightColour,
-                                                                     shapeText, colregInfo, COLREG_FALLBACK (9 states)
-                                             Extracted from syncT(): pickState / rebuildState  (the state filter that
-                                                                     used to read the vc/vs/va/vt <select> values)
-                                                                     configOf (what syncT used to put into those selects)
-                                             Extracted from drawJSONLights(): lightLayout (position maths only; the
-                                                                     drawing now belongs to scene3d.js)
-                                             =========================================================================== */
+                                                               Moved over unchanged:   loadCOLREG (as COLREG.load), stateFor, stateLabel,
+                                                                                       stateForType, applyCOLREGState, lightColour,
+                                                                                       shapeText, colregInfo, COLREG_FALLBACK (9 states)
+                                                               Extracted from syncT(): pickState / rebuildState  (the state filter that
+                                                                                       used to read the vc/vs/va/vt <select> values)
+                                                                                       configOf (what syncT used to put into those selects)
+                                                               Extracted from drawJSONLights(): lightLayout (position maths only; the
+                                                                                       drawing now belongs to scene3d.js)
+                                                               =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -1486,7 +1493,7 @@
         ];
 
         /* Was rebuildState()'s filter. vesselType is the simulator type key
-                                             (large | tug | fishing | sail). Returns the best state object or null. */
+                                                               (large | tug | fishing | sail). Returns the best state object or null. */
         function pickState(vesselType, condition, special, activity) {
           const type = TYPE_MAP[vesselType] || "power_driven";
 
@@ -1564,8 +1571,8 @@
         }
 
         /* Was the body of rebuildState(): store the editor choices on the vessel and
-                                             pick its COLREG state. The caller passes what the four <select>s held.
-                                             NOTE (fix 2): when the vessel TYPE changes, pass activity = "normal_navigation". */
+                                                               pick its COLREG state. The caller passes what the four <select>s held.
+                                                               NOTE (fix 2): when the vessel TYPE changes, pass activity = "normal_navigation". */
         function rebuildState(s, condition, special, activity) {
           s.cond = condition;
           s.special = special;
@@ -1602,9 +1609,12 @@
 
         function lightColour(name) {
           return (
-            { red: "#ff3b30", green: "#35e06a", white: "#fff6d8", yellow: "#ffd23a" }[
-              String(name).toLowerCase()
-            ] || "#fff6d8"
+            {
+              red: "#ff3b30",
+              green: "#35e06a",
+              white: "#fff6d8",
+              yellow: "#ffd23a",
+            }[String(name).toLowerCase()] || "#fff6d8"
           );
         }
 
@@ -1632,15 +1642,15 @@
         }
 
         /* ---- light layout (was the position maths of drawJSONLights) ----------
-                                             Returns null when the vessel's state has no light definitions (the renderer
-                                             then uses its built-in light model), otherwise an array of
-                                               { side, along, token, colours, names }
-                                             side    -1 = port, +1 = starboard, 0 = centre   (2D: x = -W, +W, 0)
-                                             along   fraction of hull length L, negative = towards the bow   (2D: y / L)
-                                             token   'top' | 'bottom' | 'forward' | 'stern' | 'mid'  (what the JSON said)
-                                             colours hex strings, one per lamp; several colours = a vertical stack
-                                                     (2D spacing between lamps: min(5, L * 0.12))
-                                             names   the raw colour names                                                */
+                                                               Returns null when the vessel's state has no light definitions (the renderer
+                                                               then uses its built-in light model), otherwise an array of
+                                                                 { side, along, token, colours, names }
+                                                               side    -1 = port, +1 = starboard, 0 = centre   (2D: x = -W, +W, 0)
+                                                               along   fraction of hull length L, negative = towards the bow   (2D: y / L)
+                                                               token   'top' | 'bottom' | 'forward' | 'stern' | 'mid'  (what the JSON said)
+                                                               colours hex strings, one per lamp; several colours = a vertical stack
+                                                                       (2D spacing between lamps: min(5, L * 0.12))
+                                                               names   the raw colour names                                                */
         function lightLayout(s) {
           const q = stateFor(s);
           if (!q || !Array.isArray(q.lights) || !q.lights.length) return null;
@@ -1717,55 +1727,55 @@
     <script>
       /* ======== sim.js ======== */
       /* ===========================================================================
-                                             sim.js  -  headless COLREG / CPA-TCPA simulation core
-                                             Ported from colreg_2d_fixed.html (script blocks 2 and 3) with IDENTICAL
-                                             logic and numbers. No document, no $(), no canvas, no Three.js.
+                                                               sim.js  -  headless COLREG / CPA-TCPA simulation core
+                                                               Ported from colreg_2d_fixed.html (script blocks 2 and 3) with IDENTICAL
+                                                               logic and numbers. No document, no $(), no canvas, no Three.js.
 
-                                             Needs colreg.js loaded first.   Global: Sim   (also module.exports in Node)
+                                                               Needs colreg.js loaded first.   Global: Sim   (also module.exports in Node)
 
-                                             Units: nm, kn, minutes (TCPA), degrees true.  World: x = east, y = north.
+                                                               Units: nm, kn, minutes (TCPA), degrees true.  World: x = east, y = north.
 
-                                             Every slider the 2D code read is now a field of Sim.settings:
-                                               range       furthest a target may be placed or dragged from own ship, nm
-                                               ownCourse   deg                  (was slider #oc, applied every step)
-                                               ownSpeed    kn                   (was slider #os)
-                                               cpaLimit    nm                   (was #cl)
-                                               tcpaAlarm   min                  (was #tl)
-                                               timeScale   simulated s per real s   (was #ms)
-                                               zone        'open' | 'coast' | 'harbour'   (was #zone)
-                                               autoAction  bool                 (was the #ai checkbox)
+                                                               Every slider the 2D code read is now a field of Sim.settings:
+                                                                 range       furthest a target may be placed or dragged from own ship, nm
+                                                                 ownCourse   deg                  (was slider #oc, applied every step)
+                                                                 ownSpeed    kn                   (was slider #os)
+                                                                 cpaLimit    nm                   (was #cl)
+                                                                 tcpaAlarm   min                  (was #tl)
+                                                                 timeScale   simulated s per real s   (was #ms)
+                                                                 zone        'open' | 'coast' | 'harbour'   (was #zone)
+                                                                 autoAction  bool                 (was the #ai checkbox)
 
-                                             API
-                                               await Sim.init(opts)   load COLREG data, apply opts, build a scenario
-                                               Sim.reset()            new random scenario (same as the Reset button)
-                                               Sim.step(realDt)       one frame; realDt in real seconds (capped at 0.1,
-                                                                      exactly like the 2D loop). Does nothing but keep
-                                                                      own ship in sync while paused.
-                                               Sim.getState()         snapshot for UI / renderer (see below)
-                                             plus helpers: toggle, setRunning, setSettings, applyZone, setScenario,
-                                             setRandom, seed, placeTarget, moveTarget, setTargetCourse, setTargetSpeed,
-                                             manualOverride, setVesselType, setVesselConfig, and the pure functions
-                                             cpa, status, encounter, condOf, isStatic, rankOf, vel, norm180.
+                                                               API
+                                                                 await Sim.init(opts)   load COLREG data, apply opts, build a scenario
+                                                                 Sim.reset()            new random scenario (same as the Reset button)
+                                                                 Sim.step(realDt)       one frame; realDt in real seconds (capped at 0.1,
+                                                                                        exactly like the 2D loop). Does nothing but keep
+                                                                                        own ship in sync while paused.
+                                                                 Sim.getState()         snapshot for UI / renderer (see below)
+                                                               plus helpers: toggle, setRunning, setSettings, applyZone, setScenario,
+                                                               setRandom, seed, placeTarget, moveTarget, setTargetCourse, setTargetSpeed,
+                                                               manualOverride, setVesselType, setVesselConfig, and the pure functions
+                                                               cpa, status, encounter, condOf, isStatic, rankOf, vel, norm180.
 
-                                             getState() returns
-                                               own, targets        live vessel objects (treat as read-only)
-                                                                   {n,type,x,y,course,speed,colregState,cond?,special?,
-                                                                    act?,man,...}
-                                               results[i]          one per target:
-                                                  n, rg, br, cpa, tcpa (min, null if no relative motion), cl, closing,
-                                                  status          SAFE | CAUTION | DANGER | COLLISION | COLLIDED
-                                                  enc             encounter(own, target)  = YOUR duty
-                                                  encRev          encounter(target, own)  = the TARGET's duty
-                                                  lookH           look-ahead hours used for the 2D motion vectors
-                                                  ownEnd, tgtEnd  [x,y] world nm of both ships after lookH
-                                                  endSep          distance between those two points, nm
-                                                  acting          target is carrying out an automatic manoeuvre
-                                               ownVecEnd           [x,y] end of the own 6-minute vector (world nm)
-                                               collisions          [[nameA,nameB],...]     collided  bool
-                                               log                 last 6 avoiding-action lines, newest first
-                                               simTime             simulated seconds       running   bool
-                                               settings            copy of Sim.settings
-                                             =========================================================================== */
+                                                               getState() returns
+                                                                 own, targets        live vessel objects (treat as read-only)
+                                                                                     {n,type,x,y,course,speed,colregState,cond?,special?,
+                                                                                      act?,man,...}
+                                                                 results[i]          one per target:
+                                                                    n, rg, br, cpa, tcpa (min, null if no relative motion), cl, closing,
+                                                                    status          SAFE | CAUTION | DANGER | COLLISION | COLLIDED
+                                                                    enc             encounter(own, target)  = YOUR duty
+                                                                    encRev          encounter(target, own)  = the TARGET's duty
+                                                                    lookH           look-ahead hours used for the 2D motion vectors
+                                                                    ownEnd, tgtEnd  [x,y] world nm of both ships after lookH
+                                                                    endSep          distance between those two points, nm
+                                                                    acting          target is carrying out an automatic manoeuvre
+                                                                 ownVecEnd           [x,y] end of the own 6-minute vector (world nm)
+                                                                 collisions          [[nameA,nameB],...]     collided  bool
+                                                                 log                 last 6 avoiding-action lines, newest first
+                                                                 simTime             simulated seconds       running   bool
+                                                                 settings            copy of Sim.settings
+                                                               =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -1804,6 +1814,27 @@
           zone: "open",
           autoAction: true,
           specialSim: true, // NUC drifts, CBD turns slowly (RAM / NUC never act to avoid, as before)
+          windKn: 0, // wind speed, kn: leeway on every vessel under way (see drift())
+          currentSet: 0, // direction the current flows TOWARDS, deg true
+          currentKn: 0, // current rate, kn: moves every vessel under way
+          tssAngleDeg: 30, // R10: "general direction of traffic flow" tolerance; R9: along-the-channel tolerance
+          hazardClearNm: 0.25, // clearance the planner keeps from a hazard's edge
+          lookaheadSec: 600, // the planner checks channel, lane and hazard constraints this long after a turn
+          visibilityNm: 10, // meteorological visibility, nm. Environment presets set it; the slider overrides it
+          night: false, // night: vessels are seen by their lights (Rule 22 ranges) instead of by their hulls
+          restrictedVisNm: 3, // visibility below this counts as restricted visibility (Rule 3(l) gives no number)
+          radarRangeNm: 24, // radar detects every vessel within this range (no clutter or small-target model)
+          hearingNm: 2, // fog signals (Rule 35) are heard within this range; every vessel is assumed to sound them
+          steerageKn: 4, // minimum speed at which a ship can be kept on her course (Rule 19(e))
+          safeKnPerNm: 6, // Rule 19(b) safe speed for the own-ship autopilot: this many knots per nm of visibility, not below steerageKn
+          ownAuto: false, // own-ship autopilot: when on, own ship acts under R8 and R14-R17 like the targets; your course and speed are then the planned route
+          clearRangeFrac: 0.75, // own ship resumes the route only when the other vessel is past and at least this fraction of the CPA limit away
+          windFrom: 0, // direction the wind blows FROM, deg true (used by Rule 12 only; no wind force is simulated)
+          minAlter: 30, // smallest course alteration the planner will choose, deg (R8(b): readily apparent)
+          standOnObserveMin: 3, // R17(a)(ii): minutes the give-way vessel is observed before the stand-on vessel may act
+          apparentDeg: 5, // a course change of at least this much counts as the give-way vessel acting
+          headOnDeg: 10, // Rule 14: each vessel sees the other within this many degrees of her bow
+          riskHighFrac: 0.5, // riskLevel(): HIGH/CRITICAL when TCPA is within this fraction of the TCPA alarm
         };
 
         /* ---- state ------------------------------------------------------------- */
@@ -1815,6 +1846,9 @@
           simT = 0;
         const MAN_LOG = [];
 
+        let applied = { c: 0, s: 0 }, // the own-ship order last applied: pausing must not move the ship, only a changed order does
+          dynMode = false, // true while the simulation runs: own course and speed follow the order dynamically
+          acc = 0; // simulated seconds not yet consumed by a fixed step
         let random = Math.random; // replaceable for tests
         const rad = (d) => (d * Math.PI) / 180;
         const rnd = (a, b) => a + random() * (b - a);
@@ -1832,9 +1866,32 @@
           }
           return ((h >>> 0) % 10000) / 10000;
         };
+        /* Over-ground motion (Phase 6). Ground velocity = through-water velocity + current + leeway.
+         current  currentKn towards currentSet.
+         leeway   LEEWAY[type] x windKn, downwind (an assumption per vessel type; windage and draught differ).
+         Anchored and aground vessels are fixed over the ground. A vessel stopped in the water (NUC) drifts. */
+        const LEEWAY = { large: 0.02, tug: 0.03, fishing: 0.03, sail: 0.04 };
+        const fixedOverGround = (v) => {
+          const c = condOf(v);
+          return c === "anchor" || c === "aground";
+        };
+        function drift(v) {
+          if (fixedOverGround(v)) return [0, 0];
+          const cs = rad(+settings.currentSet),
+            ck = +settings.currentKn,
+            lw = (LEEWAY[v.type] || 0.02) * +settings.windKn,
+            wt = rad(+settings.windFrom + 180);
+          return [
+            ck * Math.sin(cs) + lw * Math.sin(wt),
+            ck * Math.cos(cs) + lw * Math.cos(wt),
+          ];
+        }
         const vel = (s) => {
           let vx = s.speed * Math.sin(rad(s.course)),
             vy = s.speed * Math.cos(rad(s.course));
+          const dr = drift(s);
+          vx += dr[0];
+          vy += dr[1];
           if (
             settings.specialSim &&
             s !== own &&
@@ -1852,35 +1909,105 @@
 
         /* ---- CPA / TCPA and status -------------------------------------------- */
 
-        function cpa(a, b) {
+        /* cpaV: CPA/TCPA from explicit positions and velocity vectors [east, north] in kn.
+         rr     range rate in kn      (negative = closing, positive = opening)
+         brate  bearing rate in deg/min (positive = bearing increasing, i.e. target drawing right)
+         relSpeed kn, relCourse deg true (null when there is no relative motion)
+         tcpa is in minutes; negative = the closest point is already in the past. */
+        function cpaV(a, b, va, vb) {
           const rx = b.x - a.x,
             ry = b.y - a.y,
-            [ax, ay] = vel(a),
-            [bx, by] = vel(b),
-            vx = bx - ax,
-            vy = by - ay,
+            vx = vb[0] - va[0],
+            vy = vb[1] - va[1],
             rg = Math.hypot(rx, ry),
             br = ((Math.atan2(rx, ry) * 180) / Math.PI + 360) % 360,
             v2 = vx * vx + vy * vy;
-          if (v2 < 1e-9) return { rg, br, cpa: rg, tcpa: null, cl: false };
-          const h = -(rx * vx + ry * vy) / v2;
-          if (h <= 0) return { rg, br, cpa: rg, tcpa: h * 60, cl: false };
-          return {
+          const base = {
             rg,
             br,
+            rr: rg > 1e-9 ? (rx * vx + ry * vy) / rg : 0,
+            brate:
+              rg > 1e-9
+                ? (((ry * vx - rx * vy) / (rg * rg)) * 180) / Math.PI / 60
+                : 0,
+            relSpeed: Math.sqrt(v2),
+            relCourse:
+              v2 > 1e-12 ? ((Math.atan2(vx, vy) * 180) / Math.PI + 360) % 360 : null,
+          };
+          if (v2 < 1e-9)
+            return Object.assign(base, { cpa: rg, tcpa: null, cl: false });
+          const h = -(rx * vx + ry * vy) / v2;
+          if (h <= 0)
+            return Object.assign(base, { cpa: rg, tcpa: h * 60, cl: false });
+          return Object.assign(base, {
             cpa: Math.hypot(rx + vx * h, ry + vy * h),
             tcpa: h * 60,
             cl: true,
-          };
+          });
+        }
+        function cpa(a, b) {
+          return cpaV(a, b, vel(a), vel(b));
         }
 
+        /* status: SAFE / CAUTION / DANGER / COLLISION (COLLIDED = hulls touched).
+                         Phase 1: COLLISION now also needs TCPA within the alarm. A predicted CPA inside the zone
+                         minimum that is still beyond the alarm time is CAUTION, so a distant future CPA is not
+                         shown as an imminent collision. */
         function status(r, n) {
           if (n) return "COLLIDED";
           if (!r.cl) return "SAFE";
-          if (r.cpa < ZONES[settings.zone].cpa[0]) return "COLLISION";
-          if (r.cpa < +settings.cpaLimit)
-            return r.tcpa <= +settings.tcpaAlarm ? "DANGER" : "CAUTION";
-          return "SAFE";
+          const zmin = ZONES[settings.zone].cpa[0],
+            thr = Math.max(+settings.cpaLimit, zmin);
+          if (r.cpa >= thr) return "SAFE";
+          if (r.tcpa > +settings.tcpaAlarm) return "CAUTION";
+          return r.cpa < zmin ? "COLLISION" : "DANGER";
+        }
+
+        /* riskLevel: five levels, all thresholds configurable (settings.cpaLimit, settings.tcpaAlarm,
+                         settings.riskHighFrac and the zone minimum). These are simulator settings, not values
+                         prescribed by the COLREGs.
+                         NONE      not closing, or predicted CPA at or beyond the limit
+                         LOW       CPA inside the limit, TCPA beyond the alarm
+                         MODERATE  CPA inside the limit, TCPA within the alarm
+                         HIGH      TCPA within alarm*riskHighFrac, or CPA inside the zone minimum with TCPA within the alarm
+                         CRITICAL  CPA inside the zone minimum and TCPA within alarm*riskHighFrac, or hulls touched */
+        function riskLevel(r, collided) {
+          if (collided) return "CRITICAL";
+          if (!r.cl) return "NONE";
+          const zmin = ZONES[settings.zone].cpa[0],
+            thr = Math.max(+settings.cpaLimit, zmin),
+            alarm = +settings.tcpaAlarm,
+            soon = r.tcpa <= alarm,
+            imminent = r.tcpa <= alarm * +settings.riskHighFrac;
+          if (r.cpa >= thr) return "NONE";
+          if (r.cpa < zmin && imminent) return "CRITICAL";
+          if (imminent || (r.cpa < zmin && soon)) return "HIGH";
+          return soon ? "MODERATE" : "LOW";
+        }
+
+        /* Rule 13(d): once a vessel is overtaking she stays the overtaking vessel until she is finally
+                         past and clear. OVT holds "overtaker>overtaken" (vessel names). updateOvertaking() runs every
+                         step: a pair enters the set when the overtaker is in the other's more-than-22.5-deg-abaft-the-beam
+                         sector and closing, and leaves it when the closest point is past (not closing). */
+        const OVT = new Set();
+        function updateOvertaking() {
+          const all = [own, ...tg];
+          for (let i = 0; i < all.length; i++)
+            for (let j = i + 1; j < all.length; j++) {
+              const a = all[i],
+                b = all[j],
+                r = cpa(a, b),
+                kab = b.n + ">" + a.n, // b overtakes a
+                kba = a.n + ">" + b.n; // a overtakes b
+              if (!r.cl || r.tcpa <= 0) {
+                OVT.delete(kab);
+                OVT.delete(kba);
+                continue;
+              }
+              if (Math.abs(norm180(r.br - a.course)) > 112.5) OVT.add(kab);
+              if (Math.abs(norm180(((r.br + 180) % 360) - b.course)) > 112.5)
+                OVT.add(kba);
+            }
         }
 
         /* ---- vessel condition and rank (Rules 3, 18, 30) ----------------------- */
@@ -1901,8 +2028,8 @@
           ROT[t.type] * (settings.specialSim && rankOf(t) === 3 ? 0.5 : 1);
 
         /* Rule 3(g): these activities make a vessel restricted in her ability to manoeuvre (RAM).
-                                             Towing and pushing are not listed: they only count when the tow severely restricts the ability to
-                                             deviate, which the user states by choosing Special = RAM. */
+                                                               Towing and pushing are not listed: they only count when the tow severely restricts the ability to
+                                                               deviate, which the user states by choosing Special = RAM. */
         const RAM_ACTS = ["dredging", "cable", "mine_clearance", "replenishment"];
         const isRamAct = (s) => RAM_ACTS.indexOf(s.act) >= 0;
 
@@ -1925,9 +2052,44 @@
         }
 
         /* Vessels at anchor, aground or not making way cannot move: force speed 0.
-                                             The previous cruise speed is remembered and restored when underway again.
-                                             (2D version also synchronised slider widgets; that part now belongs to the UI.
-                                              settings.ownSpeed plays the role of the #os slider value.) */
+                                                               The previous cruise speed is remembered and restored when underway again.
+                                                               (2D version also synchronised slider widgets; that part now belongs to the UI.
+                                                                settings.ownSpeed plays the role of the #os slider value.) */
+        /* ---- ship dynamics shared by own ship, targets and the planner (Phase 2) ----------------------
+         Course: the rate of turn builds up gradually (rudder and hull response) to rotOf(v), and is brought back
+         to zero in time to stop exactly on the ordered course, so a turn is a smooth curve with no overshoot.
+         LAG = seconds to build up the full rate of turn. Speed: rate-limited by SPDRATE (unchanged).
+         LAG and SPDRATE are simulator assumptions, to be checked against real manoeuvring data.
+         v.rot is the signed rate of turn in deg/min (+ = turning to starboard). */
+        const LAG = { large: 40, tug: 20, fishing: 15, sail: 20 };
+        const wrap360 = (a) => ((a % 360) + 360) % 360;
+        function dynStep(v, cmdC, cmdS, sec) {
+          const rmax = rotOf(v), // deg/min
+            acc = rmax / ((LAG[v.type] || 30) / 60), // deg/min per min
+            dm = sec / 60,
+            dc = norm180(cmdC - v.course);
+          let r = v.rot || 0;
+          if (Math.abs(dc) < 0.02 && Math.abs(r) < 0.3) {
+            v.course = wrap360(cmdC);
+            r = 0;
+          } else {
+            // highest rate from which the ship can still stop on the ordered course, exact for this step size
+            const kd = acc * dm * dm,
+              stopRate =
+                (acc * dm * (Math.sqrt(1 + (8 * Math.abs(dc)) / kd) - 1)) / 2,
+              want = Math.sign(dc) * Math.min(rmax, stopRate);
+            r += Math.max(-acc * dm, Math.min(acc * dm, want - r));
+            const dpsi = r * dm;
+            if (Math.sign(dpsi) === Math.sign(dc) && Math.abs(dpsi) >= Math.abs(dc)) {
+              v.course = wrap360(cmdC);
+              r = 0;
+            } else v.course = wrap360(v.course + dpsi);
+          }
+          v.rot = r;
+          const sr = (SPDRATE[v.type] * sec) / 60;
+          v.speed += Math.max(-sr, Math.min(sr, cmdS - v.speed));
+        }
+
         function motionRules() {
           tg.forEach((t) => {
             if (isStatic(t)) {
@@ -1953,25 +2115,319 @@
             own._st = false;
             own.speed = own.cruise || 10;
             settings.ownSpeed = own.speed;
-          } else own.speed = +settings.ownSpeed;
+          } else if (!dynMode && +settings.ownSpeed !== applied.s) {
+            own.speed = +settings.ownSpeed;
+            applied.s = +settings.ownSpeed;
+          }
         }
 
         /* ---- COLREG encounter: situation and the duty of o towards t ----------- */
 
+        /* ---- Navigation features (Phase 6) -------------------------------------------------------------
+         Rectangles are given by a centre line (x1,y1)-(x2,y2) in nm and a width w in nm; for lanes the line runs in the
+         direction of traffic flow. channels: narrow channels (R9). lanes / zones: traffic separation scheme lanes and
+         separation zones (R10). hazards: circles {x, y, r} (shoal, wreck, rock). buoys: marks {x, y, kind}, shown only. */
+        const NAV = { channels: [], lanes: [], zones: [], hazards: [], buoys: [] };
+        function mkRect(f) {
+          const dx = f.x2 - f.x1,
+            dy = f.y2 - f.y1,
+            L = Math.hypot(dx, dy) || 1e-9;
+          return Object.assign({}, f, {
+            L,
+            ux: dx / L,
+            uy: dy / L,
+            course: wrap360((Math.atan2(dx, dy) * 180) / Math.PI),
+          });
+        }
+        function setNav(f) {
+          f = f || {};
+          NAV.channels = (f.channels || []).map(mkRect);
+          NAV.lanes = (f.lanes || []).map(mkRect);
+          NAV.zones = (f.zones || []).map(mkRect);
+          NAV.hazards = (f.hazards || []).map((h) => Object.assign({}, h));
+          NAV.buoys = (f.buoys || []).map((b) => Object.assign({}, b));
+        }
+        function inRect(f, x, y, m = 0) {
+          const px = x - f.x1,
+            py = y - f.y1,
+            s = px * f.ux + py * f.uy,
+            q = px * f.uy - py * f.ux;
+          return s >= -m && s <= f.L + m && Math.abs(q) <= f.w / 2 + m;
+        }
+        const hasNav = () =>
+          NAV.channels.length +
+            NAV.lanes.length +
+            NAV.zones.length +
+            NAV.hazards.length >
+          0;
+        /* The vessel's situation at the start of a plan: only NEW violations count. */
+        function navContext(t) {
+          return {
+            inCh: NAV.channels.filter((c) => inRect(c, t.x, t.y)),
+            inLane: NAV.lanes.filter((l) => inRect(l, t.x, t.y)),
+            follow: NAV.lanes.filter(
+              (l) =>
+                inRect(l, t.x, t.y) &&
+                Math.abs(norm180(t.course - l.course)) <= +settings.tssAngleDeg,
+            ),
+            inZone: NAV.zones.filter((z) => inRect(z, t.x, t.y)),
+            nearHaz: NAV.hazards.filter(
+              (h) => Math.hypot(t.x - h.x, t.y - h.y) < h.r + +settings.hazardClearNm,
+            ),
+          };
+        }
+        function navViolation(ctx, x, y, h) {
+          for (const c of ctx.inCh)
+            if (!inRect(c, x, y))
+              return "leaves " + (c.id || "the channel") + " (R9)";
+          for (const z of NAV.hazards) {
+            const d = Math.hypot(x - z.x, y - z.y);
+            if (d < z.r) return "would run aground on " + (z.id || "a hazard");
+            if (!ctx.nearHaz.includes(z) && d < z.r + +settings.hazardClearNm)
+              return "enters the clearance of " + (z.id || "a hazard");
+          }
+          for (const z of NAV.zones)
+            if (!ctx.inZone.includes(z) && inRect(z, x, y))
+              return "enters a separation zone (R10(b)(ii))";
+          for (const l of NAV.lanes) {
+            if (!inRect(l, x, y)) continue;
+            const a = Math.abs(norm180(h - l.course));
+            if (ctx.follow.includes(l)) {
+              if (a > +settings.tssAngleDeg)
+                return (
+                  "leaves the direction of traffic flow in " +
+                  (l.id || "the lane") +
+                  " (R10(b)(i))"
+                );
+            } else if (!ctx.inLane.includes(l) && Math.abs(a - 90) > 30)
+              return (
+                "crosses " +
+                (l.id || "a traffic lane") +
+                " other than at nearly right angles (R10(c))"
+              );
+          }
+          return null;
+        }
+        const chOnly = (v) =>
+          !!(v.channelOnly || (stateFor(v) && stateFor(v).is_cbd)); // can safely navigate only within the channel
+        const alongAxis = (v, f) => {
+          const a = Math.abs(norm180(v.course - f.course));
+          return Math.min(a, 180 - a) <= +settings.tssAngleDeg;
+        };
+        /* Rules 9(b),(c),(d) and 10(i),(j): who must not impede whom. Returns { giver: "o" | "t", rule, name, why } or null. */
+        function navRoles(o, t) {
+          // [privileged vessel B, vessel A that must not impede, which side A is: "t" if A is the target]
+          for (const [B, A, who] of [
+            [o, t, "t"],
+            [t, o, "o"],
+          ]) {
+            const ch = NAV.channels.find(
+              (c) => inRect(c, B.x, B.y) && alongAxis(B, c),
+            );
+            if (ch && chOnly(B) && !chOnly(A) && inRect(ch, A.x, A.y, 0.3)) {
+              const k =
+                A.type === "sail"
+                  ? ["R9(b)", "a sailing vessel"]
+                  : rankOf(A) === 4
+                    ? ["R9(c)", "a vessel engaged in fishing"]
+                    : !alongAxis(A, ch)
+                      ? ["R9(d)", "a vessel crossing the channel"]
+                      : null;
+              if (k)
+                return {
+                  giver: who,
+                  rule: k[0],
+                  name: "Narrow channel",
+                  why: [
+                    (B === o ? "Own ship" : "The target") +
+                      " can safely navigate only within the narrow channel" +
+                      (ch.id ? " (" + ch.id + ")" : "") +
+                      " and is proceeding along it; " +
+                      k[1] +
+                      " shall not impede her passage (" +
+                      k[0] +
+                      ").",
+                  ],
+                };
+            }
+            const ln = NAV.lanes.find(
+              (l) =>
+                inRect(l, B.x, B.y) &&
+                Math.abs(norm180(B.course - l.course)) <= +settings.tssAngleDeg,
+            );
+            if (
+              ln &&
+              rankOf(B) === 6 &&
+              inRect(ln, A.x, A.y, 0.5) &&
+              (A.type === "sail" || rankOf(A) === 4)
+            ) {
+              const k =
+                A.type === "sail"
+                  ? ["R10(j)", "a sailing vessel"]
+                  : ["R10(i)", "a vessel engaged in fishing"];
+              return {
+                giver: who,
+                rule: k[0],
+                name: "Traffic lane",
+                why: [
+                  (B === o ? "Own ship" : "The target") +
+                    " is a power-driven vessel following the traffic lane" +
+                    (ln.id ? " (" + ln.id + ")" : "") +
+                    "; " +
+                    k[1] +
+                    " shall not impede her safe passage (" +
+                    k[0] +
+                    ").",
+                ],
+              };
+            }
+          }
+          return null;
+        }
+        /* Anchored vessels lie head to the dominant force: wind (10 kn counts like 1 kn of current) or current.
+                         They swing slowly (0.5 deg/min); aground vessels do not. Both thresholds are assumptions. */
+        function swingHeading() {
+          const w = +settings.windKn,
+            c = +settings.currentKn;
+          if (w < 3 && c < 0.2) return null;
+          return w / 10 >= c
+            ? wrap360(+settings.windFrom)
+            : wrap360(+settings.currentSet + 180);
+        }
+        function swing(sec) {
+          const h = swingHeading();
+          if (h === null) return;
+          for (const v of [own, ...tg])
+            if (condOf(v) === "anchor") {
+              const m = (0.5 * sec) / 60;
+              v.course = wrap360(
+                v.course + Math.max(-m, Math.min(m, norm180(h - v.course))),
+              );
+            }
+        }
+        /* A vessel under way whose position enters a hazard runs aground: an explicit event, logged. */
+        function checkGrounding() {
+          for (const v of [own, ...tg]) {
+            if (fixedOverGround(v)) continue;
+            for (const z of NAV.hazards)
+              if (Math.hypot(v.x - z.x, v.y - z.y) < z.r) {
+                COLREG.rebuildState(v, "aground", "normal", "normal_navigation");
+                v.speed = 0;
+                v.rot = 0;
+                v.man = null;
+                if (v === own) settings.ownSpeed = 0;
+                mlog(v.n + " runs aground on " + (z.id || "a hazard"));
+                break;
+              }
+          }
+        }
+        /* ---- Visibility, radar and Rule 19 (Phase 5) -------------------------------------------------------
+                         Rule 3(k): vessels are in sight of one another only when one can be observed visually from the other.
+                         Simulator model (assumptions, not COLREG values):
+                         day    visual range = min(visibility, 2 nm + length/40 m)
+                         night  visual range = min(visibility, light range): vessel of 50 m or more 6 nm from within the
+                                masthead-light arc (112.5 deg either side of the bow) and 3 nm from astern; 12 m to under 50 m
+                                5 nm and 2 nm; sailing vessels show sidelights and a sternlight only: 2 nm.
+                         radar  detects any vessel within settings.radarRangeNm, whatever the visibility. */
+        const shipLengthM = (v) => (HULL_NM[v.type] || HULL_NM.large) * 1852; // metres
+        const restricted = () => +settings.visibilityNm < +settings.restrictedVisNm;
+        function visualRange(target, aspect) {
+          const L = shipLengthM(target),
+            vis = +settings.visibilityNm;
+          if (!settings.night) return Math.min(vis, 2 + L / 40);
+          const fwd = Math.abs(aspect) <= 112.5;
+          let nm;
+          if (target.type === "sail") nm = 2;
+          else if (L >= 50) nm = fwd ? 6 : 3;
+          else nm = fwd ? 5 : 2;
+          return Math.min(vis, nm);
+        }
+        /* o and t with r = cpa(o, t): in sight if either can see the other */
+        function sightInfo(o, t, r) {
+          const rbT = norm180(((r.br + 180) % 360) - t.course), // o seen from t's bow
+            rbO = norm180(r.br - o.course), // t seen from o's bow
+            vr = Math.max(visualRange(t, rbT), visualRange(o, rbO)),
+            sight = r.rg <= vr,
+            radar = r.rg <= +settings.radarRangeNm,
+            heard = restricted() && r.rg <= +settings.hearingNm;
+          return {
+            sight,
+            radar,
+            heard,
+            visualRange: vr,
+            detection: sight ? "visual" : radar ? "radar" : "none",
+          };
+        }
+        /* Rule 19(d): which way may vessel t alter course for vessel v (r = cpa(t, v))?
+                         [1] starboard only, [-1] port only, [1, -1] either.
+                         (i) not to port for a vessel forward of the beam, other than a vessel being overtaken;
+                         (ii) not towards a vessel abeam or abaft the beam. */
+        function rule19Dirs(t, v, r) {
+          const rb = norm180(r.br - t.course),
+            beingOvertaken =
+              Math.abs(norm180(((r.br + 180) % 360) - v.course)) > 112.5;
+          if (beingOvertaken) return [1, -1];
+          if (Math.abs(rb) < 90) return [1];
+          return rb > 0 ? [-1] : [1];
+        }
+        /* Rule 19(e): a vessel that hears the fog signal of another apparently forward of her beam, or cannot
+                         avoid a close-quarters situation with a vessel forward of her beam, reduces to the minimum speed at
+                         which she can be kept on her course. */
+        function rule19Speed(t, v, r, unavoidable) {
+          const forward = Math.abs(norm180(r.br - t.course)) < 90,
+            heard = restricted() && r.rg <= +settings.hearingNm;
+          if (!forward || !(heard || unavoidable)) return null;
+          return {
+            speed: Math.min(t.speed, +settings.steerageKn),
+            why: heard
+              ? "R19(e): fog signal heard forward of the beam"
+              : "R19(e): close-quarters situation with a vessel forward of the beam cannot be avoided",
+          };
+        }
+        const safeSpeed = () =>
+          Math.max(
+            +settings.steerageKn,
+            +settings.visibilityNm * +settings.safeKnPerNm,
+          );
+        const plannedSpeed = () =>
+          settings.ownAuto && restricted()
+            ? Math.min(+settings.ownSpeed, safeSpeed())
+            : +settings.ownSpeed;
+
+        /* Rule pipeline: each outcome carries `why`, the reasons in the order they were applied.
+                         Order: R7 (closing?), anchored/aground, R13 overtaking (overrides Part B Section II),
+                         R18 between different vessel classes, R12 (two sailing vessels), R14 / R15 (two power-driven
+                         vessels). A vessel beyond radar range and not in sight is "not detected". In restricted visibility, vessels that are
+                         not in sight of one another (radar only) are classified under Rule 19, not Rules 11-18. In clear
+                         weather every detected vessel is classified under Rules 11-18 early (R8: action in ample time). */
+        /* tack: -1 wind on the port side (port tack), +1 wind on the starboard side, 0 cannot tell
+                         (wind dead ahead or astern). settings.windFrom is the direction the wind blows FROM. */
+        const tackOf = (v) => {
+          const b = norm180(+settings.windFrom - v.course);
+          return Math.abs(b) < 1 || Math.abs(b) > 179 ? 0 : b < 0 ? -1 : 1;
+        };
         function encounter(o, t, r) {
           const cbd = (x) => {
             const q = stateFor(x);
             return !!(q && q.is_cbd);
           };
-          const R = (enc, role, rule, short, cls) => ({
+          const R = (enc, role, rule, short, cls, why) => ({
             enc,
             role,
-            rule: rule && (cbd(o) || cbd(t)) ? rule + ", R18(d)" : rule,
+            rule:
+              rule && (cbd(o) || cbd(t)) && rule.indexOf("R18(d)") < 0
+                ? rule + ", R18(d)"
+                : rule,
             short,
             cls,
+            why: why || [],
           });
+          const d0 = (x) => Math.round(Math.abs(x)) + "\u00b0";
+          const hand = (b) => (b >= 0 ? "starboard" : "port");
           if (!r.cl || r.tcpa <= 0)
-            return R("Opening / no risk", "—", "", "", "dimtxt");
+            return R("Opening / no risk", "", "", "", "dimtxt", [
+              "Not closing, or the closest point of approach is already past: no risk of collision (R7).",
+            ]);
           const co = condOf(o);
           if (co === "anchor" || co === "aground")
             return R(
@@ -1980,6 +2436,11 @@
               "R2, R8",
               "NA",
               "dimtxt",
+              [
+                "Own ship is " +
+                  (co === "anchor" ? "at anchor" : "aground") +
+                  ", not underway: she cannot give way, other vessels must keep clear (R2, R8).",
+              ],
             );
           const ct = condOf(t);
           if (ct === "anchor" || ct === "aground")
@@ -1989,19 +2450,89 @@
               "R2, R8",
               "KC",
               "KC",
+              [
+                "The target is " +
+                  (ct === "anchor" ? "at anchor" : "aground") +
+                  ", not underway: there is no give-way / stand-on relation, own ship keeps clear (R2, R8).",
+              ],
             );
-
+          const vi = sightInfo(o, t, r);
+          if (!vi.sight && !vi.radar)
+            return R("Not detected", "", "", "", "dimtxt", [
+              "Beyond radar range (" +
+                settings.radarRangeNm +
+                " nm) and not in sight (visual range " +
+                vi.visualRange.toFixed(1) +
+                " nm): the target is not detected, so no rule can be applied yet (R5).",
+            ]);
+          if (restricted() && !vi.sight) {
+            const fwd = Math.abs(norm180(r.br - o.course)) < 90;
+            return R(
+              "Restricted visibility (Rule 19)",
+              "ACT (R19(d))",
+              "R19(d)",
+              "RV",
+              "CK",
+              [
+                "Visibility is " +
+                  settings.visibilityNm +
+                  " nm (restricted below " +
+                  settings.restrictedVisNm +
+                  " nm). The vessels are " +
+                  r.rg.toFixed(1) +
+                  " nm apart, beyond the visual range of " +
+                  vi.visualRange.toFixed(1) +
+                  " nm: not in sight of one another (R3(k)).",
+                "The target is detected by radar alone, so Rule 19 applies, not Rules 11-18 (R19(a),(d)). There is no give-way or stand-on vessel: each vessel avoids, in ample time.",
+                "A course change must not be to port for a vessel forward of the beam (other than one being overtaken), nor towards a vessel abeam or abaft the beam (R19(d)(i),(ii)).",
+                vi.heard && fwd
+                  ? "Her fog signal is heard apparently forward of the beam: reduce to the minimum speed at which the vessel can be kept on her course (R19(e))."
+                  : "Safe speed and engines ready for immediate manoeuvre (R19(b)).",
+              ],
+            );
+          }
           const rbO = norm180(r.br - o.course); // target bearing relative to own bow
           const rbT = norm180(((r.br + 180) % 360) - t.course); // own bearing relative to target bow
           const ro = rankOf(o),
             rt = rankOf(t);
-
           // Rule 13: overtaking = coming up from more than 22.5 deg abaft the beam
           if (Math.abs(rbO) > 112.5)
-            return R("Target overtaking you", "STAND-ON", "R13, R17", "SO", "SO");
+            return R("Target overtaking you", "STAND-ON", "R13, R17", "SO", "SO", [
+              "Target bears " +
+                d0(rbO) +
+                " from own bow, more than 112.5\u00b0 (22.5\u00b0 abaft the beam), and is closing: she is overtaking (R13(a),(b)).",
+              "She keeps clear until finally past and clear (R13(d)); own ship stands on (R17).",
+            ]);
           if (Math.abs(rbT) > 112.5)
-            return R("You overtake target", "GIVE-WAY", "R13, R16", "GW", "GW");
-
+            return R("You overtake target", "GIVE-WAY", "R13, R16", "GW", "GW", [
+              "Own ship bears " +
+                d0(rbT) +
+                " from the target's bow, more than 112.5\u00b0 (22.5\u00b0 abaft her beam), and is closing: own ship is overtaking (R13(a),(b)).",
+              "Own ship keeps clear until finally past and clear (R13(d), R16).",
+            ]);
+          // Rule 13(d): still overtaking until finally past and clear, even if the sector test no longer holds
+          if (OVT.has(t.n + ">" + o.n))
+            return R("Target overtaking you", "STAND-ON", "R13, R17", "SO", "SO", [
+              "Overtaking by the target was established earlier and continues until she is finally past and clear (R13(d)), even though the sector test no longer holds.",
+            ]);
+          if (OVT.has(o.n + ">" + t.n))
+            return R("You overtake target", "GIVE-WAY", "R13, R16", "GW", "GW", [
+              "Overtaking by own ship was established earlier and continues until she is finally past and clear (R13(d)), even though the sector test no longer holds.",
+            ]);
+          // Rules 9 and 10 override Rule 18 (R18: "except where Rules 9, 10 and 13 otherwise require")
+          const nr = navRoles(o, t);
+          if (nr) {
+            const mine = nr.giver === "o";
+            return R(
+              nr.name +
+                (mine ? ": you must not impede" : ": the target must not impede"),
+              mine ? "GIVE-WAY" : "STAND-ON",
+              nr.rule + ", " + (mine ? "R16" : "R17"),
+              mine ? "GW" : "SO",
+              mine ? "GW" : "SO",
+              nr.why,
+            );
+          }
           // Rule 18 sets no order between a vessel not under command and one restricted in her ability to manoeuvre
           if (ro <= 2 && rt <= 2)
             return R(
@@ -2010,44 +2541,176 @@
               "R2, R8",
               "?",
               "CK",
+              [
+                "Rule 18 gives no priority between a vessel not under command and one restricted in her ability to manoeuvre: both act under R2 and R8.",
+              ],
             );
-
           // Rule 18: responsibilities between vessels
           if (ro !== rt) {
-            const give = ro > rt;
+            const give = ro > rt,
+              giver = give ? ro : rt,
+              stand = give ? rt : ro,
+              para =
+                stand === 3
+                  ? "R18(d)"
+                  : giver === 6
+                    ? "R18(a)"
+                    : giver === 5
+                      ? "R18(b)"
+                      : giver === 4
+                        ? "R18(c)"
+                        : "R18(d), R2";
             return R(
               cap(RANKN[rt]) + " vessel",
               give ? "GIVE-WAY" : "STAND-ON",
-              "R18, " + (give ? "R16" : "R17"),
+              para + ", " + (give ? "R16" : "R17"),
               give ? "GW" : "SO",
               give ? "GW" : "SO",
+              [
+                (give
+                  ? "Own ship (" +
+                    RANKN[ro] +
+                    ") must keep out of the way of a " +
+                    RANKN[rt] +
+                    " vessel"
+                  : "A " +
+                    RANKN[rt] +
+                    " vessel must keep out of the way of own ship (" +
+                    RANKN[ro] +
+                    ")") +
+                  " (" +
+                  para +
+                  (stand === 3
+                    ? ": avoid impeding her safe passage if circumstances permit"
+                    : "") +
+                  ").",
+                give
+                  ? "Give-way vessel: early and substantial action (R16)."
+                  : "Stand-on vessel: keep course and speed (R17).",
+              ],
             );
           }
-          // Rule 12: two sailing vessels (needs wind side, which this simulator does not model)
-          if (ro === 5)
-            return R("Sail / sail", "CHECK (wind side)", "R12", "?", "CK");
-
+          // Rule 12: two sailing vessels
+          if (ro === 5) {
+            const kO = tackOf(o),
+              kT = tackOf(t),
+              word = (k) =>
+                k < 0
+                  ? "port tack (wind on her port side)"
+                  : "starboard tack (wind on her starboard side)";
+            if (!kO || !kT)
+              return R("Sail / sail", "CHECK (tack unclear)", "R12", "?", "CK", [
+                "Rule 12 needs each vessel's tack, but the wind is dead ahead or astern of at least one of them: act under R2 and R8.",
+              ]);
+            if (kO !== kT) {
+              const give = kO < 0;
+              return R(
+                "Sailing: opposite tacks",
+                give ? "GIVE-WAY" : "STAND-ON",
+                "R12(a)(i), " + (give ? "R16" : "R17"),
+                give ? "GW" : "SO",
+                give ? "GW" : "SO",
+                [
+                  "Own ship is on " +
+                    word(kO) +
+                    ", the target on " +
+                    word(kT) +
+                    ": the vessel with the wind on her port side keeps out of the way (R12(a)(i)).",
+                ],
+              );
+            }
+            const dUp = r.rg * Math.cos(rad(+settings.windFrom - r.br)); // > 0: target is to windward of own ship
+            if (Math.abs(dUp) < 1e-9)
+              return R("Sail / sail", "CHECK (same tack, abeam)", "R12", "?", "CK", [
+                "Same tack and neither vessel is to windward of the other: act under R2 and R8.",
+              ]);
+            const give = dUp < 0; // own ship is the windward vessel
+            return R(
+              "Sailing: same tack",
+              give ? "GIVE-WAY" : "STAND-ON",
+              "R12(a)(ii), " + (give ? "R16" : "R17"),
+              give ? "GW" : "SO",
+              give ? "GW" : "SO",
+              [
+                "Both are on " +
+                  word(kO) +
+                  ": the windward vessel keeps out of the way of the leeward vessel (R12(a)(ii)). " +
+                  (give ? "Own ship is to windward." : "The target is to windward."),
+              ],
+            );
+          }
           // Rules 14 and 15: two power-driven vessels
           if (ro === 6) {
-            const og = rbO >= 0,
-              tgw = rbT >= 0;
-            if ((Math.abs(rbO) <= 10 && Math.abs(rbT) <= 10) || og === tgw)
-              return R("Head-on", "GIVE-WAY (turn stbd)", "R14", "HO", "GW");
+            const og = rbO >= 0, // target on my starboard side
+              tgw = rbT >= 0, // I am on the target's starboard side
+              ho = +settings.headOnDeg;
+            const pos =
+              "Target bears " +
+              d0(rbO) +
+              " " +
+              hand(rbO) +
+              " of own bow; own ship bears " +
+              d0(rbT) +
+              " " +
+              hand(rbT) +
+              " of the target's bow.";
+            // Rule 14: each vessel sees the other ahead or nearly ahead
+            if (Math.abs(rbO) <= ho && Math.abs(rbT) <= ho)
+              return R("Head-on", "GIVE-WAY (turn stbd)", "R14", "HO", "GW", [
+                pos,
+                "Each vessel sees the other within " +
+                  ho +
+                  "\u00b0 of her bow: head-on (R14). Both alter course to starboard and pass port to port.",
+              ]);
+            // Rule 15, read literally: the vessel that has the other on her own starboard side gives way
+            if (og && tgw)
+              return R(
+                "Crossing: each on the other's stbd",
+                "GIVE-WAY",
+                "R15, R16",
+                "GW",
+                "GW",
+                [
+                  pos,
+                  "Not head-on. Each vessel has the other on her own starboard side, so by R15 read literally each gives way.",
+                ],
+              );
+            if (!og && !tgw)
+              return R(
+                "Crossing: each on the other's port",
+                "STAND-ON",
+                "R15, R17",
+                "SO",
+                "SO",
+                [
+                  pos,
+                  "Not head-on. Neither vessel has the other on her starboard side, so R15 read literally names no give-way vessel: each stands on (R17) and the stand-on rules for acting apply.",
+                ],
+              );
             return og
-              ? R("Crossing: target on stbd", "GIVE-WAY", "R15, R16", "GW", "GW")
-              : R("Crossing: target on port", "STAND-ON", "R15, R17", "SO", "SO");
+              ? R("Crossing: target on stbd", "GIVE-WAY", "R15, R16", "GW", "GW", [
+                  pos,
+                  "The target is on own starboard side: own ship gives way (R15) and avoids crossing ahead of her.",
+                ])
+              : R("Crossing: target on port", "STAND-ON", "R15, R17", "SO", "SO", [
+                  pos,
+                  "Own ship is on the target's starboard side: the target gives way (R15), own ship stands on (R17).",
+                ]);
           }
-          return R("Same class", "CHECK", "R2, R8", "?", "CK");
+          return R("Same class", "CHECK", "R2, R8", "?", "CK", [
+            "Rules 14 and 15 cover power-driven vessels only and Rule 18 sets no order between two vessels of this class: act under R2 and R8.",
+          ]);
         }
-
         /* ===== AUTOMATIC ACTION BY TARGET VESSELS (Rules 8, 13-17) ================
-                                             Give-way target (R16): early, substantial action. Head-on and crossing: alter to starboard
-                                             (R14, R15), overtaking and R18: either side, starboard preferred. Speed is reduced when a course
-                                             change alone is not enough (R8(e)). The plan is chosen as the least drastic action that keeps the
-                                             predicted CPA with every other ship above the CPA limit, assuming the others hold course and speed.
-                                             Stand-on target (R17): keeps course and speed until, at half the TCPA alarm, the give-way vessel
-                                             has still not acted; it then alters to starboard (never to port for a vessel on its port side).
-                                             The vessel resumes its original course and speed once the other vessel is past and clear.       */
+                                                               Give-way target (R16): early, substantial action. Head-on and crossing: alter to starboard
+                                                               (R14, R15), overtaking and R18: either side, starboard preferred. Speed is reduced when a course
+                                                               change alone is not enough (R8(e)). The plan is chosen as the least drastic action that keeps the
+                                                               predicted CPA with every other ship above the CPA limit, assuming the others hold course and speed.
+                                                               Stand-on target (R17): holds course and speed (R17(a)(i)) until it becomes apparent that the give-way vessel is
+       not acting (R17(a)(ii): observed for settings.standOnObserveMin with no appreciable change, TCPA inside half the
+       alarm), or until the give-way vessel alone can no longer avoid the collision (R17(b)). In a crossing it
+       never alters to port for a vessel on its port side (R17(c)); other stand-on actions may go either way.
+                                                               The vessel resumes its original course and speed once the other vessel is past and clear.       */
 
         const fmtT = (x) =>
           String(Math.floor(x / 3600)).padStart(2, "0") +
@@ -2062,50 +2725,84 @@
         };
 
         /* Predict where t will be once it has completed a turn to course c / speed sp (limited turn rate and
-                                             acceleration), then return the smallest predicted CPA to any closing vessel from that moment on. */
-        function worstFor(t, c, sp) {
+                                                               acceleration), then return the smallest predicted CPA to any closing vessel from that moment on. */
+        /* Evaluate one candidate (course c, speed sp through the water) for vessel t:
+         w     the smaller of the CPA after the turn and the closest range during it, to every closing vessel,
+               using GROUND motion (current and leeway included);
+         viol  the first channel, lane, zone or hazard constraint the track would break during the turn and for
+               settings.lookaheadSec afterwards (only NEW violations: see navContext), or null. */
+        function evalCandidate(t, c, sp) {
+          const tmp = Object.assign({}, t, { rot: t.rot || 0 });
+          const others = [own, ...tg].filter((v) => v !== t);
+          const dr = drift(t),
+            ctx = hasNav() ? navContext(t) : null;
+          // vessels that are closing now: the range to them during the turn is a lower bound on the CPA
+          const closing = others.filter((v) => cpa(t, v).cl);
           let x = t.x,
             y = t.y,
-            crs = t.course,
-            spd = t.speed,
-            time = 0;
-          const rot = (rotOf(t) / 60) * 10,
-            acc = (SPDRATE[t.type] / 60) * 10; // per 10 s step
+            time = 0,
+            during = Infinity,
+            viol = null;
+          const sample = () => {
+            for (const v of closing) {
+              const [vx, vy] = vel(v);
+              during = Math.min(
+                during,
+                Math.hypot(
+                  v.x + (vx * time) / 3600 - x,
+                  v.y + (vy * time) / 3600 - y,
+                ),
+              );
+            }
+            if (ctx && !viol) viol = navViolation(ctx, x, y, tmp.course);
+          };
+          sample();
           for (let k = 0; k < 400; k++) {
-            const dc = norm180(c - crs),
-              ds = sp - spd;
-            if (Math.abs(dc) < 0.5 && Math.abs(ds) < 0.05) break;
-            crs = (crs + Math.max(-rot, Math.min(rot, dc)) + 360) % 360;
-            spd += Math.max(-acc, Math.min(acc, ds));
-            x += (spd * Math.sin(rad(crs)) * 10) / 3600;
-            y += (spd * Math.cos(rad(crs)) * 10) / 3600;
+            if (
+              Math.abs(norm180(c - tmp.course)) < 0.5 &&
+              Math.abs(sp - tmp.speed) < 0.05 &&
+              Math.abs(tmp.rot) < 1
+            )
+              break;
+            dynStep(tmp, c, sp, 10);
+            x += ((tmp.speed * Math.sin(rad(tmp.course)) + dr[0]) * 10) / 3600;
+            y += ((tmp.speed * Math.cos(rad(tmp.course)) + dr[1]) * 10) / 3600;
             time += 10;
+            sample();
           }
-          let w = Infinity;
-          for (const v of [own, ...tg]) {
-            if (v === t) continue;
+          if (ctx && !viol) {
+            let lx = x,
+              ly = y;
+            for (let s = 30; s <= +settings.lookaheadSec && !viol; s += 30) {
+              lx += ((sp * Math.sin(rad(c)) + dr[0]) * 30) / 3600;
+              ly += ((sp * Math.cos(rad(c)) + dr[1]) * 30) / 3600;
+              viol = navViolation(ctx, lx, ly, c);
+            }
+          }
+          let w = during;
+          const cv = [sp * Math.sin(rad(c)) + dr[0], sp * Math.cos(rad(c)) + dr[1]];
+          for (const v of others) {
             const [vx, vy] = vel(v),
               hh = time / 3600;
-            const r = cpa(
-              { x, y, course: c, speed: sp },
-              {
-                x: v.x + vx * hh,
-                y: v.y + vy * hh,
-                course: v.course,
-                speed: v.speed,
-              },
-            );
+            const r = cpaV({ x, y }, { x: v.x + vx * hh, y: v.y + vy * hh }, cv, [
+              vx,
+              vy,
+            ]);
             if (r.cl && r.cpa < w) w = r.cpa;
           }
-          return w;
+          return { w, viol };
         }
-
+        function worstFor(t, c, sp) {
+          return evalCandidate(t, c, sp).w;
+        }
         function planAction(t, dirs, factors, desired, maxDelta) {
           let best = null;
+          const rows = [];
           const consider = (dl, d, f) => {
             const c = (((t.course + d * dl) % 360) + 360) % 360,
               sp = t.speed * f;
-            const worst = worstFor(t, c, sp);
+            const ev = evalCandidate(t, c, sp),
+              worst = ev.w;
             const cand = {
               course: c,
               speed: sp,
@@ -2113,28 +2810,113 @@
               d,
               f,
               worst,
-              ok: worst >= desired,
+              ok: worst >= desired && !ev.viol,
+              viol: ev.viol,
               cost:
-                dl / 90 + 1.5 * (1 - f) + (d < 0 ? 0.15 : 0) + (dl === 0 ? 0.3 : 0),
+                (ev.viol ? 50 : 0) +
+                dl / 90 +
+                1.5 * (1 - f) +
+                (d < 0 ? 0.15 : 0) +
+                (dl === 0 ? 0.3 : 0),
             };
+
+            rows.push(cand);
+            const adj = (c) => c.worst - (c.viol ? 0.5 : 0); // among failures, a constraint violation counts against a candidate
             const better =
               !best ||
               (cand.ok && !best.ok) ||
               (cand.ok === best.ok &&
                 (cand.ok
                   ? cand.cost < best.cost
-                  : cand.worst > best.worst + 1e-6 ||
-                    (Math.abs(cand.worst - best.worst) <= 1e-6 &&
+                  : adj(cand) > adj(best) + 1e-6 ||
+                    (Math.abs(adj(cand) - adj(best)) <= 1e-6 &&
                       cand.cost < best.cost)));
             if (better) best = cand;
           };
           for (const f of factors) if (f < 1) consider(0, 1, f);
           for (const d of dirs)
-            for (let dl = 20; dl <= maxDelta; dl += 5)
+            for (
+              let dl = Math.max(5, +settings.minAlter || 30);
+              dl <= maxDelta;
+              dl += 5
+            )
               for (const f of factors) consider(dl, d, f);
+          if (best) best.rows = rows;
           return best;
         }
 
+        /* Own-ship autopilot records: one per avoidance, with what was seen, what was done and how it ended */
+        const AP = { cur: null, records: [], slow: false };
+        /* Rule 17 observation memory: when the stand-on vessel first saw a risk with a given give-way vessel,
+                         and what that vessel was doing then. Key "stand-on|give-way". */
+        const OBS = new Map();
+        const noReact = (v) => isStatic(v) || rankOf(v) <= 2; // anchored, aground, NUC, RAM cannot act
+        /* standOnStage(t, v, r): what stand-on vessel t may or must do about give-way vessel v.
+                         stage 0: keep course and speed, R17(a)(i)
+                         stage 1: may act, R17(a)(ii): v has been observed for settings.standOnObserveMin without any
+                                  appreciable change of course, speed or rate of turn, and TCPA is within half the alarm
+                         stage 2: must act, R17(b): even v's best action (course changes of 30-90 deg either way, or a speed
+                                  reduction) would leave the predicted CPA below the zone minimum */
+        function standOnStage(t, v, r) {
+          const alarm = +settings.tcpaAlarm,
+            zmin = ZONES[settings.zone].cpa[0],
+            key = t.n + "|" + v.n;
+          let o = OBS.get(key);
+          if (!o) {
+            o = { t0: simT, c0: v.course, s0: v.speed };
+            OBS.set(key, o);
+          }
+          if (r.tcpa <= alarm) {
+            let best = r.cpa;
+            if (!noReact(v)) {
+              best = -Infinity;
+              const tryC = (d, dl, f) => {
+                best = Math.max(
+                  best,
+                  worstFor(v, wrap360(v.course + d * dl), v.speed * f),
+                );
+              };
+              tryC(1, 0, 0.5);
+              tryC(1, 0, 0.25);
+              for (const d of [1, -1])
+                for (const dl of [30, 60, 90])
+                  for (const f of [1, 0.5]) tryC(d, dl, f);
+            }
+            if (best < zmin)
+              return {
+                stage: 2,
+                best,
+                why:
+                  "R17(b): even the best action by the give-way vessel would leave a CPA of " +
+                  best.toFixed(2) +
+                  " nm, below " +
+                  zmin +
+                  " nm",
+              };
+          }
+          const responding =
+            Math.abs(norm180(v.course - o.c0)) >= +settings.apparentDeg ||
+            Math.abs(v.rot || 0) >= 0.5 ||
+            Math.abs(v.speed - o.s0) >= 1;
+          if (
+            r.tcpa <= alarm * 0.5 &&
+            simT - o.t0 >= +settings.standOnObserveMin * 60
+          ) {
+            if (!responding)
+              return {
+                stage: 1,
+                why:
+                  "R17(a)(ii): the give-way vessel has made no appreciable change for " +
+                  Math.round((simT - o.t0) / 60) +
+                  " min",
+              };
+            return {
+              stage: 0,
+              why: "the give-way vessel is altering course or speed: keep course and speed (R17(a)(i))",
+            };
+          }
+          return { stage: 0, why: "keep course and speed (R17(a)(i))" };
+        }
         /* Work out what target t must do right now, or null when nothing is required. */
         function assess(t) {
           const lim = +settings.cpaLimit,
@@ -2145,31 +2927,76 @@
           for (const v of [own, ...tg]) {
             if (v === t) continue;
             const r = cpa(t, v);
-            if (!r.cl || r.cpa >= lim) continue;
+            if (!r.cl || r.cpa >= lim) {
+              OBS.delete(t.n + "|" + v.n);
+              continue;
+            }
             const e = encounter(t, v, r);
-            if (e.short === "GW" || e.short === "HO" || e.short === "KC") {
+            if (
+              e.short === "GW" ||
+              e.short === "HO" ||
+              e.short === "KC" ||
+              e.short === "RV"
+            ) {
               if (r.tcpa <= alarm && (!duty || r.tcpa < duty.r.tcpa))
                 duty = { v, r, e };
             } else if (e.short === "SO") {
-              if (r.tcpa <= alarm * 0.5 && (!so || r.tcpa < so.r.tcpa))
-                so = { v, r, e };
+              const st = standOnStage(t, v, r);
+              if (st.stage > 0 && (!so || r.tcpa < so.r.tcpa))
+                so = { v, r, e, stage: st.stage };
             }
           }
           const a = duty || so;
           if (!a) return null;
           const giving = !!duty;
-          const stbdOnly = !giving || a.e.short === "HO" || /^R1[45]/.test(a.e.rule);
-          const p = planAction(
+          // R14 / R15 give-way: starboard only. R17(c): a stand-on vessel in a crossing never turns to port.
+          // R19(d): not to port for a vessel forward of the beam, not towards a vessel abeam or abaft.
+          const rv = a.e.short === "RV";
+          const dirs = rv
+            ? rule19Dirs(t, a.v, a.r)
+            : (
+                  giving
+                    ? a.e.short === "HO" || /^R1[45]/.test(a.e.rule)
+                    : /^R15/.test(a.e.rule)
+                )
+              ? [1]
+              : [1, -1];
+          let p = planAction(
             t,
-            stbdOnly ? [1] : [1, -1],
+            dirs,
             giving ? [1, 0.75, 0.5, 0.25] : [1, 0.75],
             desired,
             90,
           );
+          let s19 = null;
+          if (rv) {
+            s19 = rule19Speed(t, a.v, a.r, !p || !p.ok);
+            if (s19) {
+              const sp = Math.min(p ? p.speed : t.speed, s19.speed);
+              p = Object.assign(
+                {},
+                p || {
+                  course: t.course,
+                  dl: 0,
+                  ok: false,
+                  worst: a.r.cpa,
+                  cost: 0,
+                  rows: [],
+                },
+                { speed: sp, f: sp / t.speed },
+              );
+            }
+          }
           if (!p || (p.dl === 0 && p.f === 1)) return null;
-          return { a, giving, p };
+          return {
+            a,
+            giving,
+            p,
+            s19,
+            stage: giving ? 0 : a.stage,
+            stageName: rv ? (s19 ? "R19(d),(e)" : "R19(d)") : null,
+          };
         }
-
         function describe(t, d) {
           const dc = norm180(d.p.course - t.course),
             parts = [];
@@ -2177,27 +3004,31 @@
             parts.push(
               "course " +
                 Math.round(t.course) +
-                "° → " +
+                "  " +
                 Math.round(d.p.course) +
-                "° (" +
+                " (" +
                 (dc > 0 ? "to starboard" : "to port") +
                 ")",
             );
           if (d.p.f < 1)
             parts.push(
-              "speed " + t.speed.toFixed(1) + " → " + d.p.speed.toFixed(1) + " kn",
+              "speed " + t.speed.toFixed(1) + "  " + d.p.speed.toFixed(1) + " kn",
             );
           return (
-            (d.giving
-              ? " gives way to " + vname(d.a.v) + " (" + d.a.e.rule + "): "
-              : " stand-on, acts to avoid collision with " +
-                vname(d.a.v) +
-                " (R17): ") +
+            (d.a.e.short === "RV"
+              ? " acts under R19(d) (radar only) against " + vname(d.a.v) + ": "
+              : d.giving
+                ? " gives way to " + vname(d.a.v) + " (" + d.a.e.rule + "): "
+                : " stand-on, acts against " +
+                  vname(d.a.v) +
+                  (d.stage === 2
+                    ? " (R17(b): collision cannot be avoided by the give-way vessel alone): "
+                    : " (R17(a)(ii): the give-way vessel is not acting): ")) +
             parts.join(", ") +
+            (d.s19 ? " [" + d.s19.why + "]" : "") +
             (d.p.ok ? "" : " [best available]")
           );
         }
-
         function autoManeuver() {
           if (!settings.autoAction) return;
           tg.forEach((t) => {
@@ -2211,30 +3042,149 @@
               speed: d.p.speed,
               orig: { course: t.course, speed: t.speed },
               vs: d.a.v.n,
+              stage:
+                d.stageName ||
+                (d.stage ? (d.stage === 2 ? "R17(b)" : "R17(a)(ii)") : "R16"),
               phase: "act",
               at: simT,
             };
           });
         }
-
         /* true when t has actually reached the course and speed the manoeuvre m is steering to;
-                                             evaluate it at each use, never cache it across a phase change */
+                                                               evaluate it at each use, never cache it across a phase change */
         const isReached = (t, m) =>
           Math.abs(norm180(m.course - t.course)) < 0.5 &&
           Math.abs(m.speed - t.speed) < 0.05;
 
+        /* ---- own-ship autopilot (Phase 4) -------------------------------------------------------------
+                         Same decision cycle as the targets: assess every vessel, classify (encounter), plan the least drastic
+                         action that keeps the predicted CPA to EVERY closing vessel above the limit (planAction / worstFor),
+                         execute through the ship's dynamics, then verify: resume the planned route only when the other vessel
+                         is finally past and clear and the route itself is safe. The candidate table is kept for display. */
+        function autopilot() {
+          // Rule 19(b), Rule 6: safe speed adapted to restricted visibility
+          const slow =
+            settings.ownAuto && restricted() && +settings.ownSpeed > safeSpeed();
+          if (slow && !AP.slow)
+            mlog(
+              own.n +
+                " reduces to a safe speed of " +
+                safeSpeed().toFixed(1) +
+                " kn (R19(b), R6): visibility " +
+                settings.visibilityNm +
+                " nm",
+            );
+          AP.slow = slow;
+          if (
+            !settings.ownAuto ||
+            own.man ||
+            isStatic(own) ||
+            rankOf(own) <= 2 ||
+            simT < (own.hold || 0)
+          )
+            return;
+          const d = assess(own);
+          if (!d) return;
+          const text = describe(own, d),
+            stage =
+              d.stageName ||
+              (d.stage ? (d.stage === 2 ? "R17(b)" : "R17(a)(ii)") : "R16");
+          mlog(own.n + text);
+          own.man = {
+            course: d.p.course,
+            speed: Math.min(d.p.speed, plannedSpeed()),
+            orig: { course: own.course, speed: own.speed },
+            vs: d.a.v.n,
+            stage,
+            phase: "act",
+            at: simT,
+          };
+          const ranked = d.p.rows
+            .slice()
+            .sort((a, b) =>
+              a.ok !== b.ok
+                ? a.ok
+                  ? -1
+                  : 1
+                : a.ok
+                  ? a.cost - b.cost
+                  : b.worst - a.worst,
+            );
+          own.plan = {
+            t: simT,
+            vs: d.a.v.n,
+            rule: d.a.e.rule,
+            stage,
+            why: d.a.e.why.slice(),
+            rows: ranked.slice(0, 8).map((c) => ({
+              course: Math.round(c.course),
+              speed: +c.speed.toFixed(1),
+              minCpa: Number.isFinite(c.worst) ? +c.worst.toFixed(2) : null,
+              ok: c.ok,
+              cost: +c.cost.toFixed(2),
+              chosen: c === d.p,
+              viol: c.viol || null,
+            })),
+            candidates: d.p.rows.length,
+          };
+          AP.cur = {
+            vs: d.a.v.n,
+            t0: simT,
+            range0: d.a.r.rg,
+            cpa0: d.a.r.cpa,
+            tcpa0: d.a.r.tcpa,
+            enc: d.a.e.enc,
+            rule: d.a.e.rule,
+            stage,
+            action: text.trim(),
+            predictedCpa: d.p.worst,
+            minRange: d.a.r.rg,
+          };
+        }
+        function finishRecord() {
+          const c = AP.cur;
+          if (!c) return;
+          c.t1 = simT;
+          c.effective = c.minRange >= +settings.cpaLimit;
+          c.concern = c.effective
+            ? ""
+            : "passed at " +
+              c.minRange.toFixed(2) +
+              " nm, inside the CPA limit of " +
+              settings.cpaLimit +
+              " nm";
+          AP.records.unshift(c);
+          if (AP.records.length > 10) AP.records.pop();
+          AP.cur = null;
+        }
         function manageMan() {
           const lim = +settings.cpaLimit,
             all = [own, ...tg];
           const worstAt = worstFor;
-          tg.forEach((t) => {
+          [own, ...tg].forEach((t) => {
             const m = t.man;
+            if (t === own && !settings.ownAuto) {
+              t.man = null;
+              AP.cur = null;
+              return;
+            }
             if (!m) return;
+            if (t === own && AP.cur) {
+              const vs = all.find((x) => x.n === m.vs);
+              if (vs) AP.cur.minRange = Math.min(AP.cur.minRange, cpa(own, vs).rg);
+            }
             /* The geometry changed (a ship was dragged, another vessel acted): if the current plan no longer
-                                                 keeps us clear, plan again from where we are. Checked at most once per simulated minute. */
-            if (simT - (m.at || 0) >= 60 && worstAt(t, m.course, m.speed) < lim) {
+                                                                   keeps us clear, plan again from where we are. Checked at most once per simulated minute. */
+            let ev0 = null;
+            if (
+              simT - (m.at || 0) >= 60 &&
+              ((ev0 = evalCandidate(t, m.course, m.speed)),
+              ev0.w < lim || (ev0.viol && m.phase !== "resume"))
+            ) {
               m.at = simT;
-              const d = settings.autoAction ? assess(t) : null;
+              const d = (t === own ? settings.ownAuto : settings.autoAction)
+                ? assess(t)
+                : null;
               if (d) {
                 mlog(t.n + " re-plans, the situation has changed:" + describe(t, d));
                 m.course = d.p.course;
@@ -2245,6 +3195,41 @@
                 m.course = t.course;
                 m.speed = t.speed;
                 m.phase = "hold";
+              } else if (ev0.viol) {
+                // no collision risk is left, but the avoiding course would break a constraint: go back to the route
+                const back =
+                  t === own
+                    ? { course: +settings.ownCourse, speed: plannedSpeed() }
+                    : m.orig;
+                if (!evalCandidate(t, back.course, back.speed).viol) {
+                  m.course = back.course;
+                  m.speed = back.speed;
+                  m.phase = "resume";
+                  mlog(
+                    t.n +
+                      ": the avoiding course would break a constraint (" +
+                      ev0.viol +
+                      "), returns to the planned route",
+                  );
+                } else {
+                  // the route is blocked too: take the least drastic course or speed that breaks no constraint
+                  const p = planAction(t, [1, -1], [1, 0.5, 0.25], lim * 1.1, 90);
+                  if (p && !p.viol) {
+                    m.course = p.course;
+                    m.speed = p.speed;
+                    m.phase = "act";
+                    mlog(
+                      t.n +
+                        ": the avoiding course would break a constraint (" +
+                        ev0.viol +
+                        "), steers clear: course " +
+                        Math.round(p.course) +
+                        ", speed " +
+                        p.speed.toFixed(1) +
+                        " kn",
+                    );
+                  }
+                }
               }
             }
             if (m.phase === "act" && isReached(t, m)) m.phase = "hold";
@@ -2253,9 +3238,27 @@
                 rv = v ? cpa(t, v) : null;
               if (!rv || !rv.cl) {
                 // the other vessel is past and opening
-                if (worstAt(t, m.orig.course, m.orig.speed) >= lim) {
-                  m.course = m.orig.course;
-                  m.speed = m.orig.speed;
+                // own ship returns to the planned route (the sliders); targets to what they were doing before
+                const back =
+                  t === own
+                    ? { course: +settings.ownCourse, speed: plannedSpeed() }
+                    : m.orig;
+                // own ship also needs the other vessel to be finally past AND clear before resuming
+                const clear =
+                  t !== own || !rv || rv.rg >= lim * +settings.clearRangeFrac;
+                const evb = clear ? evalCandidate(t, back.course, back.speed) : null;
+                if (evb && evb.viol && !m.warned) {
+                  m.warned = true;
+                  mlog(
+                    t.n +
+                      ": the planned route is blocked (" +
+                      evb.viol +
+                      "), holding the avoiding course",
+                  );
+                }
+                if (evb && evb.w >= lim && !evb.viol) {
+                  m.course = back.course;
+                  m.speed = back.speed;
                   m.phase = "resume";
                   mlog(
                     t.n +
@@ -2267,8 +3270,12 @@
               }
             }
             if (m.phase === "resume" && isReached(t, m)) {
-              t.course = m.orig.course;
-              t.speed = m.orig.speed;
+              if (t === own) finishRecord();
+              else {
+                t.course = m.orig.course;
+                t.speed = m.orig.speed;
+                t.rot = 0;
+              }
               t.man = null;
               t.hold = simT + 120;
             }
@@ -2289,12 +3296,7 @@
           tg.forEach((t) => {
             const m = t.man;
             if (!m || isStatic(t)) return;
-            const rot = (rotOf(t) * sec) / 60,
-              dc = norm180(m.course - t.course);
-            t.course =
-              (((t.course + Math.max(-rot, Math.min(rot, dc))) % 360) + 360) % 360;
-            const sr = (SPDRATE[t.type] * sec) / 60;
-            t.speed += Math.max(-sr, Math.min(sr, m.speed - t.speed));
+            dynStep(t, m.course, m.speed, sec);
           });
         }
 
@@ -2381,9 +3383,26 @@
           coll = [];
           running = false;
           simT = 0;
+          acc = 0;
+          own.id = "own";
+          own.rot = 0;
+          tg.forEach((s, i) => {
+            s.id = "t" + (i + 1);
+            s.rot = 0;
+          });
+          OVT.clear();
+          OBS.clear();
+          setNav(null);
           MAN_LOG.length = 0;
           settings.ownCourse = own.course;
           settings.ownSpeed = own.speed;
+          applied.c = own.course;
+          applied.s = own.speed;
+          own.man = null;
+          own.plan = null;
+          AP.cur = null;
+          AP.records.length = 0;
+          AP.slow = false;
         }
 
         function reset() {
@@ -2394,10 +3413,10 @@
         /* ---- collisions and time stepping --------------------------------------- */
 
         /* ---- hull contact -------------------------------------------------------
-                                             A collision happens when two hulls actually touch, not when the centres come within a fixed radius.
-                                             Each hull is the same outline the 3D view draws (pointed bow, straight sides, square stern) at TRUE size:
-                                             HULL_NM = real length in nm, HULL_MODEL = [length, half-beam] in model units (keep in step with
-                                             scene3d.js REAL_NM / MODEL_DIMS). Heading = course; x is east, y is north, course clockwise from north. */
+                                                               A collision happens when two hulls actually touch, not when the centres come within a fixed radius.
+                                                               Each hull is the same outline the 3D view draws (pointed bow, straight sides, square stern) at TRUE size:
+                                                               HULL_NM = real length in nm, HULL_MODEL = [length, half-beam] in model units (keep in step with
+                                                               scene3d.js REAL_NM / MODEL_DIMS). Heading = course; x is east, y is north, course clockwise from north. */
         const HULL_NM = { large: 0.13, tug: 0.06, fishing: 0.04, sail: 0.015 };
         const HULL_MODEL = {
           large: [34, 3.4],
@@ -2406,8 +3425,8 @@
           sail: [15, 1.8],
         };
         /* The 3D view draws every ship HULL_MAG times its true size (SHIP_MAG there reads this), so hulls touch exactly where they visibly touch.
-                                             The drawn size is FIXED in the world (it never changes with zoom), so two hulls overlap on screen only when they really touch here.
-                                             Bigger HULL_MAG = bigger ships, and a bigger contact hull. Set HULL_MAG = 1 for true-size contact. */
+                                                               The drawn size is FIXED in the world (it never changes with zoom), so two hulls overlap on screen only when they really touch here.
+                                                               Bigger HULL_MAG = bigger ships, and a bigger contact hull. Set HULL_MAG = 1 for true-size contact. */
         const HULL_MAG = 5;
         const hullLen = (s) => (HULL_NM[s.type] || HULL_NM.large) * HULL_MAG;
         /* the barge a tug has in tow (position and size in the tug model's own units, measured behind its centre) */
@@ -2512,8 +3531,8 @@
         }
 
         /* Earliest moment in this step (fraction 0..1) at which any two hulls touch, or null.
-                                             The path of each ship is sampled finely enough that two small, fast hulls cannot pass through
-                                             each other between two checks. x0/y0 = positions before the move, s.x/s.y = after. */
+                                                               The path of each ship is sampled finely enough that two small, fast hulls cannot pass through
+                                                               each other between two checks. x0/y0 = positions before the move, s.x/s.y = after. */
         function firstContact(all, x0, y0) {
           let best = null;
           for (let i = 0; i < all.length; i++)
@@ -2545,54 +3564,117 @@
           return best;
         }
 
+        /* Fixed-step clock (Phase 2). Real time is converted to simulated seconds and consumed in steps of one
+         size, so a run does not depend on the frame rate. Decisions (manageMan, autoManeuver) run every step. */
+        const ownOrder = () =>
+          settings.ownAuto && own.man
+            ? own.man
+            : { course: +settings.ownCourse, speed: plannedSpeed() };
+        const stepSize = () => Math.min(2, Math.max(0.1, +settings.timeScale / 30));
+        function substep(H) {
+          const all = [own, ...tg],
+            x0 = all.map((s) => s.x),
+            y0 = all.map((s) => s.y),
+            h = H / 3600;
+          simT += H;
+          steer(H);
+          swing(H);
+          if (isStatic(own)) {
+            if (condOf(own) === "anchor" && swingHeading() !== null) {
+              settings.ownCourse = own.course; // an anchored own ship swings with the wind or current
+              applied.c = own.course;
+            } else own.course = wrap360(+settings.ownCourse);
+            own.rot = 0;
+          } else {
+            const ord = ownOrder();
+            dynStep(own, ord.course, ord.speed, H);
+          }
+          for (const s of all) {
+            const [vx, vy] = vel(s);
+            s.x += vx * h;
+            s.y += vy * h;
+          }
+          const f = firstContact(all, x0, y0);
+          if (f !== null && f < 1) {
+            // stop the ships at the moment the hulls first touch, not after they have overlapped
+            all.forEach((s, i) => {
+              s.x = x0[i] + (s.x - x0[i]) * f;
+              s.y = y0[i] + (s.y - y0[i]) * f;
+            });
+            simT -= (1 - f) * H;
+          }
+          checkGrounding();
+          checkColl();
+        }
         function advance(dt) {
-          const n = Math.max(1, Math.ceil(dt / 2)),
-            h = dt / n / 3600;
-          for (let k = 0; k < n; k++) {
-            const all = [own, ...tg],
-              x0 = all.map((s) => s.x),
-              y0 = all.map((s) => s.y);
-            simT += dt / n;
-            steer(dt / n);
-            for (const s of all) {
-              const [vx, vy] = vel(s);
-              s.x += vx * h;
-              s.y += vy * h;
+          acc += dt;
+          const H = stepSize();
+          for (let n = 0; acc >= H - 1e-9 && n < 5000; n++) {
+            acc -= H;
+            manageMan();
+            autoManeuver();
+            autopilot();
+            substep(H);
+            if (coll.length) {
+              acc = 0;
+              return;
             }
-            const f = firstContact(all, x0, y0);
-            if (f !== null && f < 1) {
-              // stop the ships at the moment the hulls first touch, not after they have overlapped
-              all.forEach((s, i) => {
-                s.x = x0[i] + (s.x - x0[i]) * f;
-                s.y = y0[i] + (s.y - y0[i]) * f;
-              });
-              simT -= (1 - f) * (dt / n);
-            }
-            checkColl();
-            if (coll.length) return;
           }
         }
 
         /* One frame. Same order as the 2D loop():
-                                             own course from settings -> motionRules -> (if running and no collision:
-                                             manageMan, autoManeuver, advance(dt * timeScale)) -> checkColl -> stop on a NEW collision. */
+                                                               own course from settings -> motionRules -> (if running and no collision:
+                                                               manageMan, autoManeuver, advance(dt * timeScale)) -> checkColl -> stop on a NEW collision. */
         function step(realDt) {
           if (!own) return;
           const dt = Number.isFinite(realDt) ? Math.max(0, Math.min(0.1, realDt)) : 0;
-          own.course = +settings.ownCourse;
-          motionRules();
           const had = coll.length;
-          if (running && !had) {
-            manageMan();
-            autoManeuver();
-            advance(dt * settings.timeScale);
+          dynMode = running && !had;
+          if (dynMode) {
+            applied.c = +settings.ownCourse;
+            applied.s = +settings.ownSpeed;
+          } else if (+settings.ownCourse !== applied.c) {
+            // paused, or stopped after contact: a CHANGED order is applied at once (set-up mode);
+            // an unchanged order leaves the ship exactly where it is
+            own.course = wrap360(+settings.ownCourse);
+            own.rot = 0;
+            applied.c = +settings.ownCourse;
           }
+          motionRules();
+          updateOvertaking();
+          if (running && !had) advance(dt * settings.timeScale);
           checkColl();
           if (coll.length && !had) running = false;
         }
 
         /* ---- snapshot for the UI / renderer -------------------------------------- */
 
+        /* Heading is where the bow points (v.course). COG/SOG come from the velocity over the ground, which for a
+         drifting vessel differs from heading and speed through the water. Particulars come from the hull table. */
+        function vesselInfo(v) {
+          const [vx, vy] = vel(v),
+            sog = Math.hypot(vx, vy),
+            m = HULL_MODEL[v.type] || HULL_MODEL.large,
+            L = (HULL_NM[v.type] || HULL_NM.large) * 1852;
+          return {
+            id: v.id,
+            name: v.n,
+            type: v.type,
+            x: v.x,
+            y: v.y,
+            heading: v.course,
+            cog:
+              sog > 1e-6 ? wrap360((Math.atan2(vx, vy) * 180) / Math.PI) : v.course,
+            sog,
+            stw: v.speed,
+            rot: v.rot || 0,
+            lengthM: L,
+            beamM: (2 * m[1] * L) / m[0],
+            cond: condOf(v),
+            rank: rankOf(v),
+            channelOnly: chOnly(v),
+          };
+        }
         function getState() {
           const inv = new Set(coll.flat()),
             alarm = +settings.tcpaAlarm,
@@ -2616,6 +3698,18 @@
               cl: r.cl,
               closing,
               status: st,
+              risk: riskLevel(r, inv.has(t.n)),
+              rangeRate: r.rr,
+              bearingRate: r.brate,
+              relSpeed: r.relSpeed,
+              relCourse: r.relCourse,
+              relBearing: norm180(r.br - own.course),
+              aspect: norm180(((r.br + 180) % 360) - t.course),
+              sight: sightInfo(own, t, r).sight,
+              radar: sightInfo(own, t, r).radar,
+              heard: sightInfo(own, t, r).heard,
+              detection: sightInfo(own, t, r).detection,
+              visualRangeNm: sightInfo(own, t, r).visualRange,
               enc,
               encRev,
               lookH: h,
@@ -2631,6 +3725,27 @@
             results,
             ownVecEnd: [own.x + ov[0] * 0.1, own.y + ov[1] * 0.1],
             collisions: coll.map((p) => p.slice()),
+            vessels: [own, ...tg].map(vesselInfo),
+            nav: {
+              channels: NAV.channels.map((c) => ({ ...c })),
+              lanes: NAV.lanes.map((c) => ({ ...c })),
+              zones: NAV.zones.map((c) => ({ ...c })),
+              hazards: NAV.hazards.map((c) => ({ ...c })),
+              buoys: NAV.buoys.map((c) => ({ ...c })),
+            },
+            visibility: {
+              nm: +settings.visibilityNm,
+              night: !!settings.night,
+              restricted: restricted(),
+              safeSpeedKn: safeSpeed(),
+            },
+            autopilot: {
+              on: !!settings.ownAuto,
+              man: own.man ? { ...own.man } : null,
+              plan: own.plan || null,
+              current: AP.cur ? { ...AP.cur } : null,
+              records: AP.records.map((r) => ({ ...r })),
+            },
             collided: coll.length > 0,
             log: MAN_LOG.slice(),
             simTime: simT,
@@ -2659,7 +3774,7 @@
         }
 
         /* What setZone() did to the slider VALUES: select the zone and start at the
-                                             upper (safer) CPA limit and TCPA alarm of its band. Slider min/max are UI. */
+                                                               upper (safer) CPA limit and TCPA alarm of its band. Slider min/max are UI. */
         function applyZone(k) {
           const z = ZONES[k];
           if (!z) return;
@@ -2669,12 +3784,13 @@
         }
 
         /* Install an explicit scenario (for tests and saved set-ups).
-                                             o  : { course, speed, type? }
-                                             ts : [{ type, course, speed, rg, brg }  or  { type, course, speed, x, y }, ...] */
+                                                               o  : { course, speed, type? }
+                                                               ts : [{ type, course, speed, rg, brg }  or  { type, course, speed, x, y }, ...] */
         function setScenario(def) {
           const o = {
             n: "Own",
             type: (def.own && def.own.type) || "large",
+            channelOnly: !!(def.own && def.own.channelOnly),
             x: 0,
             y: 0,
             speed: def.own.speed,
@@ -2691,6 +3807,7 @@
             return {
               n: "T" + (i + 1),
               type: t.type || "large",
+              channelOnly: !!t.channelOnly,
               x,
               y,
               speed: t.speed,
@@ -2698,8 +3815,10 @@
             };
           });
           install(o, ts);
+          setNav(def.nav);
+          if (def.sea) Object.assign(settings, def.sea);
+          if (def.zone) applyZone(def.zone);
         }
-
         const vessel = (who) =>
           who === -1 || who === "own" ? own : typeof who === "number" ? tg[who] : who;
 
@@ -2723,11 +3842,12 @@
         }
 
         /* A manual change to a target cancels its automatic manoeuvre and holds the
-                                             AI off for 10 simulated minutes (was touch()). */
+                                                               AI off for 10 simulated minutes (was touch()). */
         function manualOverride(who) {
           const t = vessel(who);
           if (t) {
             t.man = null;
+            t.rot = 0;
             t.hold = simT + 600;
           }
         }
@@ -2780,8 +3900,8 @@
         /* ---- init ------------------------------------------------------------------ */
 
         /* opts: { settings, zone, colregUrl, colregData, seed, scenario }
-                                             colregUrl: string = fetch it (default 'colreg.json'), null = built-in fallback only.
-                                             Resolves when the COLREG data is in and a scenario has been installed. */
+                                                               colregUrl: string = fetch it (default 'colreg.json'), null = built-in fallback only.
+                                                               Resolves when the COLREG data is in and a scenario has been installed. */
         async function init(opts) {
           opts = opts || {};
           if (opts.seed !== undefined) seed(opts.seed);
@@ -2816,8 +3936,31 @@
           setVesselType,
           setVesselConfig,
           cpa,
+          cpaV,
           status,
+          riskLevel,
           encounter,
+          worstFor,
+          overtakingPairs: () => Array.from(OVT),
+          dynStep,
+          drift,
+          LEEWAY,
+          setNav,
+          inRect,
+          evalCandidate,
+          swingHeading,
+          ownOrder,
+          sightInfo,
+          visualRange,
+          rule19Dirs,
+          rule19Speed,
+          safeSpeed,
+          restricted,
+          standOnStage,
+          tackOf,
+          stepSize,
+          vesselInfo,
+          LAG,
           condOf,
           isStatic,
           rankOf,
@@ -2849,51 +3992,51 @@
     <script>
       /* ======== scene3d.js ======== */
       /* ===========================================================================
-                                             scene3d.js  -  Three.js r128 renderer for the COLREG CPA/TCPA simulator.
-                                             Needs: THREE (r128 UMD) loaded first. No simulation logic in this file.
+                                                               scene3d.js  -  Three.js r128 renderer for the COLREG CPA/TCPA simulator.
+                                                               Needs: THREE (r128 UMD) loaded first. No simulation logic in this file.
 
-                                             Global: Scene3D
+                                                               Global: Scene3D
 
-                                             World mapping : sim x = east, y = north (nm)  ->  three (x, 0, -y)
-                                             Floating origin: own ship is always drawn at (0,0,0); a vessel at sim (x,y)
-                                                              is drawn at (x-own.x, 0, -(y-own.y)).  Heading c deg true:
-                                                              group.rotation.y = -rad(c)   (bow is -Z in model space).
+                                                               World mapping : sim x = east, y = north (nm)  ->  three (x, 0, -y)
+                                                               Floating origin: own ship is always drawn at (0,0,0); a vessel at sim (x,y)
+                                                                                is drawn at (x-own.x, 0, -(y-own.y)).  Heading c deg true:
+                                                                                group.rotation.y = -rad(c)   (bow is -Z in model space).
 
-                                             API
-                                               Scene3D.init(canvas, opts?)     opts: { view, night, sel, onPick? (unused here) }
-                                               Scene3D.updateScene(state, settings)   call EVERY frame. state = Sim.getState(),
-                                                                               settings = state.settings (uses .range). Updates
-                                                                               ships, rings, camera, then renders.
-                                               Scene3D.render(state, settings) alias of updateScene
-                                               Scene3D.setView('orbit'|'chase'|'bridge')   smooth transition
-                                               Scene3D.recenter()              back to own ship, default angle and zoom
-                                               Scene3D.setNight(bool)          day / night palette
-                                               Scene3D.setConfig({view,night,sel,palette,range,overlay})   any subset
-                                                                               overlay:false hides the built-in COLLISION text (markers stay)
-                                               Scene3D.resize()                called automatically on window / container resize
-                                               Scene3D.getView()  Scene3D.getConfig()  Scene3D.dispose()
-                                               Scene3D.orbit                   { enabled } - set false while a ship is being dragged
+                                                               API
+                                                                 Scene3D.init(canvas, opts?)     opts: { view, night, sel, onPick? (unused here) }
+                                                                 Scene3D.updateScene(state, settings)   call EVERY frame. state = Sim.getState(),
+                                                                                                 settings = state.settings (uses .range). Updates
+                                                                                                 ships, rings, camera, then renders.
+                                                                 Scene3D.render(state, settings) alias of updateScene
+                                                                 Scene3D.setView('orbit'|'chase'|'bridge')   smooth transition
+                                                                 Scene3D.recenter()              back to own ship, default angle and zoom
+                                                                 Scene3D.setNight(bool)          day / night palette
+                                                                 Scene3D.setConfig({view,night,sel,palette,range,overlay})   any subset
+                                                                                                 overlay:false hides the built-in COLLISION text (markers stay)
+                                                                 Scene3D.resize()                called automatically on window / container resize
+                                                                 Scene3D.getView()  Scene3D.getConfig()  Scene3D.dispose()
+                                                                 Scene3D.orbit                   { enabled } - set false while a ship is being dragged
 
-                                             Views / keys are wired in index.html:  1 orbit, 2 chase, 3 bridge, C centre.
+                                                               Views / keys are wired in index.html:  1 orbit, 2 chase, 3 bridge, C centre.
 
-                                             Phase 4 overlays (all driven by state.results / settings, nothing computed here):
-                                               CPA-limit dashed ring, own 6-minute vector, per target: dashed own + target
-                                               vectors to the look-ahead point, predicted-position spheres, CPA line + label,
-                                               pulsing meeting ring, status colouring, "T3 . stand-on [ACT]" tags, COLLISION
-                                               text overlay + 3D markers.  Every dynamic ribbon / label reuses one buffer or
-                                               canvas, so nothing is allocated per frame.
+                                                               Phase 4 overlays (all driven by state.results / settings, nothing computed here):
+                                                                 CPA-limit dashed ring, own 6-minute vector, per target: dashed own + target
+                                                                 vectors to the look-ahead point, predicted-position spheres, CPA line + label,
+                                                                 pulsing meeting ring, status colouring, "T3 . stand-on [ACT]" tags, COLLISION
+                                                                 text overlay + 3D markers.  Every dynamic ribbon / label reuses one buffer or
+                                                                 canvas, so nothing is allocated per frame.
 
-                                             Phase 5 (night / day):
-                                               setNight() now FADES over ~1.8 s. Material colours, sea, fog, sky dome and light
-                                               rig are blended continuously between the day and night palettes; text and status
-                                               colours flip once at the half-way point.  At night every ship shows glowing
-                                               navigation lights (screen-size additive sprite + emissive core), taken from
-                                               COLREG.lightLayout() when the colreg state has lights, else a fallback set by
-                                               condition / type (fishing sidelights + sternlight only above 0.5 kn).  Up to 8
-                                               PointLights (2 per ship, fixed count so shaders never recompile) light the hulls.
-                                               By day the same ships show black day shapes (anchor ball, aground balls, JSON
-                                               shapes, or built-in NUC / RAM / CBD / fishing shapes).
-                                             =========================================================================== */
+                                                               Phase 5 (night / day):
+                                                                 setNight() now FADES over ~1.8 s. Material colours, sea, fog, sky dome and light
+                                                                 rig are blended continuously between the day and night palettes; text and status
+                                                                 colours flip once at the half-way point.  At night every ship shows glowing
+                                                                 navigation lights (screen-size additive sprite + emissive core), taken from
+                                                                 COLREG.lightLayout() when the colreg state has lights, else a fallback set by
+                                                                 condition / type (fishing sidelights + sternlight only above 0.5 kn).  Up to 8
+                                                                 PointLights (2 per ship, fixed count so shaders never recompile) light the hulls.
+                                                                 By day the same ships show black day shapes (anchor ball, aground balls, JSON
+                                                                 shapes, or built-in NUC / RAM / CBD / fishing shapes).
+                                                               =========================================================================== */
       (function (root) {
         "use strict";
         if (typeof THREE === "undefined") {
@@ -2948,8 +4091,8 @@
         };
 
         /* ---- ship model data -----------------------------------------------------
-                                             Model units = the 2D pixel units. [L, W] = length, half-beam (same as the 2D SIZE table).
-                                             Bow is -Z, starboard is +X.  REAL_NM = true length in nm, used in the chase / bridge views. */
+                                                               Model units = the 2D pixel units. [L, W] = length, half-beam (same as the 2D SIZE table).
+                                                               Bow is -Z, starboard is +X.  REAL_NM = true length in nm, used in the chase / bridge views. */
         const MODEL_DIMS = {
           large: [34, 3.4],
           tug: [18, 2.6],
@@ -2958,7 +4101,7 @@
         };
         const REAL_NM = { large: 0.13, tug: 0.06, fishing: 0.04, sail: 0.015 };
         /* how much bigger than true size ships are drawn (1 = true size). Hulls are drawn at this FIXED world size at every zoom,
-                                             so zooming is a real zoom and ships only overlap on screen when they really are that close. */
+                                                               so zooming is a real zoom and ships only overlap on screen when they really are that close. */
         const SHIP_MAG = (root.Sim && root.Sim.HULL_MAG) || 3;
         const MAG_REF = 3; // magnification the camera distances below were tuned for (chase / bridge scale by SHIP_MAG / MAG_REF)
         const PIP_PX = 16; // a hull shorter than ~14 px on screen is marked by a small constant-size dot (fades out as the hull grows)
@@ -3351,7 +4494,7 @@
           return m;
         }
         /* Screen-size label sprite with its OWN canvas + texture, redrawn only when the text or colour changes
-                                             (no cache growth, no per-frame allocation). Always faces the camera, drawn on top, with a halo for legibility. */
+                                                               (no cache growth, no per-frame allocation). Always faces the camera, drawn on top, with a halo for legibility. */
         function makeLabel(w, h, align) {
           const c = document.createElement("canvas");
           c.width = w;
@@ -3455,9 +4598,9 @@
         }
 
         /* Dashed (or solid) flat ribbon in a preallocated buffer, rewritten in place every frame.
-                                             line(x0,z0,x1,z1,halfWidth,dash,gap,y)   gap <= 0 gives one solid quad
-                                             ring(radius,halfWidth,dash,gap,y)        around the origin (own ship)
-                                             Widths and dash lengths are given in nm, so the caller passes (pixels * nm-per-pixel). */
+                                                               line(x0,z0,x1,z1,halfWidth,dash,gap,y)   gap <= 0 gives one solid quad
+                                                               ring(radius,halfWidth,dash,gap,y)        around the origin (own ship)
+                                                               Widths and dash lengths are given in nm, so the caller passes (pixels * nm-per-pixel). */
         function DashRibbon(maxDash, material) {
           const pos = new Float32Array(maxDash * 18),
             geom = new THREE.BufferGeometry();
@@ -3551,9 +4694,9 @@
         }
 
         /* ---- ocean: one big shaded plane that follows the camera; the waves are anchored to the world ---------------
-                                             Wave heights are never built as geometry. Seven travelling sine waves (wavelength 420 m down to 27 m, deep-water
-                                             speed) give the surface slope, which drives sky reflection (Fresnel), a sun glint, crest foam and haze. Each wave
-                                             fades out when it is smaller than a few pixels, so the far sea stays calm instead of shimmering. */
+                                                               Wave heights are never built as geometry. Seven travelling sine waves (wavelength 420 m down to 27 m, deep-water
+                                                               speed) give the surface slope, which drives sky reflection (Fresnel), a sun glint, crest foam and haze. Each wave
+                                                               fades out when it is smaller than a few pixels, so the far sea stays calm instead of shimmering. */
         const OCEAN_VS =
           "varying vec3 vW;\nvoid main(){ vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }";
         const OCEAN_FS = `
@@ -3704,8 +4847,8 @@ void main(){
         }
 
         /* Foam texture laid on the sea around every ship, in ship lengths (L): the plane spans 2.4 L across and 4 L along,
-                                             starting 0.6 L ahead of the centre. Top of the picture = bow. Bow wave, a foam ring along the hull, two Kelvin arms
-                                             and a propeller wash that fades astern. */
+                                                               starting 0.6 L ahead of the centre. Top of the picture = bow. Bow wave, a foam ring along the hull, two Kelvin arms
+                                                               and a propeller wash that fades astern. */
         function makeWakeTex() {
           const W = 256,
             H = 512,
@@ -3829,14 +4972,18 @@ void main(){
           return new THREE.Mesh(g, m);
         }
         /* ==== ship models, matched to the Anglo-Eastern reference pictures ================================
-                                             loftHull() builds a lofted hull from options; every type below uses it. Model units as before:
-                                             bow is -Z, starboard is +X, y = 0 is the sea. */
+                                                               loftHull() builds a lofted hull from options; every type below uses it. Model units as before:
+                                                               bow is -Z, starboard is +X, y = 0 is the sea. */
         function csMats() {
           if (mats.csTop) return;
           const std = (o) =>
             new THREE.MeshStandardMaterial(
               Object.assign(
-                { roughness: 0.55, metalness: 0.15, side: THREE.DoubleSide },
+                {
+                  roughness: 0.55,
+                  metalness: 0.15,
+                  side: THREE.DoubleSide,
+                },
                 o,
               ),
             );
@@ -3924,7 +5071,7 @@ void main(){
             gapSize: 0.1,
           });
           /* The Anglo-Eastern logo, traced from the supplied artwork (1000 x 1000 box, even-odd fill). aeLogo(ctx, centreX, centreY, diameter)
-                   draws it in gold; every ship texture below (hull decals, funnel, yacht sail) uses this one drawing. */
+                                     draws it in gold; every ship texture below (hull decals, funnel, yacht sail) uses this one drawing. */
           const AE_LOGO = new Path2D(
             "M567 998L635 985L687 966L719 952L769 924L801 901L828 879L859 848L884 821L912 783L945 726L972 662L989 598L996 561L998 515L997 509L994 506L989 506L920 525L910 530L908 535L901 584L886 636L877 661L851 712L824 752L800 781L778 803L743 832L712 853L688 867L646 886L637 888L633 885L631 876L631 523L634 512L643 507L981 416L988 412L989 404L981 371L967 324L948 279L933 251L913 218L890 187L865 157L835 127L807 103L776 81L716 46L666 25L636 15L591 5L552 0L546 3L544 12L544 435L540 441L532 444L466 463L458 463L456 458L456 10L454 3L449 0L425 2L385 10L350 19L283 46L220 83L187 107L153 137L125 167L98 201L76 234L49 283L39 306L20 359L7 423L2 482L2 489L5 493L12 493L81 475L88 471L91 464L97 424L103 400L114 361L137 307L174 250L210 208L251 172L301 139L339 120L355 113L361 112L365 115L366 123L366 479L364 488L356 493L17 584L11 589L11 601L20 642L27 662L48 714L68 752L87 783L105 808L131 840L159 868L192 896L239 930L289 957L364 985L405 994L449 1000L454 996L456 988L456 564L457 560L461 558L494 547L534 537L541 537L543 540L544 990L545 996L549 999ZM876 350L839 362L690 403L642 414L634 413L631 405L631 124L634 113L641 112L657 118L709 145L747 171L776 196L804 224L826 251L844 277L876 336L878 345ZM364 887L360 888L353 886L298 860L249 826L219 800L193 773L159 727L134 686L122 657L122 653L123 649L166 636L356 586L361 585L364 587L366 594L366 877Z",
           );
@@ -4078,7 +5225,11 @@ void main(){
               y,
               z + rk(y),
             ]; // a point on the side, just proud of the plating
-            return { red, side, blue: [red[red.length - 1], [bd, h, z + rk(h)]] };
+            return {
+              red,
+              side,
+              blue: [red[red.length - 1], [bd, h, z + rk(h)]],
+            };
           };
           const S = [];
           for (let i = 0; i <= N; i++) S.push(station(i / N));
@@ -5238,7 +6389,7 @@ void main(){
 
         /* ---- activity vessels (pilot boat, supply ship, towed / pushed barge), built as real hulls ----------- */
         /* Where a barge carries its lights: sidelights on the deck corners at the bow end and a sternlight at the stern end, both in the free
-           deck beyond the container stacks. Barge-local coordinates, taken from the hull's own deck width and height. */
+                             deck beyond the container stacks. Barge-local coordinates, taken from the hull's own deck width and height. */
         function bargeMounts(h, bl) {
           const zb = bl / 2 - 0.65,
             at = (z, sg) => {
@@ -5246,7 +6397,11 @@ void main(){
                 base = h.sheer(t);
               return { x: sg * (h.hd(t) - 0.3), y: base + 1.15, z, base };
             };
-          return { port: at(-zb, -1), stbd: at(-zb, 1), stern: Object.assign(at(zb, 1), { x: 0 }) };
+          return {
+            port: at(-zb, -1),
+            stbd: at(-zb, 1),
+            stern: Object.assign(at(zb, 1), { x: 0 }),
+          };
         }
         function buildRigBarge(g, bl, hwHint) {
           csMats();
@@ -5796,8 +6951,8 @@ void main(){
           return t;
         }
         /* ---- sun, moon and stars: a sky layer that follows the camera (world-fixed directions, drawn over the dome) ------------
-                                             Day: sun disc + glow (low and orange at sunset, pale and dim in fog). Night: moon, and a star field that twinkles.
-                                             The sun direction also drives the sea glint, so the glitter path lies under the sun (or the moon at night). */
+                                                               Day: sun disc + glow (low and orange at sunset, pale and dim in fog). Night: moon, and a star field that twinkles.
+                                                               The sun direction also drives the sea glint, so the glitter path lies under the sun (or the moon at night). */
         let sky = null,
           skyOn = true,
           skyEl = 0.31;
@@ -5809,7 +6964,7 @@ void main(){
           _sc = new THREE.Color(),
           _sc2 = new THREE.Color();
         /* Sea state and ship motion. The same 10 waves the ocean shader draws are sampled on the CPU (same directions, same
-                       formula, same clock), so every ship heaves, pitches and rolls on the waves you can see. Visual only. */
+                                         formula, same clock), so every ship heaves, pitches and rolls on the waves you can see. Visual only. */
         const SEA_LV = {
           calm: 0.5,
           slight: 1.0,
@@ -5890,10 +7045,10 @@ void main(){
           };
         }
         /* A barge on a tow line (or pushed ahead) floats on the water WHERE THE BARGE IS. It used to be fixed to the ship, so every pitch
-           or roll of the ship swung a barge 30+ units away up and down (flying, then sinking), and rig barges never rose with the waves.
-           This samples the same waves under the barge, then places it in its parent's frame so it sits on the surface.
-           v = the ship, sc = model scale, pm = parent-to-ship-frame matrix of the barge's parent, lx / lz = where the barge sits in the
-           ship's model units (x starboard, z astern), yaw = its swing relative to the ship (rad), bl = barge length (model units). */
+                             or roll of the ship swung a barge 30+ units away up and down (flying, then sinking), and rig barges never rose with the waves.
+                             This samples the same waves under the barge, then places it in its parent's frame so it sits on the surface.
+                             v = the ship, sc = model scale, pm = parent-to-ship-frame matrix of the barge's parent, lx / lz = where the barge sits in the
+                             ship's model units (x starboard, z astern), yaw = its swing relative to the ship (rad), bl = barge length (model units). */
         const _fm = new THREE.Matrix4(),
           _fd = new THREE.Matrix4(),
           _pm = new THREE.Matrix4(),
@@ -5944,7 +7099,7 @@ void main(){
           if (o.motion !== undefined) sea.motion = !!o.motion;
         }
         /* Ocean current (visual only): kn = rate, set = direction the water flows TOWARDS (degrees true). The water pattern is moved
-                       by kn x simulated hours, so it keeps pace with the ships whatever the time speed and stops when paused. */
+                                         by kn x simulated hours, so it keeps pace with the ships whatever the time speed and stops when paused. */
         let cur = { kn: 0, set: 90 },
           curOff = new THREE.Vector2(),
           curLast = null;
@@ -6193,9 +7348,9 @@ void main(){
         }
 
         /* ---- Rain and snow: GPU-animated particles in a box that follows the camera ---------------------------------
-                                   Every drop has a fixed random start in [0,1)^3; the vertex shader moves it down with the clock and wraps it
-                                   round the camera, so nothing is updated on the CPU. The box size follows the camera distance (bridge: fixed
-                                   and small), so the look is the same at any zoom. VISUAL ONLY: never read by Sim. */
+                                                     Every drop has a fixed random start in [0,1)^3; the vertex shader moves it down with the clock and wraps it
+                                                     round the camera, so nothing is updated on the CPU. The box size follows the camera distance (bridge: fixed
+                                                     and small), so the look is the same at any zoom. VISUAL ONLY: never read by Sim. */
         const RAIN_VS = `
 attribute float aEnd;
 uniform vec3 uCam; uniform float uS, uH, uTime, uRate, uLen;
@@ -6372,14 +7527,14 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* Lamp list for one vessel, in model units: [{x, y, z, col, r}].  JSON layout first (position tokens from
-                                             COLREG.lightLayout, the same maths as the 2D drawJSONLights), else the fallback set by condition then type. */
+                                                               COLREG.lightLayout, the same maths as the 2D drawJSONLights), else the fallback set by condition then type. */
         const RAM_ACTS = ["dredging", "cable", "mine_clearance", "replenishment"]; // Rule 3(g), same list as sim.js
         let postMat = null,
           postGeo = null; // lamp posts share one geometry and material
         /* Where lamps and day shapes really mount on each model (model units; x starboard, z astern, y up), measured from the
-           models themselves. A MAST role is a span {z, lo, hi} the lamps stack down from the top; a POINT role (aft, stern) is a
-           lamp height {hi, lo} on a short post standing on `base`; wing = the sidelight spot on the bridge (mirrored for port).
-           shape / shapeFwd = the mast span a stack of day shapes hangs on (underway / at anchor or aground). */
+                             models themselves. A MAST role is a span {z, lo, hi} the lamps stack down from the top; a POINT role (aft, stern) is a
+                             lamp height {hi, lo} on a short post standing on `base`; wing = the sidelight spot on the bridge (mirrored for port).
+                             shape / shapeFwd = the mast span a stack of day shapes hangs on (underway / at anchor or aground). */
         const ANCH = {
           large: {
             mast: { z: -3.5, lo: 7.9, hi: 10.8 }, // radar mast on the bridge
@@ -6423,13 +7578,18 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           },
         };
         /* One lamp position: role = "mast" | "fore" | "mid" | "aft" | "stern" | "wing" (side -1 port / +1 starboard); k of n lamps
-           stacked, first on top. Returns {x, y, z, base}: base is the height of the post the lamp stands on (none: it sits on a mast
-           or roof). */
+                             stacked, first on top. Returns {x, y, z, base}: base is the height of the post the lamp stands on (none: it sits on a mast
+                             or roof). */
         function lampAt(type, role, k, n, side) {
           const A = ANCH[type] || ANCH.large;
           if (role === "wing") {
             const w = A.wing;
-            return { x: (side || 1) * w.x, y: w.y - k * 0.9, z: w.z, base: k === 0 ? w.base : undefined };
+            return {
+              x: (side || 1) * w.x,
+              y: w.y - k * 0.9,
+              z: w.z,
+              base: k === 0 ? w.base : undefined,
+            };
           }
           const R = A[role] || A.mast,
             gap = n > 1 ? Math.min(1.1, (R.hi - R.lo) / (n - 1)) : 0;
@@ -6453,11 +7613,24 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             /* every lamp is mounted on a real structure of the model (see ANCH): add(role, k, n, colour, size, side) */
             add = (role, k, n, col, r, side) => {
               const p = lampAt(type, role, k, n, side);
-              out.push({ x: p.x, y: p.y, z: p.z, base: p.base, col, r: r || 1 });
+              out.push({
+                x: p.x,
+                y: p.y,
+                z: p.z,
+                base: p.base,
+                col,
+                r: r || 1,
+              });
             };
           const lay = root.COLREG ? root.COLREG.lightLayout(v) : null;
           if (lay && lay.length) {
-            const roleOf = { top: "mast", forward: "fore", mid: "mid", bottom: "aft", stern: "stern" };
+            const roleOf = {
+              top: "mast",
+              forward: "fore",
+              mid: "mid",
+              bottom: "aft",
+              stern: "stern",
+            };
             for (const l of lay) {
               if (fish && !moving && (l.side !== 0 || l.token === "stern")) continue; // fishing: sidelights + sternlight only when making way
               const n = l.colours.length,
@@ -6615,13 +7788,15 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           return { glow, core, c: new THREE.Color(), on: false, r: 1 };
         }
         /* Lights of the barges a ship tows or pushes: sidelights at the bow end, plus a sternlight on a barge in tow (Rule 24). They are
-           children of the barge, so they ride the waves with it. Rebuilt only when the set of barges changes. */
+                             children of the barge, so they ride the waves with it. Rebuilt only when the set of barges changes. */
         function refreshBargeLamps(s) {
           const list = [],
             tw = s.body && s.body.userData.tow;
           if (tw) list.push({ obj: tw.bg, towed: true });
           if (s.rig)
-            s.rig.fl.forEach((f) => list.push({ obj: f.obj, towed: f.kind === "flat" })); // flat = towed, model = pushed
+            s.rig.fl.forEach((f) =>
+              list.push({ obj: f.obj, towed: f.kind === "flat" }),
+            ); // flat = towed, model = pushed
           const sig = list.map((b) => b.obj.uuid + (b.towed ? "T" : "P")).join("|");
           if (sig === s.bSig) return;
           s.bSig = sig;
@@ -6673,8 +7848,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           const spec = lampSpec(v);
           (s.posts || []).forEach((m) => s.lampGroup.remove(m)); // lamp posts (shared geometry / material)
           s.posts = [];
-          postMat =
-            postMat || new THREE.MeshLambertMaterial({ color: "#59616a" });
+          postMat = postMat || new THREE.MeshLambertMaterial({ color: "#59616a" });
           postGeo = postGeo || new THREE.CylinderGeometry(0.07, 0.07, 1, 6);
           spec.forEach((d) => {
             if (d.base === undefined || d.y - d.base < 0.25) return;
@@ -7197,9 +8371,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* ---- view controller: a drag anywhere on the sea moves the view -------------------------------------------------
-                                             Orbit view:  one finger / left button = pan (the sea follows the pointer), right button / middle / Shift / Ctrl = turn and tilt,
-                                                          wheel or pinch = zoom, two-finger twist = turn, two-finger slide up / down = tilt.
-                                             Chase / bridge: a drag looks around.  A press on a ship is taken by input.js first (it drags the ship instead). */
+                                                               Orbit view:  one finger / left button = pan (the sea follows the pointer), right button / middle / Shift / Ctrl = turn and tilt,
+                                                                            wheel or pinch = zoom, two-finger twist = turn, two-finger slide up / down = tilt.
+                                                               Chase / bridge: a drag looks around.  A press on a ship is taken by input.js first (it drags the ship instead). */
         function recenter() {
           startTrans();
           orbit.focus = -1;
@@ -7391,8 +8565,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           sail: { w: 1.4, h: 0.45, roll: 0.07, pitch: 0.03 },
         };
         /* ---- Activity rigs: what each Activity looks like (fishing, towing, pushing, dredging, cable, mine clearance, pilotage,
-                       replenishment). Visual only. Everything is built in model units: bow -Z, stern +Z, starboard +X. Floating things go
-                       in s.flat (they stay at sea level), deck gear in s.model (it moves with the ship). ----------------------------- */
+                                         replenishment). Visual only. Everything is built in model units: bow -Z, stern +Z, starboard +X. Floating things go
+                                         in s.flat (they stay at sea level), deck gear in s.model (it moves with the ship). ----------------------------- */
         const ACT_RIG = {
           fishing: 1,
           towing: 1,
@@ -7981,7 +9155,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             }
             tw.afloat = sea.motion;
             tw.bg.updateMatrix();
-            const e = _fp.set(tw.tie[0], tw.tie[1], tw.tie[2]).applyMatrix4(tw.bg.matrix), // rope end on the barge, in the tug's frame
+            const e = _fp
+                .set(tw.tie[0], tw.tie[1], tw.tie[2])
+                .applyMatrix4(tw.bg.matrix), // rope end on the barge, in the tug's frame
               a = tw.start,
               pa = tw.rope.geometry.attributes.position;
             for (let i = 0; i <= 12; i++) {
@@ -8155,8 +9331,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         }
 
         /* Tag text after "Own": MY role, taken from the COLREG encounter of every target
-                                   (r.enc = own ship's duty towards that target). Several targets can give different
-                                   roles, e.g. give-way to T1 and stand-on to T3, so they are grouped by role. */
+                                                     (r.enc = own ship's duty towards that target). Several targets can give different
+                                                     roles, e.g. give-way to T1 and stand-on to T3, so they are grouped by role. */
         function ownRole(res) {
           const g = [],
             so = [],
@@ -8516,64 +9692,64 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== input.js ======== */
       /* ===========================================================================
-                                             input.js  -  pointer, wheel and keyboard input for the 3D COLREG simulator
-                                             Needs, already loaded:  three.js r128 (UMD),  sim.js (Sim),  scene3d.js (Scene3D)
-                                             Global: Input.   No simulation maths lives here: every change goes through
-                                             Sim.moveTarget / Sim.toggle / Sim.reset / Sim.setSettings and
-                                             Scene3D.setConfig / setView / setNight.
+                                                               input.js  -  pointer, wheel and keyboard input for the 3D COLREG simulator
+                                                               Needs, already loaded:  three.js r128 (UMD),  sim.js (Sim),  scene3d.js (Scene3D)
+                                                               Global: Input.   No simulation maths lives here: every change goes through
+                                                               Sim.moveTarget / Sim.toggle / Sim.reset / Sim.setSettings and
+                                                               Scene3D.setConfig / setView / setNight.
 
-                                             Usage (after Scene3D.init):
-                                               Input.init(canvas, { onAction(name, detail) { ...refresh your UI... } });
+                                                               Usage (after Scene3D.init):
+                                                                 Input.init(canvas, { onAction(name, detail) { ...refresh your UI... } });
 
-                                             POINTER (primary button / touch / pen)
-                                               - A THREE.Raycaster goes from the pointer through the camera to the sea plane
-                                                 (y = 0).  Hit testing compares the pointer with each ship's projected screen
-                                                 position (24 px for a mouse, 38 px for touch, the 2D values), nearest target
-                                                 first, then own ship.
-                                               - Press on a target: select it and start a drag.  The ship keeps the offset
-                                                 between the pointer and its centre (the 2D "grab" offset), and moves only after
-                                                 the pointer has travelled a few px, so a tap selects without nudging it.
-                                                 The new position is clamped to the placement limit (distance from own ship
-                                                 <= settings.range) and written with Sim.moveTarget(i, x, y), which is what the 2D
-                                                 pointermove did to tg[drag].x / .y.
-                                               - Press on own ship: select own (sel = -1).  Own ship is not draggable.
-                                               - While a ship is held, the orbit camera is switched off (Scene3D.orbit.enabled =
-                                                 false) and the press never reaches Scene3D's own orbit handler; on release it is
-                                                 switched back on.  A press on empty sea orbits as before.
-                                               - Only one pointer may start a ship drag; a second finger is ignored, and a ship
-                                                 drag never starts while another pointer is already down.
-                                               - Dragging is off in the bridge view (the sea is seen at a grazing angle); selecting
-                                                 still works there.
-                                               - Hover (mouse): cursor 'grab' over a target, 'pointer' over own ship.
-                                             WHEEL  (captured before Scene3D's own wheel handler, which therefore never runs)
-                                               - Zoom in orbit, chase and bridge (Scene3D.zoomBy), Shift + wheel too.
-                                             KEYBOARD
-                                               Space  start / pause    only when focus is on the page body or the canvas
-                                               R      reset            N  day / night
-                                               1 orbit  2 chase  3 bridge  C centre the view
-                                               Esc    closes the info panel (default #zpanel, button #zinfo; or opts.onEscape)
-                                               Letters and digits are ignored while typing in an input / select / textarea,
-                                               and with Ctrl / Alt / Meta held.
+                                                               POINTER (primary button / touch / pen)
+                                                                 - A THREE.Raycaster goes from the pointer through the camera to the sea plane
+                                                                   (y = 0).  Hit testing compares the pointer with each ship's projected screen
+                                                                   position (24 px for a mouse, 38 px for touch, the 2D values), nearest target
+                                                                   first, then own ship.
+                                                                 - Press on a target: select it and start a drag.  The ship keeps the offset
+                                                                   between the pointer and its centre (the 2D "grab" offset), and moves only after
+                                                                   the pointer has travelled a few px, so a tap selects without nudging it.
+                                                                   The new position is clamped to the placement limit (distance from own ship
+                                                                   <= settings.range) and written with Sim.moveTarget(i, x, y), which is what the 2D
+                                                                   pointermove did to tg[drag].x / .y.
+                                                                 - Press on own ship: select own (sel = -1).  Own ship is not draggable.
+                                                                 - While a ship is held, the orbit camera is switched off (Scene3D.orbit.enabled =
+                                                                   false) and the press never reaches Scene3D's own orbit handler; on release it is
+                                                                   switched back on.  A press on empty sea orbits as before.
+                                                                 - Only one pointer may start a ship drag; a second finger is ignored, and a ship
+                                                                   drag never starts while another pointer is already down.
+                                                                 - Dragging is off in the bridge view (the sea is seen at a grazing angle); selecting
+                                                                   still works there.
+                                                                 - Hover (mouse): cursor 'grab' over a target, 'pointer' over own ship.
+                                                               WHEEL  (captured before Scene3D's own wheel handler, which therefore never runs)
+                                                                 - Zoom in orbit, chase and bridge (Scene3D.zoomBy), Shift + wheel too.
+                                                               KEYBOARD
+                                                                 Space  start / pause    only when focus is on the page body or the canvas
+                                                                 R      reset            N  day / night
+                                                                 1 orbit  2 chase  3 bridge  C centre the view
+                                                                 Esc    closes the info panel (default #zpanel, button #zinfo; or opts.onEscape)
+                                                                 Letters and digits are ignored while typing in an input / select / textarea,
+                                                                 and with Ctrl / Alt / Meta held.
 
-                                             Options
-                                               hit            { fine: 24, coarse: 38 }       hit radius, px
-                                               dragThreshold  { fine: 3,  coarse: 8 }        px before a press becomes a drag
-                                               infoPanel, infoButton   element or selector   (defaults '#zpanel', '#zinfo')
-                                               onEscape()     return true if you closed something yourself
-                                               getState()     default Sim.getState
-                                               getCamera()    default Scene3D.getCamera, else captured (see below)
-                                               onAction(name, detail)  called AFTER the default action:
-                                                  'select' {sel}   'dragstart' {sel}   'drag' {sel,x,y}   'dragend' {sel}
-                                                  'range' {range}  'toggle' {running}  'reset'  'night' {night}
-                                                  'view' {view}    'escape'
+                                                               Options
+                                                                 hit            { fine: 24, coarse: 38 }       hit radius, px
+                                                                 dragThreshold  { fine: 3,  coarse: 8 }        px before a press becomes a drag
+                                                                 infoPanel, infoButton   element or selector   (defaults '#zpanel', '#zinfo')
+                                                                 onEscape()     return true if you closed something yourself
+                                                                 getState()     default Sim.getState
+                                                                 getCamera()    default Scene3D.getCamera, else captured (see below)
+                                                                 onAction(name, detail)  called AFTER the default action:
+                                                                    'select' {sel}   'dragstart' {sel}   'drag' {sel,x,y}   'dragend' {sel}
+                                                                    'range' {range}  'toggle' {running}  'reset'  'night' {night}
+                                                                    'view' {view}    'escape'
 
-                                             Assumptions about scene3d.js: own ship sits at the scene origin (floating origin)
-                                             and a vessel at sim (x, y) is drawn at (x - own.x, 0, -(y - own.y)).
-                                             The camera is read from opts.getCamera() or Scene3D.getCamera() if either exists;
-                                             otherwise it is captured from the PerspectiveCamera that scene3d.js updates every
-                                             frame, so scene3d.js needs no change.  (Adding  getCamera: () => camera  to the
-                                             Scene3D export is a one-line way to make it explicit.)
-                                             =========================================================================== */
+                                                               Assumptions about scene3d.js: own ship sits at the scene origin (floating origin)
+                                                               and a vessel at sim (x, y) is drawn at (x - own.x, 0, -(y - own.y)).
+                                                               The camera is read from opts.getCamera() or Scene3D.getCamera() if either exists;
+                                                               otherwise it is captured from the PerspectiveCamera that scene3d.js updates every
+                                                               frame, so scene3d.js needs no change.  (Adding  getCamera: () => camera  to the
+                                                               Scene3D export is a one-line way to make it explicit.)
+                                                               =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -8634,10 +9810,10 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             t.isContentEditable);
 
         /* The camera, in order of preference:
-                                               1. opts.getCamera()           2. Scene3D.getCamera()
-                                               3. the PerspectiveCamera that scene3d.js updates every frame (captured from
-                                                  THREE.PerspectiveCamera.prototype.updateProjectionMatrix, because in r128
-                                                  WebGLRenderer.render is a per-instance method and cannot be wrapped). */
+                                                                 1. opts.getCamera()           2. Scene3D.getCamera()
+                                                                 3. the PerspectiveCamera that scene3d.js updates every frame (captured from
+                                                                    THREE.PerspectiveCamera.prototype.updateProjectionMatrix, because in r128
+                                                                    WebGLRenderer.render is a per-instance method and cannot be wrapped). */
         function hookCamera() {
           if ((o && o.getCamera) || (S() && typeof S().getCamera === "function"))
             return;
@@ -9072,30 +10248,30 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== ui.js ======== */
       /* ===========================================================================
-                                             ui.js  -  the side panel of the 3D COLREG CPA/TCPA simulator
-                                             Ported from colreg_2d_fixed.html (ui(), types(), syncT(), setZone(), zinfo(),
-                                             setMode() and the slider / button handlers) with the same behaviour and the
-                                             same CSS colour classes (SAFE CAUTION DANGER COLLISION COLLIDED GW SO KC CK dimtxt).
+                                                               ui.js  -  the side panel of the 3D COLREG CPA/TCPA simulator
+                                                               Ported from colreg_2d_fixed.html (ui(), types(), syncT(), setZone(), zinfo(),
+                                                               setMode() and the slider / button handlers) with the same behaviour and the
+                                                               same CSS colour classes (SAFE CAUTION DANGER COLLISION COLLIDED GW SO KC CK dimtxt).
 
-                                             Needs, already loaded:  colreg.js (COLREG), sim.js (Sim), scene3d.js (Scene3D)
-                                             Optional:               input.js (Input) - keyboard, wheel and 3D pointer input
-                                             Global: UI
+                                                               Needs, already loaded:  colreg.js (COLREG), sim.js (Sim), scene3d.js (Scene3D)
+                                                               Optional:               input.js (Input) - keyboard, wheel and 3D pointer input
+                                                               Global: UI
 
-                                             All simulation changes go through Sim (setSettings, applyZone, toggle, reset,
-                                             placeTarget, setTargetCourse/Speed, setVesselType/Config).  Nothing is computed
-                                             here: every number shown comes from Sim.getState().
+                                                               All simulation changes go through Sim (setSettings, applyZone, toggle, reset,
+                                                               placeTarget, setTargetCourse/Speed, setVesselType/Config).  Nothing is computed
+                                                               here: every number shown comes from Sim.getState().
 
-                                             API
-                                               UI.init({ night })          wire the panel; call once, after Sim.init()
-                                               UI.update(state)            refresh tables, banner, log, outputs (main.js: every 4th frame)
-                                               UI.refreshAll()             rebuild everything (after Reset or a new scenario)
-                                               UI.onAction(name, detail)   hook for Input.init({ onAction }): select, view, night,
-                                                                           range, reset, toggle
-                                               UI.setSel(i) / UI.getSel()  selected vessel, -1 = own ship, 0..2 = T1..T3
-                                               UI.setMode(night)           day / night (page theme + Scene3D.setNight)
+                                                               API
+                                                                 UI.init({ night })          wire the panel; call once, after Sim.init()
+                                                                 UI.update(state)            refresh tables, banner, log, outputs (main.js: every 4th frame)
+                                                                 UI.refreshAll()             rebuild everything (after Reset or a new scenario)
+                                                                 UI.onAction(name, detail)   hook for Input.init({ onAction }): select, view, night,
+                                                                                             range, reset, toggle
+                                                                 UI.setSel(i) / UI.getSel()  selected vessel, -1 = own ship, 0..2 = T1..T3
+                                                                 UI.setMode(night)           day / night (page theme + Scene3D.setNight)
 
-                                             Keyboard (Space, R, N, 1-4, Esc), the wheel and pointer picking belong to input.js.
-                                             =========================================================================== */
+                                                               Keyboard (Space, R, N, 1-4, Esc), the wheel and pointer picking belong to input.js.
+                                                               =========================================================================== */
       (function (root) {
         "use strict";
 
@@ -9105,6 +10281,11 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         const MAP = {
           oc: "ownCourse",
           os: "ownSpeed",
+          wd: "windFrom",
+          vz: "visibilityNm",
+          wk: "windKn",
+          ck: "currentKn",
+          cs: "currentSet",
           cl: "cpaLimit",
           tl: "tcpaAlarm",
           ms: "timeScale",
@@ -9112,6 +10293,11 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
         const OUT = [
           ["oc", "ocv", (v) => v + "°"],
           ["os", "osv", (v) => v + " kn"],
+          ["wd", "wdv", (v) => v + "\u00b0"],
+          ["vz", "vzv", (v) => v + " nm"],
+          ["wk", "wkv", (v) => v + " kn"],
+          ["ck", "ckv", (v) => v + " kn"],
+          ["cs", "csv", (v) => v + "\u00b0"],
           ["cl", "clv", (v) => v + " nm"],
           ["tl", "tlv", (v) => v + " min"],
           ["ms", "msv", (v) => v + "x"],
@@ -9153,6 +10339,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           for (const id in MAP) if (idle($(id))) $(id).value = s[MAP[id]];
           if (idle($("zone"))) $("zone").value = s.zone;
           if (idle($("ai"))) $("ai").checked = !!s.autoAction;
+          if (idle($("ap"))) $("ap").checked = !!s.ownAuto;
+          if (idle($("nt"))) $("nt").checked = !!s.night;
         }
 
         /* ---- navigation zones (was setZone) ------------------------------------------------ */
@@ -9435,7 +10623,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
                 0,
                 Math.min(
                   SPD_MAX,
-                  Math.round((v.speed + d * (big ? 2 : 0.5)) * 10) / 10,
+                  Math.round((+st.settings.ownSpeed + d * (big ? 2 : 0.5)) * 10) / 10,
                 ),
               );
             Sim.setSettings({ ownSpeed: sp });
@@ -9444,7 +10632,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             const d = k === "ArrowRight" ? 1 : -1, // right = starboard = course increases
               c =
                 Math.round(
-                  ((((v.course + d * (big ? 5 : 1)) % 360) + 360) % 360) * 10,
+                  ((((+st.settings.ownCourse + d * (big ? 5 : 1)) % 360) + 360) %
+                    360) *
+                    10,
                 ) / 10;
             Sim.setSettings({ ownCourse: c });
             keyHud(
@@ -9576,6 +10766,7 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               e = r.enc,
               f = r.encRev;
             txt(c[1], e.enc);
+            c[1].title = (e.why || []).join(" ");
             txt(c[2], e.role);
             txt(c[3], f.role + (r.acting ? " (acting)" : ""));
             txt(c[4], e.rule);
@@ -9623,6 +10814,52 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             $("mlog"),
             st.log.length ? st.log.join("\n") : "No avoiding action taken yet.",
           );
+          {
+            const ap = st.autopilot,
+              p = ap && ap.on && ap.plan;
+            let s = "";
+            if (p) {
+              s =
+                "Own-ship decision vs " +
+                p.vs +
+                " (" +
+                p.rule +
+                ", " +
+                p.stage +
+                ")\n" +
+                (p.why[0] || "") +
+                "\ncourse speed minCPA  ok  cost\n";
+              p.rows.forEach((c) => {
+                s +=
+                  (c.chosen ? "> " : "  ") +
+                  String(c.course).padStart(4) +
+                  " " +
+                  c.speed.toFixed(1).padStart(5) +
+                  " " +
+                  (c.minCpa === null ? "  -  " : c.minCpa.toFixed(2).padStart(5)) +
+                  "  " +
+                  (c.ok ? "yes" : "no ") +
+                  " " +
+                  c.cost.toFixed(2) +
+                  (c.viol ? "  ! " + c.viol : "") +
+                  "\n";
+              });
+              s +=
+                "(best 8 of " +
+                p.candidates +
+                " candidates, each scored against every closing vessel)";
+              const r = ap.records[0];
+              if (r)
+                s +=
+                  "\nLast avoidance: " +
+                  r.vs +
+                  ", passed at " +
+                  r.minRange.toFixed(2) +
+                  " nm, " +
+                  (r.effective ? "effective" : "NOT effective");
+            }
+            txt($("aptab"), s);
+          }
 
           syncSliders();
           syncLive(st);
@@ -9680,6 +10917,8 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
               Sim.setSettings({ [MAP[id]]: +$(id).value });
               outputs();
             };
+          $("ap").onchange = () => Sim.setSettings({ ownAuto: $("ap").checked });
+          $("nt").onchange = () => Sim.setSettings({ night: $("nt").checked });
           $("ai").onchange = () => Sim.setSettings({ autoAction: $("ai").checked });
           addEventListener("keydown", shipKeys);
           const spa = $("spanim");
@@ -9773,14 +11012,25 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
       })(typeof window !== "undefined" ? window : globalThis);
     </script>
     <script>
-      /* Environment controls: visual only; talk to Scene3D, never to Sim. */
+      /* Environment controls: the preset changes the drawing (Scene3D) and sets the simulated visibility (Sim). */
       (function () {
+        const ENV_VIS = {
+          clear: 10,
+          sunset: 10,
+          fog: 0.8,
+          dense: 0.2,
+          rain: 1.5,
+          snow: 1.0,
+        }; // simulated visibility, nm
+
         const sel = document.getElementById("envp"),
           fx = document.getElementById("lowfx");
         if (!sel || !fx || !window.Scene3D) return;
-        sel.addEventListener("change", () =>
-          Scene3D.setEnvironment({ preset: sel.value }),
-        );
+        sel.addEventListener("change", () => {
+          Scene3D.setEnvironment({ preset: sel.value });
+          if (window.Sim && ENV_VIS[sel.value] !== undefined)
+            Sim.setSettings({ visibilityNm: ENV_VIS[sel.value] });
+        });
         fx.addEventListener("change", () =>
           Scene3D.setEnvironment({ lowFx: fx.checked }),
         );
@@ -9931,6 +11181,77 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             g.arc(cx, cy, Math.min(lim * k, R), 0, 7);
             g.stroke();
             g.setLineDash([]);
+          }
+          // navigation features: channels (dashed), traffic lanes (dotted) and zones (shaded), hazards and buoys
+          try {
+            const nv = st.nav;
+            if (nv) {
+              const rectPath = (f) => {
+                const nx = (f.uy * f.w) / 2,
+                  ny = (-f.ux * f.w) / 2;
+                g.beginPath();
+                [
+                  [f.x1 + nx, f.y1 + ny],
+                  [f.x2 + nx, f.y2 + ny],
+                  [f.x2 - nx, f.y2 - ny],
+                  [f.x1 - nx, f.y1 - ny],
+                ].forEach((p, i) => {
+                  const q = P(p[0], p[1]);
+                  if (i) g.lineTo(q[0], q[1]);
+                  else g.moveTo(q[0], q[1]);
+                });
+                g.closePath();
+              };
+              g.lineWidth = 1;
+              g.strokeStyle = col.dim;
+              g.fillStyle = col.dim;
+              g.setLineDash([6, 3]);
+              nv.channels.forEach((f) => {
+                rectPath(f);
+                g.stroke();
+              });
+              g.setLineDash([2, 3]);
+              nv.lanes.forEach((f) => {
+                rectPath(f);
+                g.stroke();
+                const m = P((f.x1 + f.x2) / 2, (f.y1 + f.y2) / 2),
+                  e = P(
+                    (f.x1 + f.x2) / 2 + f.ux * 0.6,
+                    (f.y1 + f.y2) / 2 + f.uy * 0.6,
+                  );
+                g.beginPath();
+                g.moveTo(m[0], m[1]);
+                g.lineTo(e[0], e[1]);
+                g.stroke();
+              });
+              g.globalAlpha = 0.25;
+              nv.zones.forEach((f) => {
+                rectPath(f);
+                g.fill();
+              });
+              g.globalAlpha = 1;
+              g.setLineDash([]);
+              nv.hazards.forEach((z) => {
+                const q = P(z.x, z.y);
+                g.beginPath();
+                g.arc(q[0], q[1], Math.max(3, z.r * k), 0, 7);
+                g.stroke();
+                g.fillText("x", q[0] - 3, q[1] + 4);
+              });
+              nv.buoys.forEach((b) => {
+                const q = P(b.x, b.y);
+                g.beginPath();
+                g.moveTo(q[0], q[1] - 4);
+                g.lineTo(q[0] + 4, q[1]);
+                g.lineTo(q[0], q[1] + 4);
+                g.lineTo(q[0] - 4, q[1]);
+                g.closePath();
+                g.stroke();
+              });
+            }
+          } catch (e) {
+            g.setLineDash([]);
+            g.globalAlpha = 1; // an overlay problem must never stop the radar
           }
           // own ship: heading line (heading = course in this sim) and 6-min vector
           const ov = st.ownVecEnd,
@@ -10146,7 +11467,69 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             expect: null,
             env: "fog",
             obj: "Vessels not in sight of one another: proceed at a safe speed, use radar, and avoid altering to port for a vessel forward of the beam.",
-            note: "Rule 19 replaces Rules 13-17 here. The encounter table classifies as if in sight, so treat it as geometry only. Fog is a visual effect.",
+            note: "Visibility is 0.8 nm, so T1 (8 nm away) is detected by radar alone and is not in sight: Rule 19 applies instead of Rules 13-17. There is no give-way or stand-on vessel; each vessel avoids under R19(d). Once the vessels are within the visual range, Rules 11-18 apply again.",
+          },
+          {
+            id: "channel",
+            name: "9. Narrow channel (Rule 9)",
+            own: { course: 0, speed: 6, type: "sail" },
+            targets: [
+              { type: "large", x: 0, y: 6, course: 180, speed: 8, channelOnly: true },
+            ],
+            zone: "harbour",
+            nav: {
+              channels: [{ id: "the channel", x1: 0, y1: -6, x2: 0, y2: 16, w: 1.5 }],
+              buoys: [
+                { x: 0.9, y: 2, kind: "starboard" },
+                { x: -0.9, y: 2, kind: "port" },
+                { x: 0.9, y: 9, kind: "starboard" },
+                { x: -0.9, y: 9, kind: "port" },
+              ],
+            },
+            expect: ["GW"],
+            obj: "A sailing vessel in a narrow channel meets a vessel that can navigate only within it: the sailing vessel must not impede her passage (R9(b)). The channel limits restrict how far the avoiding action can go. Switch on the own autopilot to see it.",
+            note: "The channel is a hard limit for the planner. Rule 9(a) (keep to the starboard side) is not modelled. In a tight channel the autopilot may alternate between avoiding and returning.",
+          },
+          {
+            id: "tss",
+            name: "10. Traffic separation scheme (Rule 10)",
+            own: { course: 0, speed: 10 },
+            targets: [{ type: "large", x: 5, y: 6, course: 270, speed: 10 }],
+            nav: {
+              lanes: [
+                { id: "northbound lane", x1: 0, y1: -8, x2: 0, y2: 16, w: 1.2 },
+                { id: "southbound lane", x1: -2.4, y1: 16, x2: -2.4, y2: -8, w: 1.2 },
+              ],
+              zones: [
+                { id: "separation zone", x1: -1.2, y1: -8, x2: -1.2, y2: 16, w: 0.8 },
+              ],
+            },
+            expect: ["GW"],
+            obj: "Own ship follows the northbound lane and a power-driven vessel crosses from starboard. Own ship gives way (R15), but inside the lane her course may differ from the traffic flow by at most 30 degrees (R10(b)(i)) and she may not enter the separation zone, so a speed reduction is used as well. Switch on the own autopilot.",
+            note: "Rule 10 is modelled for lane direction, separation zones, crossing angle and 10(i),(j). Joining and leaving, inshore traffic zones and 10(h) anchoring are not.",
+          },
+          {
+            id: "hazard",
+            name: "11. Limited sea room (Rules 8 and 14)",
+            own: { course: 0, speed: 10 },
+            targets: [{ type: "large", x: 0.2, y: 9, course: 180, speed: 10 }],
+            nav: {
+              hazards: [{ id: "the shoal", x: 1.8, y: 3.5, r: 1.2 }],
+              buoys: [{ x: 1.8, y: 2.1, kind: "cardinal" }],
+            },
+            expect: ["HO"],
+            obj: "Head-on with a shoal close on the starboard side. The planner rejects any course that would enter the shoal's clearance and re-plans when the avoiding course turns unsafe. A manual own ship that holds or turns into the shoal runs aground.",
+            note: "Grounding is a simulation event: the vessel becomes aground, logged, and stays there.",
+          },
+          {
+            id: "current",
+            name: "12. Strong current and wind",
+            own: { course: 0, speed: 10 },
+            targets: [T(355, 8, 175, 8)],
+            sea: { currentSet: 90, currentKn: 3, windFrom: 300, windKn: 25 },
+            expect: ["HO"],
+            obj: "Head-on in a 3 knot current setting east and a 25 knot wind from 300 degrees. Every vessel is set sideways: heading and course over ground differ, and CPA and TCPA are computed from the ground motion.",
+            note: "Ground velocity = through-water velocity + current + leeway. Leeway per knot of wind is an assumption by vessel type.",
           },
         ];
 
@@ -10183,6 +11566,16 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
           ) {
             const p = sc.env || "clear";
             root.Scene3D.setEnvironment({ preset: p });
+            root.Sim.setSettings({
+              visibilityNm: {
+                clear: 10,
+                sunset: 10,
+                fog: 0.8,
+                dense: 0.2,
+                rain: 1.5,
+                snow: 1.0,
+              }[p],
+            });
             if (envp) envp.value = p;
           }
           envFromScenario = !!sc.env;
@@ -10219,19 +11612,19 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
     <script>
       /* ======== main.js ======== */
       /* ===========================================================================
-                                             main.js  -  boot sequence and frame loop of the 3D COLREG CPA/TCPA simulator
-                                             Load order (this file):  three r128 -> embedded data -> colreg -> sim -> scene3d -> input -> ui -> main
+                                                               main.js  -  boot sequence and frame loop of the 3D COLREG CPA/TCPA simulator
+                                                               Load order (this file):  three r128 -> embedded data -> colreg -> sim -> scene3d -> input -> ui -> main
 
-                                             boot():  Sim.init()   loads colreg.json (built-in 9-state fallback if it is missing or
-                                                                   the page is opened from file://), then builds a random scenario
-                                                      UI.init()    side panel, tables, sliders, theme
-                                                      Scene3D.init + Input.init   3D scene, pointer / wheel / keyboard
-                                                      requestAnimationFrame(loop)
+                                                               boot():  Sim.init()   loads colreg.json (built-in 9-state fallback if it is missing or
+                                                                                     the page is opened from file://), then builds a random scenario
+                                                                        UI.init()    side panel, tables, sliders, theme
+                                                                        Scene3D.init + Input.init   3D scene, pointer / wheel / keyboard
+                                                                        requestAnimationFrame(loop)
 
-                                             loop(): same order as the 2D loop():
-                                                      Sim.step(dt)  ->  Scene3D.updateScene(state)  ->  every 4th frame UI.update(state)
-                                             If WebGL is not available the side panel and the simulation still run; a message is shown.
-                                             =========================================================================== */
+                                                               loop(): same order as the 2D loop():
+                                                                        Sim.step(dt)  ->  Scene3D.updateScene(state)  ->  every 4th frame UI.update(state)
+                                                               If WebGL is not available the side panel and the simulation still run; a message is shown.
+                                                               =========================================================================== */
       (function () {
         "use strict";
 
@@ -10294,7 +11687,9 @@ void main(){ float d = length(gl_PointCoord - 0.5); float a = uAlpha * vA * smoo
             if (!window.Scene3D)
               throw new Error("three.js could not be loaded, check the connection");
             Scene3D.init(cv, { view: "orbit", night, sel: UI.getSel() });
-            Input.init(cv, { onAction: (name, detail) => UI.onAction(name, detail) });
+            Input.init(cv, {
+              onAction: (name, detail) => UI.onAction(name, detail),
+            });
             sceneOK = true;
           } catch (e) {
             showError(
